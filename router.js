@@ -90,6 +90,7 @@ export default function Routers() {
       {/* <BottomTabs /> */}
       <Stack.Navigator headerShown={false} >
         <Stack.Screen name="Home" component={BottomTabs} />
+        {/* Bottom Tab Bar is hidden for the following screens */}
         <Stack.Screen 
           name="Edit Diet" 
           component={EditDietScreen}
