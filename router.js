@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Button, Text, View } from 'react-native';
+import { Button, Text, View, TouchableWithoutFeedback } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, HeaderBackButton } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -15,6 +15,7 @@ import EditDietScreen from "./screens/diet/EditDietScreen"
 
 // Exercise Screens
 import SettingsScreen from "./screens/ExerciseScreenMain"
+import { Header } from 'react-native/Libraries/NewAppScreen';
 
 // Stacks
 const HomeStack = createStackNavigator();
@@ -34,7 +35,6 @@ function DietStackScreen() {
     return (
         <DietStack.Navigator>
             <DietStack.Screen name="Diet Main" component={DietScreenMain} />
-            {/* <DietStack.Screen name="Edit Diet" component={EditDietScreen} /> */}
         </DietStack.Navigator>
     )
 }
@@ -68,7 +68,6 @@ function BottomTabs() {
               iconName = 'ios-pulse';
             }
 
-            // You can return any component that you like here!
             return <Ionicons name={iconName} size={size} color={color} />;
           },
         })}
@@ -77,22 +76,26 @@ function BottomTabs() {
           inactiveTintColor: 'gray',
         }}
     >
-    <Tab.Screen name="Home" component={HomeStackScreen} />
-    <Tab.Screen name="Diet" component={DietStackScreen} />
-    <Tab.Screen name="Exercise" component={ExerciseStackScreen} />
+    <Tab.Screen name="Home" options={{headerShown: false}} component={HomeStackScreen} />
+    <Tab.Screen name="Diet" options={{headerShown: false}} component={DietStackScreen} />
+    <Tab.Screen name="Exercise" options={{headerShown: false}} component={ExerciseStackScreen} />
     </Tab.Navigator>
   )
 }
 
-// const Stack = createStackNavigator();
+const Stack = createStackNavigator();
 export default function Routers() {
   return (
     <NavigationContainer>
-      <BottomTabs />
-      {/* <Stack.Navigator>
+      {/* <BottomTabs /> */}
+      <Stack.Navigator headerShown={false} >
         <Stack.Screen name="Home" component={BottomTabs} />
-        <Stack.Screen name="Edit Diet" component={EditDietScreen} />
-      </Stack.Navigator> */}
+        <Stack.Screen 
+          name="Edit Diet" 
+          component={EditDietScreen}
+          options={EditDietScreen.navigationOptions} 
+          />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
