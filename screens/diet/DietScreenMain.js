@@ -6,8 +6,8 @@ export default function DietScreenMain({ navigation }) {
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Diet Screen Main</Text>
         <Button
-          title="Go to Details"
-          onPress={() => navigation.navigate('Details')}
+          title="Edit Diet"
+          onPress={() => navigation.navigate('Edit Diet')}
         />
       </View>
     );

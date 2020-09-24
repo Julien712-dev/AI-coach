@@ -7,9 +7,14 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // Importing Screens
 import HomeScreen from "./screens/HomeScreen"
-import DietScreenMain from "./screens/DietScreenMain"
-import SettingsScreen from "./screens/ExerciseScreenMain"
 import DetailsScreen from "./screens/DetailsScreen"
+
+// Diet Screens
+import DietScreenMain from "./screens/diet/DietScreenMain"
+import EditDietScreen from "./screens/diet/EditDietScreen"
+
+// Exercise Screens
+import SettingsScreen from "./screens/ExerciseScreenMain"
 
 // Stacks
 const HomeStack = createStackNavigator();
@@ -29,7 +34,7 @@ function DietStackScreen() {
     return (
         <DietStack.Navigator>
             <DietStack.Screen name="Diet Main" component={DietScreenMain} />
-            <DietStack.Screen name="Details" component={DetailsScreen} />
+            {/* <DietStack.Screen name="Edit Diet" component={EditDietScreen} /> */}
         </DietStack.Navigator>
     )
 }
@@ -45,37 +50,49 @@ function ExerciseStackScreen() {
   );
 }
 
+// Bottom Tab - Home, Diet and Exercise
 const Tab = createBottomTabNavigator();
 
+function BottomTabs() {
+  return (
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+
+            if (route.name === 'Home') {
+              iconName = focused ? 'ios-list-box' : 'ios-list';
+            } else if (route.name === 'Diet') {
+              iconName = 'ios-restaurant'
+            } else if (route.name === 'Exercise') {
+              iconName = 'ios-pulse';
+            }
+
+            // You can return any component that you like here!
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+        })}
+        tabBarOptions={{
+          activeTintColor: 'dodgerblue',
+          inactiveTintColor: 'gray',
+        }}
+    >
+    <Tab.Screen name="Home" component={HomeStackScreen} />
+    <Tab.Screen name="Diet" component={DietStackScreen} />
+    <Tab.Screen name="Exercise" component={ExerciseStackScreen} />
+    </Tab.Navigator>
+  )
+}
+
+// const Stack = createStackNavigator();
 export default function Routers() {
   return (
     <NavigationContainer>
-      <Tab.Navigator
-              screenOptions={({ route }) => ({
-                tabBarIcon: ({ focused, color, size }) => {
-                  let iconName;
-      
-                  if (route.name === 'Home') {
-                    iconName = focused ? 'ios-list-box' : 'ios-list';
-                  } else if (route.name === 'Diet') {
-                    iconName = 'ios-restaurant'
-                  } else if (route.name === 'Exercise') {
-                    iconName = 'ios-pulse';
-                  }
-      
-                  // You can return any component that you like here!
-                  return <Ionicons name={iconName} size={size} color={color} />;
-                },
-              })}
-              tabBarOptions={{
-                activeTintColor: 'tomato',
-                inactiveTintColor: 'gray',
-              }}
-        >
-        <Tab.Screen name="Home" component={HomeStackScreen} />
-        <Tab.Screen name="Diet" component={DietStackScreen} />
-        <Tab.Screen name="Exercise" component={ExerciseStackScreen} />
-      </Tab.Navigator>
+      <BottomTabs />
+      {/* <Stack.Navigator>
+        <Stack.Screen name="Home" component={BottomTabs} />
+        <Stack.Screen name="Edit Diet" component={EditDietScreen} />
+      </Stack.Navigator> */}
     </NavigationContainer>
   );
 }
