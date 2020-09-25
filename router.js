@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { Button, Text, View, TouchableWithoutFeedback } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator, HeaderBackButton } from '@react-navigation/stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -15,88 +14,87 @@ import EditDietScreen from "./screens/diet/EditDietScreen"
 
 // Exercise Screens
 import SettingsScreen from "./screens/ExerciseScreenMain"
-import { Header } from 'react-native/Libraries/NewAppScreen';
 
 // Stacks
 const HomeStack = createStackNavigator();
 
 function HomeStackScreen() {
-  return (
-    <HomeStack.Navigator>
-      <HomeStack.Screen name="Home" component={HomeScreen} />
-      <HomeStack.Screen name="Details" component={DetailsScreen} />
-    </HomeStack.Navigator>
-  );
+	return (
+		<HomeStack.Navigator>
+			<HomeStack.Screen name="Home" component={HomeScreen} />
+			<HomeStack.Screen name="Details" component={DetailsScreen} />
+		</HomeStack.Navigator>
+	);
 }
 
 const DietStack = createStackNavigator();
 
 function DietStackScreen() {
-    return (
-        <DietStack.Navigator>
-            <DietStack.Screen name="Diet Main" component={DietScreenMain} />
-        </DietStack.Navigator>
-    )
+	return (
+		<DietStack.Navigator>
+			<DietStack.Screen name="Diet Main" component={DietScreenMain} />
+		</DietStack.Navigator>
+	)
 }
 
 const ExerciseStack = createStackNavigator();
 
 function ExerciseStackScreen() {
-  return (
-    <ExerciseStack.Navigator>
-      <ExerciseStack.Screen name="Exercise Main" component={SettingsScreen} />
-      <ExerciseStack.Screen name="Details" component={DetailsScreen} />
-    </ExerciseStack.Navigator>
-  );
+	return (
+		<ExerciseStack.Navigator>
+			<ExerciseStack.Screen name="Exercise Main" component={SettingsScreen} />
+			<ExerciseStack.Screen name="Details" component={DetailsScreen} />
+		</ExerciseStack.Navigator>
+	);
 }
 
 // Bottom Tab - Home, Diet and Exercise
 const Tab = createBottomTabNavigator();
 
 function BottomTabs() {
-  return (
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
+	return (
+		<Tab.Navigator
+			screenOptions={({ route }) => ({
+				tabBarIcon: ({ focused, color, size }) => {
+					let iconName;
 
-            if (route.name === 'Home') {
-              iconName = focused ? 'ios-list-box' : 'ios-list';
-            } else if (route.name === 'Diet') {
-              iconName = 'ios-restaurant'
-            } else if (route.name === 'Exercise') {
-              iconName = 'ios-pulse';
-            }
+					if (route.name === 'Home') {
+						iconName = focused ? 'ios-list-box' : 'ios-list';
+					} else if (route.name === 'Diet') {
+						iconName = 'ios-restaurant'
+					} else if (route.name === 'Exercise') {
+						iconName = 'ios-pulse';
+					}
 
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-        })}
-        tabBarOptions={{
-          activeTintColor: 'dodgerblue',
-          inactiveTintColor: 'gray',
-        }}
-    >
-    <Tab.Screen name="Home" options={{headerShown: false}} component={HomeStackScreen} />
-    <Tab.Screen name="Diet" options={{headerShown: false}} component={DietStackScreen} />
-    <Tab.Screen name="Exercise" options={{headerShown: false}} component={ExerciseStackScreen} />
-    </Tab.Navigator>
-  )
+					return <Ionicons name={iconName} size={size} color={color} />;
+				},
+			})}
+			tabBarOptions={{
+				activeTintColor: 'dodgerblue',
+				inactiveTintColor: 'gray',
+			}}
+		>
+			<Tab.Screen name="Home" options={{ headerShown: false }} component={HomeStackScreen} />
+			<Tab.Screen name="Diet" options={{ headerShown: false }} component={DietStackScreen} />
+			<Tab.Screen name="Exercise" options={{ headerShown: false }} component={ExerciseStackScreen} />
+		</Tab.Navigator>
+	)
 }
 
 const Stack = createStackNavigator();
 export default function Routers() {
-  return (
-    <NavigationContainer>
-      {/* <BottomTabs /> */}
-      <Stack.Navigator headerShown={false} >
-        <Stack.Screen name="Home" component={BottomTabs} />
-        {/* Bottom Tab Bar is hidden for the following screens */}
-        <Stack.Screen 
-          name="Edit Diet" 
-          component={EditDietScreen}
-          options={EditDietScreen.navigationOptions} 
-          />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
+	return (
+		<NavigationContainer>
+			{/* <BottomTabs /> */}
+			<Stack.Navigator headerShown={false} >
+				<Stack.Screen name="Home" component={BottomTabs} />
+				{/* Bottom Tab Bar is hidden for the following screens */}
+				<Stack.Screen
+					name="Edit Diet"
+					component={EditDietScreen}
+					options={EditDietScreen.navigationOptions}
+				/>
+			</Stack.Navigator>
+		</NavigationContainer>
+	);
 }
