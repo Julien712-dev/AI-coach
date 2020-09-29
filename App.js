@@ -1,21 +1,25 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Provider as PaperProvider, DefaultTheme as PaperDefaultTheme } from 'react-native-paper';
+import { DefaultTheme as NavigationDefaultTheme } from '@react-navigation/native';
+import merge from 'deepmerge';
 
 // Router
 import Router from "./router.js";
 
-export default function App() {
-	return (
-		<Router />
-	);
+let DefaultTheme = merge(PaperDefaultTheme, NavigationDefaultTheme);
+
+const theme = {
+	...DefaultTheme,
+	colors: {
+		...DefaultTheme.colors,
+		primary: 'dodgerblue',
+	},
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: '#fff',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-});
+export default function App() {
+	return (
+		<PaperProvider theme={theme}>
+			<Router theme={theme}/>
+		</PaperProvider>
+	);
+}

@@ -69,10 +69,6 @@ function BottomTabs() {
 					return <Ionicons name={iconName} size={size} color={color} />;
 				},
 			})}
-			tabBarOptions={{
-				activeTintColor: 'dodgerblue',
-				inactiveTintColor: 'gray',
-			}}
 		>
 			<Tab.Screen name="Home" options={{ headerShown: false }} component={HomeStackScreen} />
 			<Tab.Screen name="Diet" options={{ headerShown: false }} component={DietStackScreen} />
@@ -82,9 +78,9 @@ function BottomTabs() {
 }
 
 const Stack = createStackNavigator();
-export default function Routers() {
+export default function Routers({ theme }) {
 	return (
-		<NavigationContainer>
+		<NavigationContainer theme={theme}>
 			{/* <BottomTabs /> */}
 			<Stack.Navigator headerShown={false} >
 				<Stack.Screen name="Home" component={BottomTabs} />
