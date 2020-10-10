@@ -32,7 +32,7 @@ const DietStack = createStackNavigator();
 function DietStackScreen() {
 	return (
 		<DietStack.Navigator>
-			<DietStack.Screen name="Diet Main" component={DietScreenMain} />
+			<DietStack.Screen name="Diet" component={DietScreenMain} />
 		</DietStack.Navigator>
 	)
 }
@@ -42,7 +42,7 @@ const ExerciseStack = createStackNavigator();
 function ExerciseStackScreen() {
 	return (
 		<ExerciseStack.Navigator>
-			<ExerciseStack.Screen name="Exercise Main" component={SettingsScreen} />
+			<ExerciseStack.Screen name="Exercise" component={SettingsScreen} />
 			<ExerciseStack.Screen name="Details" component={DetailsScreen} />
 		</ExerciseStack.Navigator>
 	);
@@ -82,7 +82,7 @@ export default function Routers({ theme }) {
 	return (
 		<NavigationContainer theme={theme}>
 			{/* <BottomTabs /> */}
-			<Stack.Navigator headerShown={false} >
+			<Stack.Navigator screenOptions={{ headerShown: false }} >
 				<Stack.Screen name="Home" component={BottomTabs} />
 				{/* Bottom Tab Bar is hidden for the following screens */}
 				<Stack.Screen
