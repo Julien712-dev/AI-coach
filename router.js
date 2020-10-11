@@ -14,6 +14,7 @@ import EditDietScreen from "./screens/diet/EditDietScreen"
 
 // Exercise Screens
 import ExerciseMainScreen from "./screens/exercise/ExerciseMainScreen"
+import PlanWorkoutScreen from './screens/exercise/PlanWorkoutScreen';
 
 // Stacks
 const HomeStack = createStackNavigator();
@@ -43,6 +44,7 @@ function ExerciseStackScreen() {
 	return (
 		<ExerciseStack.Navigator>
 			<ExerciseStack.Screen name="Exercise" component={ExerciseMainScreen} />
+			<ExerciseStack.Screen name="Workout Planning" component={PlanWorkoutScreen} />
 		</ExerciseStack.Navigator>
 	);
 }

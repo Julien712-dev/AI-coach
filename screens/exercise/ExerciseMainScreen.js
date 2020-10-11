@@ -37,7 +37,10 @@ export default function ExerciseMainScreen({ navigation }) {
 			<View style={{ width: '100%', marginTop: 10, flexDirection: 'row', justifyContent: 'space-around' }}>
 				<FAB icon='plus' />
 				<FAB icon='play' />
-				<FAB icon='pencil' />
+				<FAB 
+					icon='pencil'
+					onPress={() => navigation.navigate('Workout Planning')} 
+				/>
 			</View>
 		</View>
 	);
