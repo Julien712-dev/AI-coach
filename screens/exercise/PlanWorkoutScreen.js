@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
-import { useTheme, IconButton, FAB, Text, Headline, Drawer, Card, Button } from 'react-native-paper';
+import { useTheme, FAB, Headline, Drawer, Card, Button } from 'react-native-paper';
 import StarRating from 'react-native-star-rating';
 
 const styles = StyleSheet.create({
@@ -35,11 +35,11 @@ function Table({ children }) {
     );
 }
 
-function ActivityCard({ type, name, level, time }) {
+function ActivityCard({ type, name, level, time, onPress }) {
     const { colors } = useTheme();
     const title = type == 'rest' ? 'Rest' : name;
     return (
-        <Card style={{ minHeight: 100 }}>
+        <Card style={{ minHeight: 100 }} onPress={onPress}>
             <Card.Title title={title} />
             {type == 'rest' ? null :
                 <Card.Content>
@@ -62,16 +62,17 @@ function ActivityCard({ type, name, level, time }) {
 }
 
 export default function PlanWorkoutScreen({ navigation }) {
+    const onActivityPress = () => navigation.navigate('View Workout');
     return (
         <ScrollView style={{ padding: 20 }}>
             <Table>
                 <Row>
                     <Headline style={{ textAlign: 'center' }}>Mon</Headline>
-                    <ActivityCard type='workout' name='Core Workout' level={4} time={20}/>
+                    <ActivityCard type='workout' name='Core Workout' level={4} time={20} onPress={onActivityPress}/>
                 </Row>
                 <Row>
                     <Headline style={{ textAlign: 'center' }}>Tue</Headline>
-                    <ActivityCard type='workout' name='Arm Workout' level={3} time={16}/>
+                    <ActivityCard type='workout' name='Arm Workout' level={3} time={16} onPress={onActivityPress}/>
                 </Row>
                 <Row>
                     <Headline style={{ textAlign: 'center' }}>Wed</Headline>
@@ -79,11 +80,11 @@ export default function PlanWorkoutScreen({ navigation }) {
                 </Row>
                 <Row>
                     <Headline style={{ textAlign: 'center' }}>Thu</Headline>
-                    <ActivityCard type='workout' name='Running' level={3} time={16}/>
+                    <ActivityCard type='workout' name='Running' level={3} time={16} onPress={onActivityPress}/>
                 </Row>
                 <Row>
                     <Headline style={{ textAlign: 'center' }}>Fri</Headline>
-                    <ActivityCard type='workout' name='Leg Workout' level={3} time={16}/>
+                    <ActivityCard type='workout' name='Leg Workout' level={3} time={16} onPress={onActivityPress}/>
                 </Row>
                 <Row>
                     <Headline style={{ textAlign: 'center' }}>Sat</Headline>
