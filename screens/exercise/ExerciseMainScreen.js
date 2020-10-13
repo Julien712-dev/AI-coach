@@ -39,7 +39,7 @@ export default function ExerciseMainScreen({ navigation }) {
 				<FAB icon='play' />
 				<FAB 
 					icon='pencil'
-					onPress={() => navigation.navigate('Workout Planning')} 
+					onPress={() => navigation.navigate('Workout Plan')} 
 				/>
 			</View>
 		</View>
