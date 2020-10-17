@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { View } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { useTheme, Button, FAB, Text, Headline, Paragraph, Card } from 'react-native-paper';
 import ProgressCircle from 'react-native-progress-circle';
 
 export default function ExerciseMainScreen({ navigation }) {
 	const { colors } = useTheme();
 	return (
-		<View style={{ alignItems: 'center', padding: 20 }}>
+		<ScrollView contentContainerStyle={{ alignItems: 'center', padding: 20 }}>
 			<ProgressCircle
 				percent={30}
 				radius={100}
@@ -42,6 +42,6 @@ export default function ExerciseMainScreen({ navigation }) {
 					onPress={() => navigation.navigate('Workout Plan')} 
 				/>
 			</View>
-		</View>
+		</ScrollView>
 	);
 }
