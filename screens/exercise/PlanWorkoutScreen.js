@@ -3,6 +3,7 @@ import * as Firebase from 'firebase';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import { useTheme, ActivityIndicator, FAB, Headline, Drawer, Card, Text } from 'react-native-paper';
 import StarRating from 'react-native-star-rating';
+import LoadingScreen from '../LoadingScreen';
 
 const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -70,26 +71,25 @@ export default function PlanWorkoutScreen({ navigation }) {
 
     // TEST
     const userId = '1234567890';
-    if (!loaded)
+
+    if (!loaded) {
         Firebase.database().ref(`/users/${userId}`).on('value', snapshot => {
             setUser(snapshot.val());
             setLoaded(true);
         });
-
-    if (!loaded) {
-        return (
-            <View style={{ height: '100%', justifyContent: 'center' }}>
-                <ActivityIndicator size='large'/>
-            </View>
-        );
+        return <LoadingScreen/>;
     } else {
-        const onActivityPress = () => navigation.navigate('View Workout');
+        const onActivityPress = day => {
+            const activity = user.exercisePlan[day];
+            if (activity.type != 'rest')
+                navigation.navigate('View Workout', { day: day })
+        };
         const rows = days.map(day => {
             const header = day[0].toUpperCase() + day.slice(1);
             const activity = user.exercisePlan[day];
             const component = activity == undefined ? 
                 <FAB icon='plus' label='Add'/> :
-                <ActivityCard activity={activity} onPress={onActivityPress}/>;
+                <ActivityCard activity={activity} onPress={() => onActivityPress(day)}/>;
             return (
                 <Row key={day} header={header}>
                     {component}
