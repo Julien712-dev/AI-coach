@@ -1,7 +1,10 @@
-import * as React from 'react';
+import React from 'react';
+import * as Firebase from 'firebase';
 import { StyleSheet, View, ScrollView } from 'react-native';
-import { useTheme, FAB, Headline, Drawer, Card, Button } from 'react-native-paper';
+import { useTheme, ActivityIndicator, FAB, Headline, Drawer, Card, Text } from 'react-native-paper';
 import StarRating from 'react-native-star-rating';
+
+const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
 const styles = StyleSheet.create({
     cell: {
@@ -11,15 +14,15 @@ const styles = StyleSheet.create({
     }
 });
 
-function Row({ last, children }) {
+function Row({ last, header, children }) {
     const { colors } = useTheme();
     return (
         <View style={{ flexDirection: 'row', minHeight: 50, borderColor: colors.border, borderBottomWidth: last ? 0 : 2 }}>
             <View style={{ ...styles.cell, flex: 1, borderColor: colors.border, borderRightWidth: 2 }}>
-                {children ? children[0] : null}
+                <Headline style={{ textAlign: 'center' }}>{header}</Headline>
             </View>
             <View style={{ ...styles.cell, flex: 3 }}>
-                {children ? children[1] : null}
+                {children}
             </View>
         </View>
     );
@@ -35,18 +38,18 @@ function Table({ children }) {
     );
 }
 
-function ActivityCard({ type, name, level, time, onPress }) {
+function ActivityCard({ activity, onPress }) {
     const { colors } = useTheme();
-    const title = type == 'rest' ? 'Rest' : name;
+    const title = activity.type == 'rest' ? 'Rest' : activity.name;
     return (
         <Card style={{ minHeight: 100 }} onPress={onPress}>
             <Card.Title title={title} />
-            {type == 'rest' ? null :
+            {activity.type == 'rest' ? null :
                 <Card.Content>
                     <StarRating
                         disabled={true}
                         maxStars={5}
-                        rating={level}
+                        rating={activity.level}
                         iconSet='Entypo'
                         fullStar='star'
                         emptyStar='star-outlined'
@@ -54,7 +57,7 @@ function ActivityCard({ type, name, level, time, onPress }) {
                         starSize={20}
                         containerStyle={{ justifyContent: 'flex-start' }}
                     />
-                    <Drawer.Item icon='clock-outline' label={`${time} mins`} />
+                    <Drawer.Item icon='clock-outline' label={`${activity.time} mins`} />
                 </Card.Content>
             }
         </Card>
@@ -62,35 +65,43 @@ function ActivityCard({ type, name, level, time, onPress }) {
 }
 
 export default function PlanWorkoutScreen({ navigation }) {
-    const onActivityPress = () => navigation.navigate('View Workout');
-    return (
-        <ScrollView style={{ padding: 20 }}>
-            <Table>
-                <Row>
-                    <Headline style={{ textAlign: 'center' }}>Mon</Headline>
-                    <ActivityCard type='workout' name='Core Workout' level={4} time={20} onPress={onActivityPress}/>
+    const [loaded, setLoaded] = React.useState(false);
+    const [user, setUser] = React.useState(null);
+
+    // TEST
+    const userId = '1234567890';
+    if (!loaded)
+        Firebase.database().ref(`/users/${userId}`).on('value', snapshot => {
+            setUser(snapshot.val());
+            setLoaded(true);
+        });
+
+    if (!loaded) {
+        return (
+            <View style={{ height: '100%', justifyContent: 'center' }}>
+                <ActivityIndicator size='large'/>
+            </View>
+        );
+    } else {
+        const onActivityPress = () => navigation.navigate('View Workout');
+        const rows = days.map(day => {
+            const header = day[0].toUpperCase() + day.slice(1);
+            const activity = user.exercisePlan[day];
+            const component = activity == undefined ? 
+                <FAB icon='plus' label='Add'/> :
+                <ActivityCard activity={activity} onPress={onActivityPress}/>;
+            return (
+                <Row key={day} header={header}>
+                    {component}
                 </Row>
-                <Row>
-                    <Headline style={{ textAlign: 'center' }}>Tue</Headline>
-                    <ActivityCard type='workout' name='Arm Workout' level={3} time={16} onPress={onActivityPress}/>
-                </Row>
-                <Row>
-                    <Headline style={{ textAlign: 'center' }}>Wed</Headline>
-                    <ActivityCard type='rest'/>
-                </Row>
-                <Row>
-                    <Headline style={{ textAlign: 'center' }}>Thu</Headline>
-                    <ActivityCard type='workout' name='Running' level={3} time={16} onPress={onActivityPress}/>
-                </Row>
-                <Row>
-                    <Headline style={{ textAlign: 'center' }}>Fri</Headline>
-                    <ActivityCard type='workout' name='Leg Workout' level={3} time={16} onPress={onActivityPress}/>
-                </Row>
-                <Row>
-                    <Headline style={{ textAlign: 'center' }}>Sat</Headline>
-                    <FAB icon='plus' label='Add'/>
-                </Row>
-            </Table>
-        </ScrollView>
-    );
+            );
+        });
+        return (
+            <ScrollView style={{ padding: 20 }}>
+                <Table>
+                    {rows}
+                </Table>
+            </ScrollView>
+        );
+    }
 }
