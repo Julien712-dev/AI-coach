@@ -1,7 +1,7 @@
 import React from 'react';
 import * as Firebase from 'firebase';
-import { StyleSheet, View, ScrollView } from 'react-native';
-import { useTheme, ActivityIndicator, FAB, Headline, Drawer, Card, Text } from 'react-native-paper';
+import { StyleSheet, View, ScrollView, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { useTheme, ActivityIndicator, FAB, Headline, Drawer, Card, Text, IconButton, Surface, Title, TouchableRipple } from 'react-native-paper';
 import StarRating from 'react-native-star-rating';
 import LoadingScreen from '../LoadingScreen';
 
@@ -12,8 +12,21 @@ const styles = StyleSheet.create({
         padding: 8,
         alignContent: 'center',
         justifyContent: 'center',
+    },
+    iconButton: {
+        margin: 0
     }
 });
+
+function IconButtonWithoutFeedback(props) {
+    return (
+        <TouchableWithoutFeedback>
+            <TouchableOpacity>
+                <IconButton {...props} />
+            </TouchableOpacity>
+        </TouchableWithoutFeedback>
+    );
+}
 
 function Row({ last, header, children }) {
     const { colors } = useTheme();
@@ -39,29 +52,42 @@ function Table({ children }) {
     );
 }
 
-function ActivityCard({ activity, onPress }) {
+function ActivityCard({ activity, onPress, onMoveUp, onMoveDown, onDelete }) {
     const { colors } = useTheme();
-    const title = activity.type == 'rest' ? 'Rest' : activity.name;
+    const title = <Title>{activity.type == 'rest' ? 'Rest' : activity.name}</Title>;
+    const content = activity.type == 'rest' ? null : (
+        <View>
+            <StarRating
+                disabled={true}
+                maxStars={5}
+                rating={activity.level}
+                iconSet='Entypo'
+                fullStar='star'
+                emptyStar='star-outlined'
+                fullStarColor={colors.accent}
+                starSize={20}
+                containerStyle={{ justifyContent: 'flex-start', marginLeft: 7 }}
+            />
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <IconButton icon='clock-outline' style={styles.iconButton} />
+                <Text>{activity.time} mins</Text>
+            </View>
+        </View>
+    );
     return (
-        <Card style={{ minHeight: 100 }} onPress={onPress}>
-            <Card.Title title={title} />
-            {activity.type == 'rest' ? null :
-                <Card.Content>
-                    <StarRating
-                        disabled={true}
-                        maxStars={5}
-                        rating={activity.level}
-                        iconSet='Entypo'
-                        fullStar='star'
-                        emptyStar='star-outlined'
-                        fullStarColor={colors.accent}
-                        starSize={20}
-                        containerStyle={{ justifyContent: 'flex-start' }}
-                    />
-                    <Drawer.Item icon='clock-outline' label={`${activity.time} mins`} />
-                </Card.Content>
-            }
-        </Card>
+        <TouchableOpacity onPress={onPress}>
+            <Surface style={{ minHeight: 100, paddingHorizontal: 10, paddingVertical: 2, flexDirection: 'row', justifyContent: 'space-between', elevation: 5, borderRadius: 7 }}>
+                <View>
+                    {title}
+                    {content}
+                </View>
+                <View>
+                    <IconButtonWithoutFeedback icon='chevron-up' style={styles.iconButton} color={colors.primary} onPress={onMoveUp} />
+                    <IconButtonWithoutFeedback icon='delete' style={styles.iconButton} color={colors.disabled} onPress={onDelete} />
+                    <IconButtonWithoutFeedback icon='chevron-down' style={styles.iconButton} color={colors.primary} onPress={onMoveDown} />
+                </View>
+            </Surface>
+        </TouchableOpacity>
     );
 }
 
@@ -77,19 +103,53 @@ export default function PlanWorkoutScreen({ navigation }) {
             setUser(snapshot.val());
             setLoaded(true);
         });
-        return <LoadingScreen/>;
+        return <LoadingScreen />;
     } else {
         const onActivityPress = day => {
             const activity = user.exercisePlan[day];
             if (activity.type != 'rest')
                 navigation.navigate('View Workout', { day: day })
         };
+        const onActivityMoveUp = day => {
+            let userClone = JSON.parse(JSON.stringify(user));
+            const index = days.indexOf(day);
+
+            if (index > 0) {
+                if (userClone.exercisePlan[days[index - 1]] != undefined) {
+                    let temp = user.exercisePlan[days[index - 1]];
+                    userClone.exercisePlan[days[index - 1]] = userClone.exercisePlan[days[index]];
+                    userClone.exercisePlan[days[index]] = temp;
+                } else
+                    userClone.exercisePlan[days[index - 1]] = userClone.exercisePlan[days[index]];
+                setUser(userClone);
+            }
+        };
+        const onActivityMoveDown = day => {
+            let userClone = JSON.parse(JSON.stringify(user));
+            const index = days.indexOf(day);
+
+            if (index < days.length - 1) {
+                if (userClone.exercisePlan[days[index + 1]] != undefined) {
+                    let temp = user.exercisePlan[days[index + 1]];
+                    userClone.exercisePlan[days[index + 1]] = userClone.exercisePlan[days[index]];
+                    userClone.exercisePlan[days[index]] = temp;
+                } else
+                    userClone.exercisePlan[days[index + 1]] = userClone.exercisePlan[days[index]];
+                setUser(userClone);
+            }
+        };
+        const onActivityDelete = day => {
+            let userClone = JSON.parse(JSON.stringify(user));
+            const index = days.indexOf(day);
+            delete userClone.exercisePlan[days[index]];
+            setUser(userClone);
+        };
         const rows = days.map(day => {
             const header = day[0].toUpperCase() + day.slice(1);
             const activity = user.exercisePlan[day];
-            const component = activity == undefined ? 
-                <FAB icon='plus' label='Add'/> :
-                <ActivityCard activity={activity} onPress={() => onActivityPress(day)}/>;
+            const component = activity == undefined ?
+                <FAB icon='plus' label='Add' /> :
+                <ActivityCard activity={activity} onPress={() => onActivityPress(day)} onMoveUp={() => onActivityMoveUp(day)} onMoveDown={() => onActivityMoveDown(day)} onDelete={() => onActivityDelete(day)} />;
             return (
                 <Row key={day} header={header}>
                     {component}
