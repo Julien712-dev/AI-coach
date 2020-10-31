@@ -28,6 +28,7 @@ module.exports = {
                 meal: null,
                 startAt: 0,
                 endAt: 6,
+                title: ``,
                 message: `Time for a good-night sleep and prepare for the amazing journey tomorrow!`,
             },
             {
@@ -35,28 +36,32 @@ module.exports = {
                 meal: `breakfast`,
                 startAt: 6,
                 endAt: 11,
-                message: `Good morning!! There's a new day upon you!`,
+                title: `Good morning!`,
+                message: `We got you. It's time for a nice breakfast!`,
             },
             {
                 time: `afternoon`,
                 meal: `lunch`,
                 startAt: 11,
                 endAt: 15,
-                message: `Yay it's lunch time! Better treat yourself better!`,
+                title: `Yay! Lunch time!`,
+                message: `Just treat yourself better!`,
             },
             {
                 time: `evening`,
                 meal: `snack`,
                 startAt: 15,
                 endAt: 18,
-                message: `Your're probably hungry at the moment. Grab some snack if you want!`,
+                title: `Tea time!`,
+                message: `Grab a snack if you feel like having one.`,
             },
             {
                 time: `night`,
                 meal: `dinner`,
                 startAt: 18,
                 endAt: 24,
-                message: `Dinner's ready, and we're all excited for that!`,
+                title: `Dinner's ready!`,
+                message: `Feel like a feast? Or planning to go clean?`,
             }
         ]
     }
