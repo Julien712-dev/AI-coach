@@ -11,7 +11,10 @@ export default function DietScreenMain({ navigation }) {
 
 	const [time, setTime] = React.useState();
 	const [message, setMessage] = React.useState({});
-	const [carouselActiveIndex, setCarouselActiveIndex] = React.useState(0);
+	const [coachAdvice, setCoachAdvice] = React.useState(`On a day of rest, try to reduce carbohydrate intake and go low calorie overall.`);
+	const [location, setLocation] = React.useState();
+	// Carousels
+	const [recommendedMealCarouselActiveIndex, setRecommendedMealCarouselActiveIndex] = React.useState(0);
 	// Dummy Data
 	const [recommendedMeals, setRecommendedMeals] = React.useState([
 		{
@@ -23,6 +26,7 @@ export default function DietScreenMain({ navigation }) {
 			text: "Fried Rice",
 		}
 	]);
+	const [restaurantMenuCarouselActiveIndex, setRestaurantMenuCarouselActiveIndex] = React.useState(0);
 	// Dummy Data
 	const [restaurantMenuItems, setRestaurantMenuItems] = React.useState([
 		{
@@ -42,10 +46,34 @@ export default function DietScreenMain({ navigation }) {
 	React.useEffect(() => {
 		let currentTime = new Date();
 		setTime(currentTime);
+		setMessage(config.messages.diet.find(message => (message.startAt <= moment(currentTime).hour() && message.endAt > moment(currentTime).hour())))
 	}, []);
 
+	// Render function for recipe item recommendations.
+	function _renderRecipeRecommendations({item,index}){
+		return (
+			<>
+			<View style={{
+				backgroundColor:'black',
+				height: 140,
+				padding: 5,
+			}}>
+			</View>
+			<View style={{
+				backgroundColor:'floralwhite',
+				borderRadius: 5,
+				height: 80,
+				padding: 5,
+				}}>
+				<Text style={{fontSize: 30}}>{item.title}</Text>
+				<Text>{item.text}</Text>
+			</View>
+			</>
+		)
+	}
+
 	// Render function for restaurant menu item recommendations.
-	function _renderItem({item,index}){
+	function _renderRestaurantMenuItems({item,index}){
         return (
 			<>
 			<View style={{
@@ -75,9 +103,12 @@ export default function DietScreenMain({ navigation }) {
 	return (
 		<View style={{flex:1}}>
 			<ScrollView contentContainerStyle={{padding: 20}}>
-				{/* <Title>{moment(time).format('LLLL')}</Title> */}
-				<Text>{config.messages.diet.find(message => (message.startAt < moment(time).hour() && message.endAt >= moment(time).hour())).message}</Text>
-				<Title>Your diet Today</Title>
+				<Title style={{fontSize: 25}}>
+					{message.title}
+				</Title>
+				<Text style={{marginBottom: 10}}>
+					{message.message}
+				</Text>
 				<Carousel
 					layout={"default"}
 					layoutCardOffset={5}
@@ -87,18 +118,18 @@ export default function DietScreenMain({ navigation }) {
 					containerCustomStyle={{overflow: "visible"}}
 					sliderWidth={250}
 					itemWidth={300}
-					renderItem={_renderItem}
-					onSnapToItem = { index => setCarouselActiveIndex(index) }
+					renderItem={_renderRecipeRecommendations}
+					onSnapToItem = { index => setRecommendedMealCarouselActiveIndex(index) }
 				/>
 				<Card style={{ width: '100%', marginTop: 10, marginBottom: 15 }}>
 					<Card.Title title={`Coach's Advice:`}/>
 					<Card.Content>
-						<Paragraph>You are doing great so far! But try not to exercise immediately after lunch, which may hurt your intestine.</Paragraph>
+						<Paragraph>{coachAdvice}</Paragraph>
 					</Card.Content>
 				</Card>
-				<Button style={{ marginBottom: 10 }} mode='contained' onPress={() => navigation.navigate('Edit Diet')}>
+				{/* <Button style={{ marginBottom: 10 }} mode='contained' onPress={() => navigation.navigate('Edit Diet')}>
 					Edit Diet
-				</Button>
+				</Button> */}
 				<Title>Explore Restaurants Nearby!</Title>
 				<Carousel
 					layout={"default"}
@@ -108,11 +139,11 @@ export default function DietScreenMain({ navigation }) {
 					containerCustomStyle={{overflow: "visible"}}
 					sliderWidth={250}
 					itemWidth={300}
-					renderItem={_renderItem}
-					onSnapToItem = { index => setCarouselActiveIndex(index) }
+					renderItem={_renderRestaurantMenuItems}
+					onSnapToItem = { index => setRestaurantMenuCarouselActiveIndex(index) }
 				/>
 			</ScrollView>
-			<DietLoggingFAB />
+			<DietLoggingFAB navigation={navigation} />
 		</View>
 	);
 }
