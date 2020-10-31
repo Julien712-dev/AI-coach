@@ -14,7 +14,7 @@ export default function DetailsScreen({ navigation }) {
 	return (
 		<View style={{flex:1}}>
 			<ScrollView contentContainerStyle={{padding: 20}}>
-				<Text>This is the edit diet page.</Text>
+				<Text>This is the log diet page.</Text>
 			</ScrollView>
 		</View>
 	);
