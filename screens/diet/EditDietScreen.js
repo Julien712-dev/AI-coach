@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -12,8 +12,10 @@ DetailsScreen['navigationOptions'] = screenProps => ({
 // screen for demo purpose
 export default function DetailsScreen({ navigation }) {
 	return (
-		<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-			<Text>Details!</Text>
+		<View style={{flex:1}}>
+			<ScrollView contentContainerStyle={{padding: 20}}>
+				<Text>This is the edit diet page.</Text>
+			</ScrollView>
 		</View>
 	);
 }
