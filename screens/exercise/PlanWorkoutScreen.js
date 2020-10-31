@@ -1,7 +1,7 @@
-import React from 'react';
-import * as Firebase from 'firebase';
+import React, { useState, useEffect } from 'react';
+import Firebase from 'firebase';
 import { StyleSheet, View, ScrollView, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
-import { useTheme, ActivityIndicator, FAB, Headline, Drawer, Card, Text, IconButton, Surface, Title, TouchableRipple } from 'react-native-paper';
+import { useTheme, FAB, Headline, Text, IconButton, Surface, Title, Portal, Dialog, Paragraph, Button } from 'react-native-paper';
 import StarRating from 'react-native-star-rating';
 import LoadingScreen from '../LoadingScreen';
 
@@ -92,19 +92,38 @@ function ActivityCard({ activity, onPress, onMoveUp, onMoveDown, onDelete }) {
 }
 
 export default function PlanWorkoutScreen({ navigation }) {
-    const [loaded, setLoaded] = React.useState(false);
-    const [user, setUser] = React.useState(null);
+    const [user, setUser] = useState(null);
+    const [initialUser, setInitialUser] = useState(null);
+    const [dialogVisible, setDialogVisible] = useState(false);
+    const [navigationAction, setNavigationAction] = useState(false);    // The navigation action interrupted by the 'Save?' dialog
+    const { colors } = useTheme();
 
     // TEST
     const userId = '1234567890';
 
-    if (!loaded) {
-        Firebase.database().ref(`/users/${userId}`).on('value', snapshot => {
-            setUser(snapshot.val());
-            setLoaded(true);
+    const userDatabaseRef = Firebase.database().ref(`/users/${userId}`);
+
+    useEffect(() => {
+        userDatabaseRef.on('value', snapshot => { 
+            let value = snapshot.val();
+            setInitialUser(value);
+            setUser(value); 
         });
+    }, []);
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('beforeRemove', event => {
+            if (JSON.stringify(user) != JSON.stringify(initialUser)) {
+                event.preventDefault();
+                setNavigationAction(event.data.action);
+                setDialogVisible(true);
+            }
+        });
+        return unsubscribe;
+    }, [navigation, user, initialUser]);
+
+    if (user == null)
         return <LoadingScreen />;
-    } else {
+    else {
         const onActivityPress = day => {
             const activity = user.exercisePlan[day];
             if (activity.type != 'rest')
@@ -115,12 +134,9 @@ export default function PlanWorkoutScreen({ navigation }) {
             const index = days.indexOf(day);
 
             if (index > 0) {
-                if (userClone.exercisePlan[days[index - 1]] != undefined) {
-                    let temp = user.exercisePlan[days[index - 1]];
-                    userClone.exercisePlan[days[index - 1]] = userClone.exercisePlan[days[index]];
-                    userClone.exercisePlan[days[index]] = temp;
-                } else
-                    userClone.exercisePlan[days[index - 1]] = userClone.exercisePlan[days[index]];
+                let temp = user.exercisePlan[days[index - 1]];
+                userClone.exercisePlan[days[index - 1]] = userClone.exercisePlan[days[index]];
+                userClone.exercisePlan[days[index]] = temp;
                 setUser(userClone);
             }
         };
@@ -129,12 +145,9 @@ export default function PlanWorkoutScreen({ navigation }) {
             const index = days.indexOf(day);
 
             if (index < days.length - 1) {
-                if (userClone.exercisePlan[days[index + 1]] != undefined) {
-                    let temp = user.exercisePlan[days[index + 1]];
-                    userClone.exercisePlan[days[index + 1]] = userClone.exercisePlan[days[index]];
-                    userClone.exercisePlan[days[index]] = temp;
-                } else
-                    userClone.exercisePlan[days[index + 1]] = userClone.exercisePlan[days[index]];
+                let temp = user.exercisePlan[days[index + 1]];
+                userClone.exercisePlan[days[index + 1]] = userClone.exercisePlan[days[index]];
+                userClone.exercisePlan[days[index]] = temp;
                 setUser(userClone);
             }
         };
@@ -144,6 +157,21 @@ export default function PlanWorkoutScreen({ navigation }) {
             delete userClone.exercisePlan[days[index]];
             setUser(userClone);
         };
+        const onDialogDismiss = () => {
+            setDialogVisible(false);
+        };
+        const onSaveChanges = () => {
+            setDialogVisible(false);
+            userDatabaseRef.set(user);
+            navigation.dispatch(navigationAction);
+        };
+        const onDiscardChanges = () => {
+            setDialogVisible(false);
+            navigation.dispatch(navigationAction);
+        };
+        const onCancelChanges = () => {
+            setDialogVisible(false);
+        }
         const rows = days.map(day => {
             const header = day[0].toUpperCase() + day.slice(1);
             const activity = user.exercisePlan[day];
@@ -161,6 +189,19 @@ export default function PlanWorkoutScreen({ navigation }) {
                 <Table>
                     {rows}
                 </Table>
+                <Portal>
+                    <Dialog visible={dialogVisible} onDismiss={onDialogDismiss}>
+                        <Dialog.Title>Save?</Dialog.Title>
+                        <Dialog.Content>
+                            <Paragraph>You have made changes to your workout plan.</Paragraph>
+                        </Dialog.Content>
+                        <Dialog.Actions>
+                            <Button onPress={onSaveChanges}>Save</Button>
+                            <Button color={colors.disabled} onPress={onDiscardChanges}>Don't save</Button>
+                            <Button color={colors.disabled} onPress={onCancelChanges}>Cancel</Button>
+                        </Dialog.Actions>
+                    </Dialog>
+                </Portal>
             </ScrollView>
         );
     }
