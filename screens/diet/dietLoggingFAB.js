@@ -2,10 +2,10 @@ import * as React from 'react';
 import { StyleSheet } from 'react-native';
 import { FAB, Portal, Provider } from 'react-native-paper';
 
-const MyComponent = () => {
+const MyComponent = (props) => {
   const [state, setState] = React.useState({ open: false });
-
   const onStateChange = ({ open }) => setState({ open });
+  const navigation = props.navigation;
 
   const { open } = state;
 
@@ -15,13 +15,17 @@ const MyComponent = () => {
         <FAB.Group
           open={open}
           style={styles}
-          icon={open ? 'minus' : 'plus'}
+          icon={open ? 'close' : 'plus'}
           actions={[
-            // { icon: 'plus', onPress: () => console.log('Pressed add') },
+            {
+                icon: 'broom',
+                label: 'Edit Recommendations',
+                onPress: () => navigation.navigate('Edit Diet'),
+              },
             {
               icon: 'pencil',
               label: 'Log Manually',
-              onPress: () => console.log('Pressed star'),
+              onPress: () => navigation.navigate('Log Diet'),
             },
             {
               icon: 'camera',
