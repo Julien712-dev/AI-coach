@@ -1,5 +1,5 @@
-import * as React from 'react';
-import * as Firebase from 'firebase';
+import React, { useState, useEffect } from 'react';
+import Firebase from 'firebase';
 import { StyleSheet, View } from 'react-native';
 import { useTheme, FAB, Text, Headline, Divider, List } from 'react-native-paper';
 import LoadingScreen from '../LoadingScreen';
@@ -14,20 +14,21 @@ const styles = StyleSheet.create({
 export default function ViewWorkoutScreen({ route, navigation }) {
     const { day } = route.params;
 
-    const [loaded, setLoaded] = React.useState(false);
-    const [workout, setWorkout] = React.useState(null);
+    const [workout, setWorkout] = useState(null);
     const { colors } = useTheme();
 
     // TEST
     const userId = '1234567890';
 
-    if (!loaded) {
-        Firebase.database().ref(`/users/${userId}/exercisePlan/${day}`).on('value', snapshot => {
-            setWorkout(snapshot.val());
-            setLoaded(true);
-        });
+    const workoutDatabaseRef = Firebase.database().ref(`/users/${userId}/exercisePlan/${day}`);
+
+    useEffect(() => {
+        workoutDatabaseRef.on('value', snapshot => { setWorkout(snapshot.val()); });
+    }, []);
+
+    if (workout == null)
         return <LoadingScreen />;
-    } else {
+    else {
         const exercises = workout.sequence.map((exercise, index) => (
             <List.Item
                 key={index}
