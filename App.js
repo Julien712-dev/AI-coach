@@ -18,6 +18,16 @@ const firebaseConfig = {
 
 Firebase.initializeApp(firebaseConfig);
 
+//Firebase.auth().onAuthStateChanged(function(user) {
+  //if (user) {
+    // User is signed in.
+
+  //} else {
+    // User is signed out.
+
+  //}
+//});
+
 let DefaultTheme = merge(PaperDefaultTheme, NavigationDefaultTheme);
 
 const theme = {
