@@ -18,6 +18,9 @@ import ExerciseMainScreen from "./screens/exercise/ExerciseMainScreen"
 import PlanWorkoutScreen from './screens/exercise/PlanWorkoutScreen';
 import ViewWorkoutScreen from './screens/exercise/ViewWorkoutScreen';
 
+// Login Screen
+import LoginScreen from "./screens/login/LoginScreen"
+
 // Stacks
 const HomeStack = createStackNavigator();
 
@@ -26,6 +29,7 @@ function HomeStackScreen() {
 		<HomeStack.Navigator>
 			<HomeStack.Screen name="Home" component={HomeScreen} />
 			<HomeStack.Screen name="Details" component={DetailsScreen} />
+			<HomeStack.Screen name="Login" component={LoginScreen} />
 		</HomeStack.Navigator>
 	);
 }
