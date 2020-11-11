@@ -2,6 +2,7 @@ import React from 'react';
 import * as Firebase from 'firebase';
 import { Provider as PaperProvider, DefaultTheme as PaperDefaultTheme } from 'react-native-paper';
 import { DefaultTheme as NavigationDefaultTheme } from '@react-navigation/native';
+import { DraxProvider } from 'react-native-drax';
 import merge from 'deepmerge';
 
 // Router
@@ -41,7 +42,9 @@ const theme = {
 export default function App() {
 	return (
 		<PaperProvider theme={theme}>
-			<Router theme={theme}/>
+			<DraxProvider>
+				<Router theme={theme}/>
+			</DraxProvider>
 		</PaperProvider>
 	);
 }
