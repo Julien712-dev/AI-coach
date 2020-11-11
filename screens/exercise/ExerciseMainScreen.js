@@ -34,7 +34,7 @@ export default function ExerciseMainScreen({ navigation }) {
 					<Button color={colors.disabled}>Dismiss</Button>
 				</Card.Actions>
 			</Card>
-			<View style={{ width: '100%', marginTop: 10, flexDirection: 'row', justifyContent: 'space-around' }}>
+			<View style={{ width: '100%', marginTop: 30, flexDirection: 'row', justifyContent: 'space-around' }}>
 				<FAB icon='plus' />
 				<FAB icon='play' />
 				<FAB 

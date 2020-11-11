@@ -92,16 +92,15 @@ function ActivityCard({ activity, onPress, onMoveUp, onMoveDown, onDelete }) {
 }
 
 export default function PlanWorkoutScreen({ navigation }) {
+    // TEST
+    const userId = '1234567890';
+    const userDatabaseRef = Firebase.database().ref(`/users/${userId}`);
+
     const [user, setUser] = useState(null);
     const [initialUser, setInitialUser] = useState(null);
     const [dialogVisible, setDialogVisible] = useState(false);
     const [navigationAction, setNavigationAction] = useState(false);    // The navigation action interrupted by the 'Save?' dialog
     const { colors } = useTheme();
-
-    // TEST
-    const userId = '1234567890';
-
-    const userDatabaseRef = Firebase.database().ref(`/users/${userId}`);
 
     useEffect(() => {
         userDatabaseRef.on('value', snapshot => { 
@@ -110,6 +109,7 @@ export default function PlanWorkoutScreen({ navigation }) {
             setUser(value); 
         });
     }, []);
+    
     useEffect(() => {
         const unsubscribe = navigation.addListener('beforeRemove', event => {
             if (JSON.stringify(user) != JSON.stringify(initialUser)) {
