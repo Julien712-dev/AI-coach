@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React, {useState} from 'react';
 import { View, ScrollView } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Text, Searchbar, Button, Divider } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // Overriding the header
@@ -11,10 +11,27 @@ DetailsScreen['navigationOptions'] = screenProps => ({
 
 // screen for demo purpose
 export default function DetailsScreen({ navigation }) {
+
+	const [results, setResults] = useState([]);
+	const [searchQuery, setSearchQuery] = React.useState('');
+
+	const onChangeSearch = query => setSearchQuery(query);
+
 	return (
 		<View style={{flex:1}}>
 			<ScrollView contentContainerStyle={{padding: 20}}>
-				<Text>This is the log diet page.</Text>
+				<Searchbar
+					style={{ marginBottom: 15 }}
+					placeholder="Search for a food item"
+					onChangeText={onChangeSearch}
+					value={searchQuery}
+				/>
+				<Divider />
+				<Divider />
+				<Text style={{fontSize: 16, alignSelf: "center", marginVertical: 5}}>Can't find your diet?</Text>
+				<Button icon="pencil" mode="contained" style={{ width: 200, alignSelf: "center", marginTop: 10 }} onPress={() => navigation.navigate('Log Diet Details')}>
+					Log Manually
+				</Button>
 			</ScrollView>
 		</View>
 	);

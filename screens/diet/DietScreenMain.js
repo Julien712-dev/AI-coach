@@ -52,51 +52,54 @@ export default function DietScreenMain({ navigation }) {
 	// Render function for recipe item recommendations.
 	function _renderRecipeRecommendations({item,index}){
 		return (
-			<>
-			<View style={{
-				backgroundColor:'black',
-				height: 140,
-				padding: 5,
-			}}>
-			</View>
-			<View style={{
-				backgroundColor:'floralwhite',
-				borderRadius: 5,
-				height: 80,
-				padding: 5,
+			<View style={{borderRadius: 8}}>
+				<View style={{
+					backgroundColor:'black',
+					height: 140,
+					padding: 5,
+					borderTopLeftRadius: 5,
+					borderTopRightRadius: 5,
 				}}>
-				<Text style={{fontSize: 30}}>{item.title}</Text>
-				<Text>{item.text}</Text>
+				</View>
+				<View style={{
+					backgroundColor:'floralwhite',
+					height: 80,
+					padding: 5,
+					borderBottomLeftRadius: 5,
+					borderBottomRightRadius: 5,
+					}}>
+					<Text style={{fontSize: 30}}>{item.title}</Text>
+					<Text>{item.text}</Text>
+				</View>
 			</View>
-			</>
 		)
 	}
 
 	// Render function for restaurant menu item recommendations.
 	function _renderRestaurantMenuItems({item,index}){
         return (
-			<>
-			<View style={{
-				backgroundColor:'black',
-				// borderRadius: 5,
-				height: 140,
-				padding: 5,
-				// marginLeft: 5,
-				// marginRight: 5
-			}}>
-			</View>
-			<View style={{
-				backgroundColor:'floralwhite',
-				borderRadius: 5,
-				height: 80,
-				padding: 5,
-				// marginLeft: 5,
-				// marginRight: 5, 
+			<View style={{borderRadius: 8}}>
+				<View style={{
+					backgroundColor:'black',
+					borderTopLeftRadius: 5,
+					borderTopRightRadius: 5,
+					height: 140,
+					padding: 5,
 				}}>
-				<Text style={{fontSize: 30}}>{item.title}</Text>
-				<Text>{item.text}</Text>
-			</View>
-		  </>
+				</View>
+				<View style={{
+					backgroundColor:'floralwhite',
+					height: 80,
+					padding: 5,
+					borderBottomLeftRadius: 5,
+					borderBottomRightRadius: 5,
+					// marginLeft: 5,
+					// marginRight: 5, 
+					}}>
+					<Text style={{fontSize: 30}}>{item.title}</Text>
+					<Text>{item.text}</Text>
+				</View>
+		  </View>
         )
     }
 

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useState} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -9,9 +9,10 @@ import HomeScreen from "./screens/HomeScreen"
 import DetailsScreen from "./screens/DetailsScreen"
 
 // Diet Screens
-import DietScreenMain from "./screens/diet/DietScreenMain"
-import EditDietScreen from "./screens/diet/EditDietScreen"
-import LogDietScreen from "./screens/diet/LogDietScreen"
+import DietScreenMain from "./screens/diet/DietScreenMain";
+import EditDietScreen from "./screens/diet/EditDietScreen";
+import LogDietScreen from "./screens/diet/LogDietScreen";
+import LogDietDetailsScreen from './screens/diet/LogDietDetailsScreen';
 
 // Exercise Screens
 import ExerciseMainScreen from "./screens/exercise/ExerciseMainScreen"
@@ -42,6 +43,7 @@ function DietStackScreen() {
 			<DietStack.Screen name="Diet" component={DietScreenMain} />
 			<DietStack.Screen name="Edit Diet" component={EditDietScreen} />
 			<DietStack.Screen name="Log Diet" component={LogDietScreen} />
+			<DietStack.Screen name="Log Diet Details" component={LogDietDetailsScreen} />
 		</DietStack.Navigator>
 	)
 }
@@ -89,10 +91,14 @@ function BottomTabs() {
 
 const Stack = createStackNavigator();
 export default function Routers({ theme }) {
+
+	const [isSignedIn, setIsSignedIn] = useState(true);
+
 	return (
+
 		<NavigationContainer theme={theme}>
-			{/* <BottomTabs /> */}
-			<Stack.Navigator screenOptions={{ headerShown: false }} >
+			<Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={isSignedIn ? 'Home' : 'Login'}>
+				<Stack.Screen name="Login" component={LoginScreen} />
 				<Stack.Screen name="Home" component={BottomTabs} />
 				{/* Bottom Tab Bar is hidden for the following screens */}
 				<Stack.Screen
@@ -102,5 +108,6 @@ export default function Routers({ theme }) {
 				/>
 			</Stack.Navigator>
 		</NavigationContainer>
+
 	);
 }
