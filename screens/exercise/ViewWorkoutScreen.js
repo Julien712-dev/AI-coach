@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Firebase from 'firebase';
 import { StyleSheet, View } from 'react-native';
-import { useTheme, FAB, Text, Headline, Divider, List } from 'react-native-paper';
+import { useTheme, FAB, Text, Headline, List } from 'react-native-paper';
 import LoadingScreen from '../LoadingScreen';
 import getIcon from './ExerciseIcon';
+import MultiDivider from '../../components/MultiDivider';
 
 const styles = StyleSheet.create({
     descriptor: {
@@ -44,15 +45,10 @@ export default function ViewWorkoutScreen({ route, navigation }) {
                     <Text style={styles.descriptor}>{workout.time} mins</Text>
                     <Text style={styles.descriptor}>Level {workout.level}/5</Text>
                 </View>
-                <Divider />
-                <Divider />
-                <Divider />
-                <Divider />
-                <Divider />
+                <MultiDivider thickness={5}/>
                 {exercises}
                 <View style={{ width: '100%', marginTop: 20, flexDirection: 'row', justifyContent: 'space-around' }}>
                     <FAB icon='play' />
-                    <FAB icon='pencil' />
                 </View>
             </View>
         );
