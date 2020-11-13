@@ -94,6 +94,14 @@ export default function Routers({ theme }) {
 
 	const [isSignedIn, setIsSignedIn] = useState(true);
 
+	Firebase.auth().onAuthStateChanged(function(user) {
+		if (user) {
+			setIsSignedIn(true)
+		} else {
+			setIsSignedIn(false)
+		}
+});
+
 	return (
 
 		<NavigationContainer theme={theme}>
