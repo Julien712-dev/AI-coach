@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -21,6 +22,7 @@ import ViewWorkoutScreen from './screens/exercise/ViewWorkoutScreen';
 
 // Login Screen
 import LoginScreen from "./screens/login/LoginScreen"
+import { loginFunc, logoutFunc } from './actions/auth.actions';
 
 // Stacks
 const HomeStack = createStackNavigator();
@@ -92,22 +94,11 @@ function BottomTabs() {
 const Stack = createStackNavigator();
 export default function Routers({ theme }) {
 
-	const [isSignedIn, setIsSignedIn] = useState(true);
-
-	Firebase.auth().onAuthStateChanged(function(user) {
-		if (user) {
-			setIsSignedIn(true)
-		} else {
-			setIsSignedIn(false)
-		}
-});
-
+	let user = useSelector(state => state.main.authReducer.user);
 	return (
-
 		<NavigationContainer theme={theme}>
-			<Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={isSignedIn ? 'Home' : 'Login'}>
-				<Stack.Screen name="Login" component={LoginScreen} />
-				<Stack.Screen name="Home" component={BottomTabs} />
+			<Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={!!user ? 'Home' : 'Login'}>
+				{!!user ? <Stack.Screen name="Home" component={BottomTabs} /> : <Stack.Screen name="Login" component={LoginScreen} />}
 				{/* Bottom Tab Bar is hidden for the following screens */}
 				<Stack.Screen
 					name="Edit Diet"
