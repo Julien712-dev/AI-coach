@@ -5,6 +5,11 @@ import { DefaultTheme as NavigationDefaultTheme } from '@react-navigation/native
 import { DraxProvider } from 'react-native-drax';
 import merge from 'deepmerge';
 
+// State saving
+import { PersistGate } from "redux-persist/integration/react";
+import { Provider } from "react-redux";
+import { store, persistor } from "./store.js";
+
 // Router
 import Router from "./router.js";
 
@@ -17,18 +22,10 @@ const firebaseConfig = {
 	storageBucket: "coach-ai.appspot.com",
 };
 
-Firebase.initializeApp(firebaseConfig);
-
-//Firebase.auth().onAuthStateChanged(function(user) {
-  //if (user) {
-    // User is signed in.
-
-  //} else {
-    // User is signed out.
-
-  //}
-//});
-
+// Prevent duplicate app
+if (!Firebase.apps.length) {
+	Firebase.initializeApp(firebaseConfig);
+}
 let DefaultTheme = merge(PaperDefaultTheme, NavigationDefaultTheme);
 
 const theme = {
@@ -43,7 +40,11 @@ export default function App() {
 	return (
 		<PaperProvider theme={theme}>
 			<DraxProvider>
-				<Router theme={theme}/>
+				<Provider store={store}>
+					<PersistGate loading={null} persistor={persistor}>
+						<Router theme={theme}/>
+					</PersistGate>
+				</Provider>
 			</DraxProvider>
 		</PaperProvider>
 	);
