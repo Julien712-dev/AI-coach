@@ -1,32 +1,27 @@
-import * as React from 'react';
 import * as Firebase from 'firebase';
 import { View } from 'react-native';
 import { Button, Text, Appbar } from 'react-native-paper';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import LoginScreen from './login/LoginScreen';
+import { loginFunc, logoutFunc, testingFunc } from '../actions/auth.actions';
 
 export default function HomeScreen({ navigation }) {
-	const [login, setLogin] = React.useState('')
+	let user = useSelector(state => state.main.authReducer.user);
+	let rrr = useSelector(state => state.main.authReducer.abc);
+	const dispatch = useDispatch();
 
 	const logout = () => {
 		Firebase.auth().signOut()
 			.then(() => {
 			// Sign-out successful.
+				dispatch(logoutFunc());
 		  	})
 		  	.catch(() => {
 				// An error happened.
 		  	});
 	}
-
-	Firebase.auth().onAuthStateChanged(function(user) {
-  		if (user) {
-		// User is signed in.
-		setLogin('user has login')
-
-  		} else {
-		// User is signed out.
-		setLogin('user has logout')
-
-  		}
-	});
 
 	return (
 		<>
@@ -34,9 +29,8 @@ export default function HomeScreen({ navigation }) {
 			<Appbar.Content title="Title" subtitle={'Subtitle'} />
 		 	<Appbar.Action icon="magnify" onPress={() => {}} />
 	 	</Appbar.Header>
-		
+		<Text>{rrr}</Text>
 		<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-			<Text>Home screen</Text>
 			<Button mode='contained' onPress={() => navigation.navigate('Login')}>
 				Go to Login
 			</Button>
@@ -45,7 +39,10 @@ export default function HomeScreen({ navigation }) {
 				Log out
 			</Button>
 
-			<Text>{login}</Text>
+			<Button mode='contained' onPress={() => dispatch(testingFunc())}>
+				Test
+			</Button>
+
 		</View>
 		</>
 	);
