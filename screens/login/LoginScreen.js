@@ -1,38 +1,53 @@
 import * as React from 'react';
 import firebase from 'firebase';
-import { Text, View, StyleSheet } from 'react-native';
-import { FAB, Portal, Provider, Card, TextInput, Button, ActivityIndicator } from 'react-native-paper';
+import { View, ScrollView, StyleSheet } from 'react-native';
+import { FAB, Portal, Provider, Card, TextInput, Button, ActivityIndicator, Snackbar } from 'react-native-paper';
 import react from 'react';
 
-const LoginScreen = (props) => {
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
-  const [error, setError] = react.useState('')
+  const [visible, setVisible] = React.useState(false)
+  const [alert, setAlert] = React.useState('')
   const [loading, setLoading] = React.useState(false)
 
   const registerButtonPress = () => {
-    setError('')
     setLoading(true)
     firebase.auth().createUserWithEmailAndPassword(email, password)
-      .then(setLoading(false))
+      .then(() => loginSuccess())
       .catch(() => {
-        setError('Registration Failed')
+        setLoading(false)
+        setAlert('Registration Failed')
+        setVisible(true)
       })
   }
 
   const loginButtonPress = () => {
-    setError('')
     setLoading(true)
     firebase.auth().signInWithEmailAndPassword(email, password)
-      .then(setLoading(false))
+      .then(() => loginSuccess())
       .catch(() => {
-        setError('Login Failed')
+        setLoading(false)
+        setAlert('Login Failed')
+        setVisible(true)
       })
   }
 
+  const loginSuccess = () => {
+    console.log('login success')
+    //setLoading(false)
+    setAlert('login Successful!!')
+    setVisible(true)
+    setTimeout(() => {
+      navigation.navigate('Home')
+    }, 1000)
+  }
+
+  const onDismissSnackBar = () => setVisible(false)
+
   
   return (
-    <View>
+    <View style={styles.container}>
       <Card style={{ margin: 10 }}>
 			  <Card.Content>
         <TextInput
@@ -58,7 +73,7 @@ const LoginScreen = (props) => {
         />
 
         <View style={{flexDirection: 'row', alignItems: 'stretch'}}>
-          <Button style={styles.btnStyle} mode="contained" onPress={() => {registerButtonPress()}}>
+          <Button style={styles.btnStyle} mode="contained" onPress={() => registerButtonPress()}>
           Register
           </Button>
 
@@ -67,15 +82,22 @@ const LoginScreen = (props) => {
           </Button>
         </View>
 
-        {loading ? <ActivityIndicator animating={true} /> : <Text style={styles.errorTextStyle}>{error}</Text>}
+        {loading ? <ActivityIndicator animating={true} /> : <ActivityIndicator animating={false} /> }
 
 			  </Card.Content>
 		  </Card>
+
+
+      <Snackbar visible={visible} onDismiss={onDismissSnackBar} duration={3000}>{alert}</Snackbar>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
   btnStyle:{
     margin: 10,
     flex: 1
