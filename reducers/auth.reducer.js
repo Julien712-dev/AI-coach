@@ -1,5 +1,6 @@
 const initialState = {
-    user: null,
+    user: null, // to store the session of the user. when null, user is required to log in
+    profile: null,
     testingVariable: 'testtttt',
     abc: 'testt'
 };
