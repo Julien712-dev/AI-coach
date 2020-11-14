@@ -19,7 +19,10 @@ const LoginScreen = ({ navigation }) => {
   const registerButtonPress = () => {
     setLoading(true)
     firebase.auth().createUserWithEmailAndPassword(email, password)
-      .then(() => loginSuccess())
+      .then(() => { 
+        setLoading(false); 
+        setAlert('Registration Succeeded!'); 
+        setVisible(true); })
       .catch(() => {
         setLoading(false)
         setAlert('Registration Failed')
@@ -49,6 +52,20 @@ const LoginScreen = ({ navigation }) => {
     setTimeout(() => {
       navigation.navigate('Home')
     }, 1000)
+  };
+
+  const loginAsTrialUser = () => {
+    setLoading(true)
+    firebase.auth().signInWithEmailAndPassword(`trial@gmail.com`, `123456`)
+      .then(() => {
+        dispatch(loginFunc());
+        loginSuccess();
+      })
+      .catch(() => {
+        setLoading(false)
+        setAlert('Login Failed')
+        setVisible(true)
+      })
   }
 
   const onDismissSnackBar = () => setVisible(false)
@@ -92,6 +109,11 @@ const LoginScreen = ({ navigation }) => {
 
         {loading ? <ActivityIndicator animating={true} /> : <ActivityIndicator animating={false} /> }
 
+        <View style={{flexDirection: 'row', alignItems: 'stretch'}}>
+          <Button style={styles.btnStyle} mode="contained" onPress={() => loginAsTrialUser()}>
+            Trial User
+          </Button>
+        </View>
 			  </Card.Content>
 		  </Card>
 
@@ -108,10 +130,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 10,
-    backgroundColor: 'white'
+    // backgroundColor: 'white'
   },
   btnStyle:{
-    margin: 10,
+    marginHorizontal: 10,
     flex: 1
   },
   textInputStyle:{

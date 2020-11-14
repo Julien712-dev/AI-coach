@@ -6,8 +6,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // Importing Screens
-import HomeScreen from "./screens/HomeScreen"
-import DetailsScreen from "./screens/DetailsScreen"
+import HomeScreen from "./screens/HomeScreen";
+import DetailsScreen from "./screens/DetailsScreen";
+import EntranceSurveyScreen from "./screens/survey/EntranceSurveyScreen";
 
 // Diet Screens
 import DietScreenMain from "./screens/diet/DietScreenMain";
@@ -97,8 +98,8 @@ export default function Routers({ theme }) {
 	let user = useSelector(state => state.main.authReducer.user);
 	return (
 		<NavigationContainer theme={theme}>
-			<Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={!!user ? 'Home' : 'Login'}>
-				{!!user ? <Stack.Screen name="Home" component={BottomTabs} /> : <Stack.Screen name="Login" component={LoginScreen} />}
+			<Stack.Navigator mode='modal' screenOptions={{ headerShown: false }} initialRouteName={!!user ? 'Home' : 'Login'}>
+				{!!user ? <><Stack.Screen name="Home" component={BottomTabs} /><Stack.Screen name="Entrance Survey" component={EntranceSurveyScreen} /></> : <Stack.Screen name="Login" component={LoginScreen} />}
 				{/* Bottom Tab Bar is hidden for the following screens */}
 				<Stack.Screen
 					name="Edit Diet"
