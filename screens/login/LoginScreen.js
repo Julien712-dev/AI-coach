@@ -1,20 +1,28 @@
-import * as React from 'react';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import firebase from 'firebase';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { FAB, Portal, Provider, Card, TextInput, Button, ActivityIndicator, Snackbar } from 'react-native-paper';
 import react from 'react';
+import { loginFunc } from '../../actions/auth.actions';
 
 const LoginScreen = ({ navigation }) => {
-  const [email, setEmail] = React.useState('')
-  const [password, setPassword] = React.useState('')
-  const [visible, setVisible] = React.useState(false)
-  const [alert, setAlert] = React.useState('')
-  const [loading, setLoading] = React.useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [visible, setVisible] = useState(false)
+  const [alert, setAlert] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const dispatch = useDispatch();
+	let user = useSelector(state => state.main.uiReducer.user);
 
   const registerButtonPress = () => {
     setLoading(true)
     firebase.auth().createUserWithEmailAndPassword(email, password)
-      .then(() => loginSuccess())
+      .then(() => { 
+        setLoading(false); 
+        setAlert('Registration Succeeded!'); 
+        setVisible(true); })
       .catch(() => {
         setLoading(false)
         setAlert('Registration Failed')
@@ -25,7 +33,10 @@ const LoginScreen = ({ navigation }) => {
   const loginButtonPress = () => {
     setLoading(true)
     firebase.auth().signInWithEmailAndPassword(email, password)
-      .then(() => loginSuccess())
+      .then(() => {
+        dispatch(loginFunc());
+        loginSuccess();
+      })
       .catch(() => {
         setLoading(false)
         setAlert('Login Failed')
@@ -41,6 +52,20 @@ const LoginScreen = ({ navigation }) => {
     setTimeout(() => {
       navigation.navigate('Home')
     }, 1000)
+  };
+
+  const loginAsTrialUser = () => {
+    setLoading(true)
+    firebase.auth().signInWithEmailAndPassword(`trial@gmail.com`, `123456`)
+      .then(() => {
+        dispatch(loginFunc());
+        loginSuccess();
+      })
+      .catch(() => {
+        setLoading(false)
+        setAlert('Login Failed')
+        setVisible(true)
+      })
   }
 
   const onDismissSnackBar = () => setVisible(false)
@@ -48,7 +73,7 @@ const LoginScreen = ({ navigation }) => {
   
   return (
     <View style={styles.container}>
-      <Card style={{ margin: 10 }}>
+      <Card style={{ margin: 10, width: 350 }}>
 			  <Card.Content>
         <TextInput
           style={styles.textInputStyle}
@@ -84,6 +109,11 @@ const LoginScreen = ({ navigation }) => {
 
         {loading ? <ActivityIndicator animating={true} /> : <ActivityIndicator animating={false} /> }
 
+        <View style={{flexDirection: 'row', alignItems: 'stretch'}}>
+          <Button style={styles.btnStyle} mode="contained" onPress={() => loginAsTrialUser()}>
+            Trial User
+          </Button>
+        </View>
 			  </Card.Content>
 		  </Card>
 
@@ -96,10 +126,14 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'space-between',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    // backgroundColor: 'white'
   },
   btnStyle:{
-    margin: 10,
+    marginHorizontal: 10,
     flex: 1
   },
   textInputStyle:{
