@@ -1,3 +1,4 @@
+import { registerRootComponent } from 'expo'
 import React from 'react';
 import * as Firebase from 'firebase';
 import { Provider as PaperProvider, DefaultTheme as PaperDefaultTheme } from 'react-native-paper';
@@ -36,7 +37,7 @@ const theme = {
 	},
 }
 
-export default function App() {
+function App() {
 	return (
 		<PaperProvider theme={theme}>
 			<DraxProvider>
@@ -49,3 +50,5 @@ export default function App() {
 		</PaperProvider>
 	);
 }
+
+export default registerRootComponent(App);
