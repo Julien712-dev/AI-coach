@@ -17,17 +17,18 @@ const LoginScreen = ({ navigation }) => {
 	let user = useSelector(state => state.main.uiReducer.user);
 
   const registerButtonPress = () => {
-    setLoading(true)
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-      .then(() => { 
-        setLoading(false); 
-        setAlert('Registration Succeeded!'); 
-        setVisible(true); })
-      .catch(() => {
-        setLoading(false)
-        setAlert('Registration Failed')
-        setVisible(true)
-      })
+    // setLoading(true)
+    // firebase.auth().createUserWithEmailAndPassword(email, password)
+    //   .then(() => { 
+    //     setLoading(false); 
+    //     setAlert('Registration Succeeded!'); 
+    //     setVisible(true); })
+    //   .catch(() => {
+    //     setLoading(false)
+    //     setAlert('Registration Failed')
+    //     setVisible(true)
+    //   })
+    navigation.navigate('Sign Up');
   }
 
   const loginButtonPress = () => {
@@ -46,7 +47,6 @@ const LoginScreen = ({ navigation }) => {
 
   const loginSuccess = () => {
     console.log('login success')
-    //setLoading(false)
     setAlert('login Successful!!')
     setVisible(true)
     setTimeout(() => {

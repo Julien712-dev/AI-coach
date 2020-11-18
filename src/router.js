@@ -17,12 +17,13 @@ import LogDietScreen from "./screens/diet/LogDietScreen";
 import LogDietDetailsScreen from './screens/diet/LogDietDetailsScreen';
 
 // Exercise Screens
-import ExerciseMainScreen from "./screens/exercise/ExerciseMainScreen"
+import ExerciseMainScreen from "./screens/exercise/ExerciseMainScreen";
 import PlanWorkoutScreen from './screens/exercise/PlanWorkoutScreen';
 import ViewWorkoutScreen from './screens/exercise/ViewWorkoutScreen';
 
 // Login Screen
-import LoginScreen from "./screens/login/LoginScreen"
+import LoginScreen from "./screens/login/LoginScreen";
+import SignUpScreen from "./screens/login/SignUpScreen";
 import { loginFunc, logoutFunc } from './actions/auth.actions';
 
 // Stacks
@@ -99,7 +100,14 @@ export default function Routers({ theme }) {
 	return (
 		<NavigationContainer theme={theme}>
 			<Stack.Navigator mode='modal' screenOptions={{ headerShown: false }} initialRouteName={!!user ? 'Home' : 'Login'}>
-				{!!user ? <><Stack.Screen name="Home" component={BottomTabs} /><Stack.Screen name="Entrance Survey" component={EntranceSurveyScreen} /></> : <Stack.Screen name="Login" component={LoginScreen} />}
+				{!!user ? 
+				<>
+					<Stack.Screen name="Home" component={BottomTabs} />
+					<Stack.Screen name="Entrance Survey" component={EntranceSurveyScreen} />
+				</> : <>
+					<Stack.Screen name="Login" component={LoginScreen} />
+					<Stack.Screen name="Sign Up" component={SignUpScreen} />
+				</>}
 				{/* Bottom Tab Bar is hidden for the following screens */}
 				<Stack.Screen
 					name="Edit Diet"
