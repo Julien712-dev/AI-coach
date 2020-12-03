@@ -4,7 +4,7 @@ import firebase from 'firebase';
 import { View, ScrollView, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Title, Card, TextInput, Button, ActivityIndicator, Snackbar } from 'react-native-paper';
 import react from 'react';
-import { loginFunc } from '../../actions/auth.actions';
+import { login } from '../../store/authSlice';
 
 const DismissKeyboard = ({ children }) => (
     <TouchableWithoutFeedback 
@@ -22,7 +22,6 @@ export default function SignUpScreen({ navigation }) {
     const [loading, setLoading] = useState(false)
 
     const dispatch = useDispatch();
-	let user = useSelector(state => state.main.uiReducer.user);
 
   const registerButtonPress = () => {
     setLoading(true)
@@ -31,7 +30,7 @@ export default function SignUpScreen({ navigation }) {
         setLoading(false); 
         setAlert('Registration Succeeded!'); 
         setVisible(true);
-        navigation.navigate('Log In');
+        navigation.navigate('Login');
     })
       .catch(() => {
         setLoading(false);
@@ -49,7 +48,7 @@ export default function SignUpScreen({ navigation }) {
     setLoading(true)
     firebase.auth().signInWithEmailAndPassword(email, password)
       .then(() => {
-        dispatch(loginFunc());
+        dispatch(login());
         loginSuccess();
       })
       .catch(() => {
@@ -72,7 +71,7 @@ export default function SignUpScreen({ navigation }) {
     setLoading(true)
     firebase.auth().signInWithEmailAndPassword(`trial@gmail.com`, `123456`)
       .then(() => {
-        dispatch(loginFunc());
+        dispatch(login());
         loginSuccess();
       })
       .catch(() => {

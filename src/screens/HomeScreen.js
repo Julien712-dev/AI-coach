@@ -4,11 +4,11 @@ import { Button, Text, Appbar, Title } from 'react-native-paper';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { logoutFunc } from '../actions/auth.actions';
+import { logout as logoutAction } from '../store/authSlice';
 import LoadingScreen from './LoadingScreen';
 
 export default function HomeScreen({ navigation }) {
-	let user = useSelector(state => state.main.authReducer.user) || {};
+	let user = useSelector(state => state.main.auth.user) || {};
 	const [isFetched, setIsFetched] = useState(false);
 	const [profile, setProfile] = useState(null);
 	const dispatch = useDispatch();
@@ -17,7 +17,7 @@ export default function HomeScreen({ navigation }) {
 		Firebase.auth().signOut()
 			.then(() => {
 			// Sign-out successful.
-				dispatch(logoutFunc());
+				dispatch(logoutAction());
 		  	})
 		  	.catch(() => {
 				// An error happened.

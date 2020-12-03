@@ -1,26 +1,29 @@
-import { createStore, applyMiddleware, combineReducers } from "redux";
-import thunk from "redux-thunk";
-import { createLogger } from "redux-logger";
-import { persistStore, persistReducer } from "redux-persist";
+import { createStore, applyMiddleware, combineReducers } from 'redux';
+import thunk from 'redux-thunk';
+import { persistStore, persistReducer } from 'redux-persist';
 
 // stores for data
-import AsyncStorage from "@react-native-community/async-storage";
-import { mainReducer } from "./reducers/index.reducer.js";
+import AsyncStorage from '@react-native-community/async-storage';
+import authReducer from './authSlice';
 
 const mainPersistConfig = {
-  key: "main",
+  key: 'main',
   storage: AsyncStorage,
   // Whitelist (Save Specific Reducers)
-  whitelist: ["authReducer"],
-  // Blacklist (Don"t Save Specific Reducers)
-  blacklist: ["uiReducer"]
+  whitelist: ['auth'],
+  // Blacklist (Don't Save Specific Reducers)
+  blacklist: []
 };
 
 // const securePersistConfig = {
-//   key: "secure",
+//   key: 'secure',
 //   storage: createSecureStore(),
-//   whitelist: ["authReducer"]
+//   whitelist: ['authReducer']
 // };
+
+const mainReducer = combineReducers({
+  auth: authReducer
+});
 
 const rootReducer = combineReducers({
   main: persistReducer(mainPersistConfig, mainReducer)
@@ -32,5 +35,6 @@ const store = createStore(rootReducer, applyMiddleware(thunk));
 
 // Middleware: Redux Persist Persister
 const persistor = persistStore(store);
+persistor.purge();
 
 export { store, persistor };

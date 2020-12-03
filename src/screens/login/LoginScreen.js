@@ -3,8 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import firebase from 'firebase';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { FAB, Portal, Provider, Card, TextInput, Button, ActivityIndicator, Snackbar } from 'react-native-paper';
-import react from 'react';
-import { loginFunc } from '../../actions/auth.actions';
+import { login } from '../../store/authSlice';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('')
@@ -14,7 +13,6 @@ const LoginScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false)
 
   const dispatch = useDispatch();
-	let user = useSelector(state => state.main.uiReducer.user);
 
   const registerButtonPress = () => {
     // setLoading(true)
@@ -35,7 +33,7 @@ const LoginScreen = ({ navigation }) => {
     setLoading(true)
     firebase.auth().signInWithEmailAndPassword(email, password)
       .then(() => {
-        dispatch(loginFunc());
+        dispatch(login());
         loginSuccess();
       })
       .catch(() => {
@@ -50,7 +48,10 @@ const LoginScreen = ({ navigation }) => {
     setAlert('login Successful!!')
     setVisible(true)
     setTimeout(() => {
-      navigation.navigate('Home')
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Home' }]
+      });
     }, 1000)
   };
 
@@ -58,7 +59,7 @@ const LoginScreen = ({ navigation }) => {
     setLoading(true)
     firebase.auth().signInWithEmailAndPassword(`trial@gmail.com`, `123456`)
       .then(() => {
-        dispatch(loginFunc());
+        dispatch(login());
         loginSuccess();
       })
       .catch(() => {
