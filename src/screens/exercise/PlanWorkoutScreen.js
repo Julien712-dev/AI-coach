@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import Firebase from 'firebase';
 import { StyleSheet, View, ScrollView, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { useTheme, FAB, Headline, Text, IconButton, Surface, Title, Portal, Dialog, Paragraph, Button } from 'react-native-paper';
@@ -93,6 +94,8 @@ function ActivityCard({ activity, onPress, onMoveUp, onMoveDown, onDelete }) {
 
 export default function PlanWorkoutScreen({ navigation }) {
     // TEST
+    const persistedUser = useSelector(state => state.main.auth.user);
+
     const userId = '1234567890';
     const userDatabaseRef = Firebase.database().ref(`/users/${userId}`);
 
@@ -162,7 +165,8 @@ export default function PlanWorkoutScreen({ navigation }) {
         };
         const onSaveChanges = () => {
             setDialogVisible(false);
-            userDatabaseRef.set(user);
+            const userExercisePlanRef = Firebase.database().ref(`/users/${persistedUser.uid}/exercisePlan`);
+            userExercisePlanRef.set(user.exercisePlan);
             navigation.dispatch(navigationAction);
         };
         const onDiscardChanges = () => {
@@ -186,6 +190,7 @@ export default function PlanWorkoutScreen({ navigation }) {
         });
         return (
             <ScrollView style={{ padding: 20 }}>
+                <Text>{JSON.stringify(user)}</Text>
                 <Table>
                     {rows}
                 </Table>
