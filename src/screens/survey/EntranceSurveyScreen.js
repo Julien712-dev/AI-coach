@@ -9,6 +9,7 @@ import DropDown from 'react-native-paper-dropdown';
 import Carousel from 'react-native-snap-carousel';
 import LoadingScreen from "../LoadingScreen";
 import { saveProfile, updateProfile } from "../../actions/profile.actions";
+import { updateTempStorage } from "../../store/profileSlice.js";
 
 import StepIndicator from 'react-native-step-indicator';
 import Swiper from 'react-native-swiper';
@@ -82,17 +83,21 @@ function EntranceSurveyStepOneScreen({ navigation }) {
             }}))}}>update dispatch</Button> */}
             {/* <Button style={styles.btnStyle} mode='contained' onPress={() => createProfile()}>create profile</Button> */}
             <Button style={styles.btnStyle} mode='contained' onPress={() => {
-                dispatch(updateProfile({ newData: { 
-                    firstName: firstName, 
-                    lastName: lastName, 
-                    height: height, 
-                    weight: weight, 
-                    heightUnit: heightUnit, 
-                    weightUnit: weightUnit,
-                    sex: sex
-                }}));
-                dispatch(saveProfile());
-                navigation.goBack();}}>create profile</Button>
+                dispatch(updateTempStorage(
+                    { 
+                        firstName: firstName, 
+                        lastName: lastName, 
+                        height: height, 
+                        weight: weight, 
+                        heightUnit: heightUnit, 
+                        weightUnit: weightUnit,
+                        sex: sex
+                    }
+                ));
+
+                // dispatch(saveProfile());
+                // navigation.goBack();
+                }}>create profile</Button>
         </View>
     )
 }
@@ -127,8 +132,8 @@ export default function EntranceSurveyScreen({ navigation }) {
 
     const swiperRef = useRef(null);
 
-    let user = useSelector(state => state.main.authReducer.user) || {};
-    let tempProfile = useSelector(state => state.main.profileReducer.firstName);
+    let user = useSelector(state => state.main.auth.user) || {};
+    let tempProfile = useSelector(state => state.main.profile);
 
     const PAGES = [
         <EntranceSurveyStepOneScreen navigation={navigation} />, 
@@ -179,6 +184,8 @@ export default function EntranceSurveyScreen({ navigation }) {
     return (
         <ScrollView>
             <View style={{flex: 1}}>
+            {/* <Text>{user.uid}</Text> */}
+            <Text>{JSON.stringify(tempProfile)}</Text>
             <Button icon="close" style={{ position: 'absolute', top:20, right:0 }} onPress={() => navigation.goBack()}>Skip</Button>
                 <View style={{ padding: 20, marginTop: 50, justifyContent: 'center', flex: 1 }}>
                     <Text>Set up your profile for a better user experience! </Text>

@@ -7,20 +7,20 @@ import { DraxProvider } from 'react-native-drax';
 import merge from 'deepmerge';
 
 // State saving
-import { PersistGate } from "redux-persist/integration/react";
-import { Provider } from "react-redux";
-import { store, persistor } from "./store.js";
+import { PersistGate } from 'redux-persist/integration/react';
+import { Provider as ReduxProvider } from 'react-redux';
+import { store, persistor } from './store/store';
 
 // Router
-import Router from "./router.js";
+import Router from './router';
 
 // Initialize Firebase
 const firebaseConfig = {
-	apiKey: "AIzaSyBFcIUtiuhVH0-xzx5aiTadgsn4eNUcf8w",
-	authDomain: "coach-ai.firebaseapp.com",
-	databaseURL: "https://coach-ai.firebaseio.com",
-	projectId: "coach-ai",
-	storageBucket: "coach-ai.appspot.com",
+	apiKey: 'AIzaSyBFcIUtiuhVH0-xzx5aiTadgsn4eNUcf8w',
+	authDomain: 'coach-ai.firebaseapp.com',
+	databaseURL: 'https://coach-ai.firebaseio.com',
+	projectId: 'coach-ai',
+	storageBucket: 'coach-ai.appspot.com',
 };
 
 // Prevent duplicate app
@@ -41,11 +41,11 @@ function App() {
 	return (
 		<PaperProvider theme={theme}>
 			<DraxProvider>
-				<Provider store={store}>
+				<ReduxProvider store={store}>
 					<PersistGate loading={null} persistor={persistor}>
 						<Router theme={theme}/>
 					</PersistGate>
-				</Provider>
+				</ReduxProvider>
 			</DraxProvider>
 		</PaperProvider>
 	);
