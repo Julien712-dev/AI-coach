@@ -58,7 +58,7 @@ export default function HomeScreen({ navigation }) {
 			<ScrollView contentContainerStyle={{ padding: 10 }}>
 				<View style={{ flex: 1 }}>
 					{/* <Title>{JSON.stringify(profile)}</Title> */}
-					<Title>Greetings, {profile.profile.firstName}</Title>
+					{/* <Title>Greetings, {profile.profile.firstName}</Title> */}
 					<Button style={styles.btnStyle} mode='contained' onPress={() => navigation.navigate('Entrance Survey')}>
 						Manage My Profile
 					</Button>
