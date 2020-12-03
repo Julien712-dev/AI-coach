@@ -17,7 +17,7 @@ export const updateProfile = ({ newData }) => {
   export const saveProfile = () => {
     return async (dispatch, getStates) => {
       try {
-        const user = getStates().main.authReducer.user;
+        const user = getStates().main.auth.user;
         const profile = getStates().main.profileReducer;
         const profileRef = firebase.database().ref(`users/${user.uid}/profile`);
         profileRef.set({
