@@ -16,7 +16,7 @@ export default function EntranceSurveyScreen({ navigation }) {
     const [isFetched, setIsFetched] = useState(false);
     const dispatch = useDispatch();
 
-    let user = useSelector(state => state.main.authReducer.user) || {};
+    let user = useSelector(state => state.main.auth.user) || {};
 
     // When the user first login, force the user to complete his profile.
 	useEffect(() => {
