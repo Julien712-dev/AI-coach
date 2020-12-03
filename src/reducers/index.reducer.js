@@ -4,12 +4,13 @@ import { combineReducers } from "redux";
 // Imports: Reducers
 import authReducer from "./auth.reducer.js";
 import uiReducer from "./ui.reducer.js";
-// import socketReducer from "./socket.reducer.js";
+import profileReducer from "./profile.reducer.js";
 
 // Redux: Root Reducer
 const mainReducer = combineReducers({
   uiReducer: uiReducer,
-  authReducer: authReducer
+  authReducer: authReducer,
+  profileReducer: profileReducer
 });
 
 // Exports

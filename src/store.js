@@ -11,7 +11,7 @@ const mainPersistConfig = {
   key: "main",
   storage: AsyncStorage,
   // Whitelist (Save Specific Reducers)
-  whitelist: ["authReducer"],
+  whitelist: ["authReducer", "profileReducer"],
   // Blacklist (Don"t Save Specific Reducers)
   blacklist: ["uiReducer"]
 };
