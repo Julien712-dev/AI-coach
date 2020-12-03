@@ -19,7 +19,21 @@ module.exports = {
         night: {
             startAt: 18,
             endAt: 24
-        }
+        },
+        heightUnits: [{
+            label: 'cm', 
+            value: 'cm'
+        }, {
+            label: 'inches', 
+            value: 'inches'
+        }],
+        weightUnits: [{
+            label: 'kg',
+            value: 'kg'
+        }, {
+            label: 'lbs', 
+            value: 'lbs'
+        }]
     },
     messages: {
         diet: [
