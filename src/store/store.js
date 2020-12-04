@@ -6,6 +6,7 @@ import { persistStore, persistReducer } from 'redux-persist';
 import AsyncStorage from '@react-native-community/async-storage';
 import authReducer from './authSlice';
 import profileReducer from './profileSlice';
+import exerciseReducer from './exerciseSlice';
 
 const mainPersistConfig = {
   key: 'main',
@@ -14,7 +15,7 @@ const mainPersistConfig = {
   whitelist: ["auth", "profile"],
   // Blacklist (Don"t Save Specific Reducers)
   blacklist: []
-};
+}
 
 // const securePersistConfig = {
 //   key: 'secure',
@@ -24,12 +25,13 @@ const mainPersistConfig = {
 
 const mainReducer = combineReducers({
   auth: authReducer,
-  profile: profileReducer
+  profile: profileReducer,
+  exercise: exerciseReducer
 });
 
 const rootReducer = combineReducers({
-  main: persistReducer(mainPersistConfig, mainReducer)
-  // secure: persistReducer(securePersistConfig, secureReducer)
+	main: persistReducer(mainPersistConfig, mainReducer)
+	// secure: persistReducer(securePersistConfig, secureReducer)
 });
 
 // Redux: Store
