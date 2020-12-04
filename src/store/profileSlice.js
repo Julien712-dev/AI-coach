@@ -4,15 +4,15 @@ import * as firebase from 'firebase';
 const profileSlice = createSlice({
     name: 'profile',
     initialState: {
-        firstName: 'John',
-        lastName: 'Doe',
-        height: 170,
+        firstName: null,
+        lastName: null,
+        height: null,
         heightUnit: 'cm',
-        weight: 60,
+        weight: null,
         weightUnit: 'kg',
         sex: 'M',
-        age: 18,
-        bodyGoal: 'Weight Control',
+        age: null,
+        bodyGoal: null,
         exerciseHabit: [],
         includeRunning: false,
         dietHabit: [],
@@ -20,11 +20,17 @@ const profileSlice = createSlice({
     },
     reducers: {
         updateTempStorage: (state, action) => {
-            state = {...state, ...action.payload}
+            return {...state, ...action.payload}
+        },
+        saveProfileToFirebase: (state, action) => {
+            const userRef = action.payload;
+            userRef.set({...state});
+            // reset state values
+            return {...state}
         }
     }
 });
 
 const { reducer, actions } = profileSlice;
-export const { updateTempStorage } = actions;
+export const { updateTempStorage, saveProfileToFirebase } = actions;
 export default reducer;
