@@ -47,12 +47,12 @@ const LoginScreen = ({ navigation }) => {
     console.log('login success')
     setAlert('login Successful!!')
     setVisible(true)
-    setTimeout(() => {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Home' }]
-      });
-    }, 1000)
+    // setTimeout(() => {
+    //   navigation.reset({
+    //     index: 0,
+    //     routes: [{ name: 'Home' }]
+    //   });
+    // }, 1000)
   };
 
   const loginAsTrialUser = () => {
