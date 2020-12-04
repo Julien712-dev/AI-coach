@@ -40,7 +40,25 @@ module.exports = {
         }, {
             label: 'Female',
             value: 'F',
-        }]
+        }],
+        exerciseHabitOptions: [
+            {
+                label: '1-2 Times per week',
+                value: '1-2',
+            },
+            {
+                label: '3-4 Times per week',
+                value: '3-4',
+            },
+            {
+                label: '5-7 Times per week',
+                value: '5-7',
+            },
+            {
+                label: 'I do not exercise in a week',
+                value: '0',
+            },
+        ]
     },
     messages: {
         diet: [
