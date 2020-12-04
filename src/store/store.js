@@ -37,6 +37,6 @@ const store = createStore(rootReducer, applyMiddleware(thunk));
 
 // Middleware: Redux Persist Persister
 const persistor = persistStore(store);
-persistor.purge();
+// persistor.purge();
 
 export { store, persistor };
