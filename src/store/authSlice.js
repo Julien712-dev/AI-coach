@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import * as firebase from 'firebase';
 
 const authSlice = createSlice({
-    name: 'counter',
+    name: 'auth',
     initialState: {
         user: null, // to store the session of the user. when null, user is required to log in
         profile: null

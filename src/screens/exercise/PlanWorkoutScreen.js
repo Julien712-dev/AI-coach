@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import Firebase from 'firebase';
 import { StyleSheet, View, ScrollView, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { useTheme, FAB, Headline, Text, IconButton, Surface, Title, Portal, Dialog, Paragraph, Button } from 'react-native-paper';
 import StarRating from 'react-native-star-rating';
+
+import { setPlan, onSavePlan, swapWorkout, removeWorkout } from '../../store/exerciseSlice';
 import LoadingScreen from '../LoadingScreen';
 
 const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
@@ -92,77 +95,66 @@ function ActivityCard({ activity, onPress, onMoveUp, onMoveDown, onDelete }) {
 }
 
 export default function PlanWorkoutScreen({ navigation }) {
-    // TEST
-    const userId = '1234567890';
-    const userDatabaseRef = Firebase.database().ref(`/users/${userId}`);
-
-    const [user, setUser] = useState(null);
-    const [initialUser, setInitialUser] = useState(null);
+    const uid = useSelector(state => state.main.auth.user.uid);
+    const plan = useSelector(state => state.main.exercise.plan);
+    const planModified = useSelector(state => state.main.exercise.planModified);
+    const dispatch = useDispatch();
     const [dialogVisible, setDialogVisible] = useState(false);
     const [navigationAction, setNavigationAction] = useState(false);    // The navigation action interrupted by the 'Save?' dialog
     const { colors } = useTheme();
 
+    const planDatabaseRef = Firebase.database().ref(`/users/${uid}/exercisePlan`);
+
     useEffect(() => {
-        userDatabaseRef.on('value', snapshot => { 
+        planDatabaseRef.on('value', snapshot => { 
             let value = snapshot.val();
-            setInitialUser(value);
-            setUser(value); 
+            dispatch(setPlan({ plan: value }));
         });
     }, []);
     
     useEffect(() => {
         const unsubscribe = navigation.addListener('beforeRemove', event => {
-            if (JSON.stringify(user) != JSON.stringify(initialUser)) {
+            if (planModified) {
                 event.preventDefault();
                 setNavigationAction(event.data.action);
                 setDialogVisible(true);
             }
         });
         return unsubscribe;
-    }, [navigation, user, initialUser]);
+    }, [navigation, planModified]);
 
-    if (user == null)
+    if (plan == null)
         return <LoadingScreen />;
     else {
         const onActivityPress = day => {
-            const activity = user.exercisePlan[day];
+            const activity = plan[day];
             if (activity.type != 'rest')
                 navigation.navigate('View Workout', { day: day })
         };
         const onActivityMoveUp = day => {
-            let userClone = JSON.parse(JSON.stringify(user));
             const index = days.indexOf(day);
-
             if (index > 0) {
-                let temp = user.exercisePlan[days[index - 1]];
-                userClone.exercisePlan[days[index - 1]] = userClone.exercisePlan[days[index]];
-                userClone.exercisePlan[days[index]] = temp;
-                setUser(userClone);
+                let prevDay = days[index - 1];
+                dispatch(swapWorkout({ fromDay: prevDay, toDay: day }));
             }
         };
         const onActivityMoveDown = day => {
-            let userClone = JSON.parse(JSON.stringify(user));
             const index = days.indexOf(day);
-
             if (index < days.length - 1) {
-                let temp = user.exercisePlan[days[index + 1]];
-                userClone.exercisePlan[days[index + 1]] = userClone.exercisePlan[days[index]];
-                userClone.exercisePlan[days[index]] = temp;
-                setUser(userClone);
+                let nextDay = days[index + 1];
+                dispatch(swapWorkout({ fromDay: nextDay, toDay: day }));
             }
         };
         const onActivityDelete = day => {
-            let userClone = JSON.parse(JSON.stringify(user));
-            const index = days.indexOf(day);
-            delete userClone.exercisePlan[days[index]];
-            setUser(userClone);
+            dispatch(removeWorkout({ day }));
         };
         const onDialogDismiss = () => {
             setDialogVisible(false);
         };
         const onSaveChanges = () => {
             setDialogVisible(false);
-            userDatabaseRef.set(user);
+            planDatabaseRef.set(plan);
+            dispatch(onSavePlan());
             navigation.dispatch(navigationAction);
         };
         const onDiscardChanges = () => {
@@ -174,7 +166,7 @@ export default function PlanWorkoutScreen({ navigation }) {
         }
         const rows = days.map(day => {
             const header = day[0].toUpperCase() + day.slice(1);
-            const activity = user.exercisePlan[day];
+            const activity = plan[day];
             const component = activity == undefined ?
                 <FAB icon='plus' label='Add' /> :
                 <ActivityCard activity={activity} onPress={() => onActivityPress(day)} onMoveUp={() => onActivityMoveUp(day)} onMoveDown={() => onActivityMoveDown(day)} onDelete={() => onActivityDelete(day)} />;
