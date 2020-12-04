@@ -4,41 +4,54 @@ import Firebase from 'firebase';
 import config from '../../config';
 import moment from 'moment';
 import { View, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
-import { Button, Text, Title, Card, Paragraph, TextInput } from 'react-native-paper';
+import { Button, Text, Title, Card, Paragraph, TextInput, Chip } from 'react-native-paper';
 import DropDown from 'react-native-paper-dropdown';
 import Carousel from 'react-native-snap-carousel';
 import LoadingScreen from "../LoadingScreen";
 import { saveProfile, updateProfile } from "../../actions/profile.actions";
-import { updateTempStorage } from "../../store/profileSlice.js";
+import { updateTempStorage, saveProfileToFirebase } from "../../store/profileSlice.js";
 
 import StepIndicator from 'react-native-step-indicator';
 import Swiper from 'react-native-swiper';
 
 function EntranceSurveyStepOneScreen({ navigation }) {
 
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [height, setHeight] = useState('');
+    const [firstName, setFirstName] = useState(null);
+    const [lastName, setLastName] = useState(null);
+    const [height, setHeight] = useState(null);
     const [heightUnit, setHeightUnit] = useState('cm');
-    const [weight, setWeight] = useState('');
+    const [weight, setWeight] = useState(null);
     const [weightUnit, setWeightUnit] = useState('kg');
+    const [age, setAge] = useState(null);
+    const [sex, setSex] = useState(null);
+    const [isValid, setIsValid] = useState(false);
     const [showHeightDropDown, setShowHeightDropDown] = useState(false);
     const [showWeightDropDown, setShowWeightDropDown] = useState(false);
-    const [sex, setSex] = useState('M');
+    const [showSexDropDown, setShowSexDropDown] = useState(false);
 
     const dispatch = useDispatch();
 
-    const onSexToggle = value => {
-        setSex(status === 'M' ? 'F' : 'M');
-    };
+	let user = useSelector(state => state.main.auth.user);
+    const surveyFields = [firstName, lastName, height, weight, age, sex];
+
+    const validateSurvey = () => {
+        for (var surveyField of surveyFields) {
+            if (!surveyField) return;
+        }
+        setIsValid(true);
+    }
+
+    useEffect(() => {
+        validateSurvey();
+    }, [firstName, lastName, height, weight, age, sex])
     
     return (
         <View style={{ flex: 1 }}>
-            <View style={{ flexDirection: "row" }}>
-                <TextInput style={styles.inputStyle} label='First Name' mode='outlined' value={firstName} onChangeText={text => setFirstName(text)} autoCorrect={false}></TextInput>
-                <TextInput style={styles.inputStyle} label='Last Name' mode='outlined' value={lastName} onChangeText={text => setLastName(text)} autoCorrect={false}></TextInput>
+            <View style={{ flexDirection: "row", width: 365, marginBottom: 8 }}>
+                <TextInput style={{width: 165, marginHorizontal: 10}} label='First Name' mode='outlined' value={firstName} onChangeText={text => setFirstName(text)} autoCorrect={false}></TextInput>
+                <TextInput style={{width: 165, marginHorizontal: 10}} label='Last Name' mode='outlined' value={lastName} onChangeText={text => setLastName(text)} autoCorrect={false}></TextInput>
             </View>
-            <View style={{ flexDirection: 'row', width: 365 }}>
+            <View style={{ flexDirection: 'row', width: 365, marginBottom: 8 }}>
                 <TextInput style={{ width: 220, marginHorizontal: 10 }} label='Height' mode='outlined' value={height} keyboardType={"number-pad"} onChangeText={text => setHeight(text)} autoCorrect={false}></TextInput>
                 <View style={{ width: 120}}>
                     <DropDown
@@ -55,10 +68,11 @@ function EntranceSurveyStepOneScreen({ navigation }) {
                     />
                 </View>
             </View>
-            <View style={{ flexDirection: "row", width: 365 }}>
+            <View style={{ flexDirection: "row", width: 365, marginBottom: 8 }}>
                 <TextInput style={{ width: 220, marginHorizontal: 10 }} label='Weight' mode='outlined' value={weight} keyboardType={"number-pad"} onChangeText={text => setWeight(text)} autoCorrect={false}></TextInput>
                 <View style={{ width: 120 }}>
                     <DropDown
+                        label={'Weight Unit'}
                         mode={'outlined'}
                         value={weightUnit}
                         setValue={setWeightUnit}
@@ -72,31 +86,38 @@ function EntranceSurveyStepOneScreen({ navigation }) {
                     />
                 </View>
             </View>
-            {/* <Button style={styles.btnStyle} mode='contained' onPress={() => {dispatch(updateProfile({ newData: { 
-                firstName: firstName, 
-                lastName: lastName, 
-                height: height, 
-                weight: weight, 
-                heightUnit: heightUnit, 
-                weightUnit: weightUnit,
-                sex: sex
-            }}))}}>update dispatch</Button> */}
-            {/* <Button style={styles.btnStyle} mode='contained' onPress={() => createProfile()}>create profile</Button> */}
-            <Button style={styles.btnStyle} mode='contained' onPress={() => {
-                dispatch(updateTempStorage(
-                    { 
-                        firstName: firstName, 
-                        lastName: lastName, 
-                        height: height, 
-                        weight: weight, 
-                        heightUnit: heightUnit, 
-                        weightUnit: weightUnit,
-                        sex: sex
-                    }
-                ));
-
-                // dispatch(saveProfile());
-                // navigation.goBack();
+            <View style={{ flexDirection: "row", width: 365, marginBottom: 8 }}>
+                <TextInput style={{ width: 220, marginHorizontal: 10 }} label='Age' mode='outlined' value={age} keyboardType={"number-pad"} onChangeText={text => setAge(text)} autoCorrect={false}></TextInput>
+                <View style={{ width: 120 }}>
+                    <DropDown
+                        label={'Gender'}
+                        mode={'outlined'}
+                        value={sex}
+                        setValue={setSex}
+                        list={config.constants.genderValues}
+                        visible={showSexDropDown}
+                        showDropDown={() => setShowSexDropDown(true)}
+                        onDismiss={() => setShowSexDropDown(false)}
+                        inputProps={{
+                            right: <TextInput.Icon name={'menu-down'} />,
+                        }}
+                    />
+                </View>
+            </View>
+            <Button style={styles.btnStyle} mode='contained' disabled={!isValid} onPress={() => {
+                let setObj = {
+                    firstName: !!firstName ? firstName: undefined,
+                    lastName: !!lastName ? lastName: undefined, 
+                    height: !!height ? height: undefined, 
+                    weight: !!weight ? weight: undefined, 
+                    heightUnit: !!heightUnit ? heightUnit: undefined, 
+                    weightUnit: !!weightUnit ? weightUnit: undefined,
+                    sex: !!sex? sex: undefined
+                }
+                dispatch(updateTempStorage(setObj));
+                const userFireBaseProfileRef = Firebase.database().ref(`/users/${user.uid}/profile`);
+                dispatch(saveProfileToFirebase(userFireBaseProfileRef));
+                navigation.goBack();
                 }}>create profile</Button>
         </View>
     )
