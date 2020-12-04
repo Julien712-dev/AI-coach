@@ -30,7 +30,7 @@ export default function HomeScreen({ navigation }) {
 		  // The screen is focused
 		  // Call any action
 		  setIsFetched(false);
-		  const userDatabaseRef = Firebase.database().ref(`/users/${user.uid}`);
+		  const userDatabaseRef = Firebase.database().ref(`/users/${user.uid}/profile`);
 		  userDatabaseRef.on('value', snapshot => { 
 			  let value = snapshot.val();
 			  if (!!value) {
@@ -57,8 +57,9 @@ export default function HomeScreen({ navigation }) {
 			<>
 			<ScrollView contentContainerStyle={{ padding: 10 }}>
 				<View style={{ flex: 1 }}>
-					{/* <Title>{JSON.stringify(profile)}</Title> */}
-					{/* <Title>Greetings, {profile.profile.firstName}</Title> */}
+					{/* <Title>{JSON.stringify(user)}</Title>
+					<Title>{JSON.stringify(profile)}</Title> */}
+					{/* <Title>Greetings, {profile}</Title> */}
 					<Button style={styles.btnStyle} mode='contained' onPress={() => navigation.navigate('Entrance Survey')}>
 						Manage My Profile
 					</Button>
