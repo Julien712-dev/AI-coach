@@ -33,6 +33,13 @@ module.exports = {
         }, {
             label: 'lbs', 
             value: 'lbs'
+        }],
+        genderValues: [{
+            label: 'Male',
+            value: 'M',
+        }, {
+            label: 'Female',
+            value: 'F',
         }]
     },
     messages: {
