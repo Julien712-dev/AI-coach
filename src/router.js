@@ -20,6 +20,7 @@ import LogDietDetailsScreen from './screens/diet/LogDietDetailsScreen';
 import ExerciseMainScreen from './screens/exercise/ExerciseMainScreen';
 import PlanWorkoutScreen from './screens/exercise/PlanWorkoutScreen';
 import ViewWorkoutScreen from './screens/exercise/ViewWorkoutScreen';
+import ViewExerciseScreen from './screens/exercise/ViewExerciseScreen';
 
 // Login Screen
 import LoginScreen from './screens/login/LoginScreen';
@@ -59,6 +60,7 @@ function ExerciseStackScreen() {
 			<ExerciseStack.Screen name='Exercise' component={ExerciseMainScreen} />
 			<ExerciseStack.Screen name='Workout Plan' component={PlanWorkoutScreen} />
 			<ExerciseStack.Screen name='View Workout' component={ViewWorkoutScreen} />
+			<ExerciseStack.Screen name='View Exercise' component={ViewExerciseScreen} />
 		</ExerciseStack.Navigator>
 	);
 }
