@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import firebase from 'firebase';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { FAB, Portal, Provider, Card, TextInput, Button, ActivityIndicator, Snackbar } from 'react-native-paper';
 import { login } from '../../store/authSlice';
 
@@ -74,6 +74,7 @@ const LoginScreen = ({ navigation }) => {
   
   return (
     <View style={styles.container}>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <Card style={{ margin: 10, width: 350 }}>
 			  <Card.Content>
         <TextInput
@@ -117,8 +118,7 @@ const LoginScreen = ({ navigation }) => {
         </View>
 			  </Card.Content>
 		  </Card>
-
-
+      </TouchableWithoutFeedback>
       <Snackbar visible={visible} onDismiss={onDismissSnackBar} duration={3000}>{alert}</Snackbar>
     </View>
   )
