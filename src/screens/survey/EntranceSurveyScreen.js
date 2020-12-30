@@ -156,6 +156,7 @@ function EntranceSurveyStepTwoScreen({ navigation, swiperRef }) {
 
     const renderSurveyOptions = (props) => {
         let {
+            index,
             setValueFunction,
             displayText,
             currentValue,
@@ -163,7 +164,7 @@ function EntranceSurveyStepTwoScreen({ navigation, swiperRef }) {
         } = props;
 
         return (
-            <TouchableOpacity style={{marginVertical: 5, padding: 15, width: 325, borderRadius: 15, borderWidth: (currentValue == value) ? 2 : 0.85, borderColor: (currentValue == value)? 'green': 'black' }} onPress={() => setValueFunction(value)}>
+            <TouchableOpacity key={index} style={{marginVertical: 5, padding: 15, width: 325, borderRadius: 15, borderWidth: (currentValue == value) ? 2 : 0.85, borderColor: (currentValue == value)? 'green': 'black' }} onPress={() => setValueFunction(value)}>
                 <Text>{displayText}</Text>
             </TouchableOpacity>
         )
@@ -180,7 +181,7 @@ function EntranceSurveyStepTwoScreen({ navigation, swiperRef }) {
                     <Text>How often do you exercise weekly?</Text> 
                 </View>
                 <View style={{ marginHorizontal: 10 }}>
-                    {config.constants.exerciseHabitOptions.map(option => (renderSurveyOptions({setValueFunction: setExerciseHabit, displayText: option.label, value: option.value, currentValue: exerciseHabit})))}
+                    {config.constants.exerciseHabitOptions.map((option, index) => (renderSurveyOptions({index: index, setValueFunction: setExerciseHabit, displayText: option.label, value: option.value, currentValue: exerciseHabit})))}
                 </View>
             </View>
 
@@ -268,9 +269,9 @@ export default function EntranceSurveyScreen({ navigation }) {
     let tempProfile = useSelector(state => state.main.profile);
 
     const PAGES = [
-        <EntranceSurveyStepOneScreen navigation={navigation} swiperRef={swiperRef} />, 
-        <EntranceSurveyStepTwoScreen navigation={navigation} swiperRef={swiperRef} />, 
-        <EntranceSurveyStepThreeScreen navigation={navigation} swiperRef={swiperRef} />
+        <EntranceSurveyStepOneScreen key={`PAGE-0`} navigation={navigation} swiperRef={swiperRef} />, 
+        <EntranceSurveyStepTwoScreen key={`PAGE-1`} navigation={navigation} swiperRef={swiperRef} />, 
+        <EntranceSurveyStepThreeScreen key={`PAGE-2`} navigation={navigation} swiperRef={swiperRef} />
     ];
 
 
