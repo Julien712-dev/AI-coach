@@ -15,7 +15,8 @@ const profileSlice = createSlice({
         bodyGoal: null,
         exerciseHabit: '',
         // includeRunning: false,
-        dietHabit: [],
+        dietHabit: [], // balanced diet, lose weight, build muscles
+        dietRestrictions: [],
         foodAllergies: [],
     },
     reducers: {
