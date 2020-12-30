@@ -11,6 +11,22 @@ import LoadingScreen from "../LoadingScreen";
 import { updateTempStorage, saveProfileToFirebase } from "../../store/profileSlice.js";
 import Swiper from 'react-native-swiper';
 
+const renderSurveyOptions = (props) => {
+    let {
+        index,
+        setValueFunction,
+        displayText,
+        currentValue,
+        value
+    } = props;
+
+    return (
+        <TouchableOpacity key={index} style={{marginVertical: 5, padding: 15, width: 325, borderRadius: 15, borderWidth: (currentValue == value) ? 2 : 0.85, borderColor: (currentValue == value)? 'green': 'black' }} onPress={() => setValueFunction(value)}>
+            <Text>{displayText}</Text>
+        </TouchableOpacity>
+    )
+}
+
 function EntranceSurveyStepOneScreen({ navigation, swiperRef }) {
 
     const [firstName, setFirstName] = useState(null);
@@ -40,7 +56,7 @@ function EntranceSurveyStepOneScreen({ navigation, swiperRef }) {
 
     useEffect(() => {
         validateSurvey();
-    }, [firstName, lastName, height, weight, age, sex])
+    }, surveyFields)
     
     return (
         <View style={{ flex: 1 }}>
@@ -128,7 +144,7 @@ function EntranceSurveyStepOneScreen({ navigation, swiperRef }) {
     )
 }
 
-function ChipOfSingleChoice() {
+function renderChipOfSingleChoice() {
     return (<Chip></Chip>)
 }
 
@@ -152,24 +168,7 @@ function EntranceSurveyStepTwoScreen({ navigation, swiperRef }) {
 
     useEffect(() => {
         validateSurvey();
-    }, [exerciseHabit])
-
-    const renderSurveyOptions = (props) => {
-        let {
-            index,
-            setValueFunction,
-            displayText,
-            currentValue,
-            value
-        } = props;
-
-        return (
-            <TouchableOpacity key={index} style={{marginVertical: 5, padding: 15, width: 325, borderRadius: 15, borderWidth: (currentValue == value) ? 2 : 0.85, borderColor: (currentValue == value)? 'green': 'black' }} onPress={() => setValueFunction(value)}>
-                <Text>{displayText}</Text>
-            </TouchableOpacity>
-        )
-    }
-
+    }, surveyFields)
 
     return (
         <View style={{ flex: 1 }}>
@@ -209,21 +208,87 @@ function EntranceSurveyStepTwoScreen({ navigation, swiperRef }) {
     )
 }
 
+function MultipleChoiceChip({ index, option, selectedElements, setValueFunction }) {
+
+    const [selected, setSelected] = useState(false);
+    const handleChipSelection = (props) => {
+        let {
+            item,
+            selectedElements,
+            setValueFunction
+        } = props;
+
+        let newSelectedElements = selectedElements || [];
+        if (selectedElements.includes(item.value)) {
+            // remove
+            newSelectedElements = newSelectedElements.filter(el => el != item.value);
+        } else {
+            // add
+            newSelectedElements.push(item.value);
+        }
+        console.log(newSelectedElements);
+        setValueFunction(newSelectedElements);
+    }
+
+    return (
+        <Chip 
+            key={index}
+            mode="flat"
+            style={{ marginHorizontal: 3, marginVertical: 5 }}
+            onPress={() => {
+                setSelected(selected => !selected); 
+                handleChipSelection({ item: option, selectedElements, setValueFunction})}} 
+            selected={selected}
+            >
+                {option.label}
+        </Chip>
+    )
+}
+
 function EntranceSurveyStepThreeScreen({ navigation, swiperRef }) {
 
     const [isValid, setIsValid] = useState(false);
     const [alert, setAlert] = useState('');
     const [visible, setVisible] = useState(false);
+    const [dietHabit, setDietHabit] = useState('');
+    const [dietRestrictions, setDietRestrictions] = useState([]);
     const [foodAllergies, setFoodAllergies] = useState([]);
     const dispatch = useDispatch();
 
-	let user = useSelector(state => state.main.auth.user);
+    let user = useSelector(state => state.main.auth.user);
+    
+    const surveyFields = [dietHabit]
+    const validateSurvey = () => {
+        for (var surveyField of surveyFields) {
+            if (!surveyField) return;
+        }
+        setIsValid(true);
+    }
+
+    useEffect(() => {
+        validateSurvey();
+    }, surveyFields)
+
     return (
         <View style={{ flex: 1 }}>
             <View style={{ height: 400}}>
                 <View style={{ marginHorizontal: 10 }}>
                     <Title>Step 3: Diet Preferences</Title>
                 </View>
+                <View style={{ marginHorizontal: 10 }}>
+                    <Text>What are the body goals you would like to achieve?</Text> 
+                </View>
+                <View style={{ marginHorizontal: 10, marginBottom: 15 }}>
+                    {config.constants.dietHabitOptions.map((option, index) => (renderSurveyOptions({index: index, setValueFunction: setDietHabit, displayText: option.label, value: option.value, currentValue: dietHabit})))}
+                </View>
+                <View style={{ marginHorizontal: 10 }}>
+                    <Text>Do you have any diet restrictions?</Text>
+                </View>
+                <View style={{ marginHorizontal: 10, marginBottom: 15, flexWrap: 1, flex: 1, flexDirection: 'row' }}>
+                    {/* {config.constants.dietRestrictions.map((option, index) => <Chip key={index} onPress={() => handleChipSelection({ item: option, selectedElements: dietRestrictions, setValueFunction: setDietRestrictions})} selected={dietRestrictions.includes(option)}>{option.label}</Chip>)} */}
+                    {config.constants.dietRestrictions.map((option, index) => <MultipleChoiceChip index={index} option={option} selectedElements={dietRestrictions} setValueFunction={setDietRestrictions} />)}
+                </View>
+
             </View>
             <View style={{ marginHorizontal: 10, flexDirection: "row", alignContent: "center", justifyContent: "center" }}>
                 <Button 
@@ -233,13 +298,15 @@ function EntranceSurveyStepThreeScreen({ navigation, swiperRef }) {
                 
                 >PREVIOUS</Button>
                 <Button
+                    disabled={!isValid}
                     style={{ marginHorizontal: 5, width: 130 }} 
                     mode="contained"
                     onPress={() => {
-                        // let setObj = {
-                        //     exerciseHabit: !!exerciseHabit ? exerciseHabit : undefined
-                        // }
-                        // dispatch(updateTempStorage(setObj));
+                        let setObj = {
+                            dietHabit: !!dietHabit ? dietHabit : undefined,
+                            dietRestrictions: !!dietRestrictions ? dietRestrictions : undefined,
+                        }
+                        dispatch(updateTempStorage(setObj));
                         setAlert('Your profile has been updated')
                         setVisible(true);
                         const userFireBaseProfileRef = Firebase.database().ref(`/users/${user.uid}/profile`);
