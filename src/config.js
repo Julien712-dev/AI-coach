@@ -58,6 +58,48 @@ module.exports = {
                 label: 'I do not exercise in a week',
                 value: '0',
             },
+        ],
+        dietHabitOptions: [
+            {
+                label: 'Lose Weight',
+                value: 'loseWeight',
+            },
+            {
+                label: 'Stay in Shape',
+                value: 'stayInShape',
+            },
+            {
+                label: 'Gain Muscles',
+                value: 'gainMuscles',
+            }
+        ],
+        dietRestrictions: [
+            {
+                label: 'Vegetarian',
+                value: 'vegetarian',
+            },
+            {
+                label: 'Vegan',
+                value: 'vegan',
+            },
+            {
+                label: 'No Fasting',
+                value: 'noFasting',
+            }
+        ],
+        foodAllergies: [
+            {
+                label: 'lactose',
+                value: 'lactose',
+            },
+            {
+                label: 'peanuts',
+                value: 'peanuts',
+            },
+            {
+                label: 'seafood',
+                value: 'seafood',
+            }
         ]
     },
     messages: {
