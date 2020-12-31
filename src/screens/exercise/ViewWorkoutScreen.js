@@ -1,11 +1,10 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { StyleSheet, View, Alert } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useTheme, FAB, Text, Headline, List } from 'react-native-paper';
 import { DraxList } from 'react-native-drax';
 
 import { swapExercise } from '~/src/store/exerciseSlice';
-import getIcon from './ExerciseIcon';
 import MultiDivider from '~/src/components/MultiDivider';
 
 const styles = StyleSheet.create({
@@ -18,8 +17,7 @@ function ExerciseItem({ item }) {
     return (
         <List.Item
             title={item.type}
-            description={item.reps ? `X ${item.reps}` : `${item.time} s`}
-            left={props => <List.Icon {...props} icon={getIcon(item.type)}/>}
+            description={`${item.length} ${item.lengthType}`}
             onPress={item.onPress}
         />
     );
@@ -44,7 +42,7 @@ export default function ViewWorkoutScreen({ route, navigation }) {
             <MultiDivider thickness={5} />
             <DraxList
                 data={listData}
-                renderItemContent={ExerciseItem}
+                renderItemContent={props => <ExerciseItem {...props}/>}
                 keyExtractor={(item, index) => index.toString()}
                 onItemReorder={({ fromIndex, toIndex }) => dispatch(swapExercise({ day, fromIndex, toIndex }))}
             />

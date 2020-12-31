@@ -1,68 +1,69 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import { useTheme, Headline, Subheading, Paragraph, Chip, Portal, Dialog } from 'react-native-paper';
+import { View, TouchableOpacity } from 'react-native';
+import { useTheme, Headline, Subheading, Paragraph, Chip, Portal, Dialog, Text } from 'react-native-paper';
 import { Video } from 'expo-av';
 import NumericInput from 'react-native-numeric-input';
 
-import MultiDivider from '~/src/components/MultiDivider.js';
-import DreamFeetVideo from '~/assets/video/dream-feet.mp4';
-
-const styles = StyleSheet.create({
-    chip: {
-        marginRight: 3
-    }
-})
+import { changeExerciseLength } from '~/src/store/exerciseSlice';
+import MultiDivider from '~/src/components/MultiDivider';
 
 export default function ViewExerciseScreen({ route, navigation }) {
     const { day, index } = route.params;
 
-    const exercise = useSelector(state => state.main.exercise.plan[day].sequence[index]);
+    const [dialogVisible, setDialogVisible] = useState(false);
+    const exerciseType = useSelector(state => state.main.exercise.plan[day].sequence[index].type);
+    const exerciseLength = useSelector(state => state.main.exercise.plan[day].sequence[index].length);
+    const exerciseLengthType = useSelector(state => state.main.exercise.plan[day].sequence[index].lengthType);
+    const exerciseDescription = useSelector(state => state.main.exercise.library[exerciseType]);
     const dispatch = useDispatch();
     const { colors } = useTheme();
 
+    const labels = exerciseDescription.labels.map((label, index) => <Chip key={index.toString()} style={{ marginRight: 3 }} mode="contained">{label}</Chip>);
+    const instructions = exerciseDescription.instructions.map((instruction, index) => `${index + 1}. ${instruction}`).join('\n');
+
+    const onPressLength = () => { setDialogVisible(true); }
+    const onDialogDismiss = () => { setDialogVisible(false); }
+    const onChangeLength = length => dispatch(changeExerciseLength({ day, index, length }));
+
     return (
         <View style={{ padding: 20, alignItems: 'center' }}>
-            <Headline style={{ textAlign: 'center', color: colors.primary }}>{exercise.type}</Headline>
-            <Video source={DreamFeetVideo} resizeMode='cover' style={{ width: 300, height: 300, marginVertical: 10 }} shouldPlay />
-            <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 5, marginBottom: 8 }}>
-            </View>
+            <Headline style={{ textAlign: 'center', color: colors.primary }}>{exerciseType}</Headline>
+            <Video
+                source={exerciseDescription.video}
+                resizeMode='cover'
+                style={{ width: 300, height: 300, marginVertical: 10 }}
+                shouldPlay
+            />
             <MultiDivider thickness={5} />
             <View style={{ width: '100%', marginTop: 5, flexDirection: 'row' }}>
-                <Chip style={styles.chip} mode="contained">
-                    Core
-                </Chip>
-                <Chip style={styles.chip} mode="contained">
-                    Leg
-                </Chip>
+                {labels}
             </View>
             <View style={{ width: '100%', marginTop: 20 }}>
                 <Subheading>Instructions</Subheading>
-                <Paragraph>
-                    1. It was the White Rabbit, trotting slowly back again.{`\n`}
-                    2. “Mary Ann! Mary Ann!” said the voice. “Fetch me my gloves this moment!”{`\n`}
-                    3. The Hatter was the first to break the silence. “What day of the month is it?” he said
-                </Paragraph>
+                <Paragraph>{instructions}</Paragraph>
             </View>
-            <TouchableOpacity onPress={() => console.log('test')}>
+            <TouchableOpacity onPress={onPressLength}>
                 <View style={{ marginTop: 60 }}>
-                    <Text style={{ textAlign: 'center', fontSize: 40, color: colors.primary }}>40</Text>
-                    <Text style={{ textAlign: 'center', fontSize: 20, color: colors.primary }}>Times</Text>
+                    <Text style={{ textAlign: 'center', fontSize: 40, color: colors.primary }}>{exerciseLength}</Text>
+                    <Text style={{ textAlign: 'center', fontSize: 20, color: colors.primary }}>{exerciseLengthType}</Text>
                 </View>
             </TouchableOpacity>
-            {/* <Portal>
+            <Portal>
                 <Dialog visible={dialogVisible} onDismiss={onDialogDismiss}>
-                    <Dialog.Title>Save?</Dialog.Title>
-                    <Dialog.Content>
-                        <NumericInput />
+                    <Dialog.Content style={{ alignItems: 'center' }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <NumericInput
+                                editable={true}
+                                value={exerciseLength}
+                                minValue={1}
+                                onChange={onChangeLength}
+                            />
+                            <Text style={{ fontSize: 22, marginLeft: 5 }}>{exerciseLengthType}</Text>
+                        </View>
                     </Dialog.Content>
-                    <Dialog.Actions>
-                        <Button onPress={onSaveChanges}>Save</Button>
-                        <Button color={colors.disabled} onPress={onDiscardChanges}>Don't save</Button>
-                        <Button color={colors.disabled} onPress={onCancelChanges}>Cancel</Button>
-                    </Dialog.Actions>
                 </Dialog>
-            </Portal> */}
+            </Portal>
         </View>
     );
 }
