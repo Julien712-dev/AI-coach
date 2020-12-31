@@ -89,15 +89,15 @@ module.exports = {
         ],
         foodAllergies: [
             {
-                label: 'lactose',
+                label: 'Lactose Intolerant',
                 value: 'lactose',
             },
             {
-                label: 'peanuts',
-                value: 'peanuts',
+                label: 'Nuts',
+                value: 'nuts',
             },
             {
-                label: 'seafood',
+                label: 'Seafood',
                 value: 'seafood',
             }
         ]
