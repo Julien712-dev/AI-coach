@@ -234,7 +234,7 @@ function MultipleChoiceChip({ index, option, selectedElements, setValueFunction 
         <Chip 
             key={index}
             mode="flat"
-            style={{ marginHorizontal: 3, marginVertical: 5 }}
+            style={{ marginHorizontal: 3, marginTop: 2, marginBottom: 3 }}
             onPress={() => {
                 setSelected(selected => !selected); 
                 handleChipSelection({ item: option, selectedElements, setValueFunction})}} 
@@ -271,22 +271,27 @@ function EntranceSurveyStepThreeScreen({ navigation, swiperRef }) {
 
     return (
         <View style={{ flex: 1 }}>
-            <View style={{ height: 400}}>
+            <View style={{ height: 420 }}>
                 <View style={{ marginHorizontal: 10 }}>
                     <Title>Step 3: Diet Preferences</Title>
                 </View>
                 <View style={{ marginHorizontal: 10 }}>
-                    <Text>What are the body goals you would like to achieve?</Text> 
+                    <Text>Body goal</Text> 
                 </View>
-                <View style={{ marginHorizontal: 10, marginBottom: 15 }}>
+                <View style={{ marginHorizontal: 10, marginBottom: 10 }}>
                     {config.constants.dietHabitOptions.map((option, index) => (renderSurveyOptions({index: index, setValueFunction: setDietHabit, displayText: option.label, value: option.value, currentValue: dietHabit})))}
                 </View>
                 <View style={{ marginHorizontal: 10 }}>
-                    <Text>Do you have any diet restrictions?</Text>
+                    <Text>Diet Restrictions</Text>
                 </View>
-                <View style={{ marginHorizontal: 10, marginBottom: 15, flexWrap: 1, flex: 1, flexDirection: 'row' }}>
-                    {/* {config.constants.dietRestrictions.map((option, index) => <Chip key={index} onPress={() => handleChipSelection({ item: option, selectedElements: dietRestrictions, setValueFunction: setDietRestrictions})} selected={dietRestrictions.includes(option)}>{option.label}</Chip>)} */}
-                    {config.constants.dietRestrictions.map((option, index) => <MultipleChoiceChip index={index} option={option} selectedElements={dietRestrictions} setValueFunction={setDietRestrictions} />)}
+                <View style={{ marginHorizontal: 10, marginBottom: 5, flexWrap: 'wrap', flexDirection: 'row' }}>
+                    {config.constants.dietRestrictions.map((option, index) => <MultipleChoiceChip key={index} index={index} option={option} selectedElements={dietRestrictions} setValueFunction={setDietRestrictions} />)}
+                </View>
+                <View style={{ marginHorizontal: 10 }}>
+                    <Text>Food Allergies</Text>
+                </View>
+                <View style={{ marginHorizontal: 10, marginBottom: 5, flexWrap: 'wrap', flexDirection: 'row' }}>
+                    {config.constants.foodAllergies.map((option, index) => <MultipleChoiceChip key={index} index={index} option={option} selectedElements={foodAllergies} setValueFunction={setFoodAllergies} />)}
                 </View>
 
             </View>
@@ -305,6 +310,7 @@ function EntranceSurveyStepThreeScreen({ navigation, swiperRef }) {
                         let setObj = {
                             dietHabit: !!dietHabit ? dietHabit : undefined,
                             dietRestrictions: !!dietRestrictions ? dietRestrictions : undefined,
+                            foodAllergies: foodAllergies || undefined,
                         }
                         dispatch(updateTempStorage(setObj));
                         setAlert('Your profile has been updated')
@@ -372,7 +378,6 @@ export default function EntranceSurveyScreen({ navigation }) {
     return (
         <ScrollView>
             <View style={{flex: 1}}>
-            {/* <Text>{JSON.stringify(tempProfile)}</Text> */}
             <Button icon="close" style={{ position: 'absolute', top:20, right:0 }} onPress={() => navigation.goBack()}>Skip</Button>
                 <View style={{ padding: 20, marginTop: 50, justifyContent: 'center', flex: 1 }}>
                     <Text>Set up your profile for a better user experience! </Text>
@@ -380,7 +385,7 @@ export default function EntranceSurveyScreen({ navigation }) {
             </View>
             <Swiper
                 ref={swiperRef}
-                style={{ height: 500 }}
+                style={{ height: 530 }}
                 loop={false}
                 index={currentPage}
                 autoplay={false}
@@ -396,30 +401,6 @@ export default function EntranceSurveyScreen({ navigation }) {
     )
     }
 }
-
-const thirdIndicatorStyles = {
-    stepIndicatorSize: 25,
-    currentStepIndicatorSize: 30,
-    separatorStrokeWidth: 2,
-    currentStepStrokeWidth: 3,
-    stepStrokeCurrentColor: '#7eaec4',
-    stepStrokeWidth: 3,
-    stepStrokeFinishedColor: '#7eaec4',
-    stepStrokeUnFinishedColor: '#dedede',
-    separatorFinishedColor: '#7eaec4',
-    separatorUnFinishedColor: '#dedede',
-    stepIndicatorFinishedColor: '#7eaec4',
-    stepIndicatorUnFinishedColor: '#ffffff',
-    stepIndicatorCurrentColor: '#ffffff',
-    stepIndicatorLabelFontSize: 0,
-    currentStepIndicatorLabelFontSize: 0,
-    stepIndicatorLabelCurrentColor: 'transparent',
-    stepIndicatorLabelFinishedColor: 'transparent',
-    stepIndicatorLabelUnFinishedColor: 'transparent',
-    labelColor: '#999999',
-    labelSize: 13,
-    currentStepLabelColor: '#7eaec4',
-  };
 
 const styles = StyleSheet.create({
     inputStyle: {
