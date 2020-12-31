@@ -19,7 +19,88 @@ module.exports = {
         night: {
             startAt: 18,
             endAt: 24
-        }
+        },
+        heightUnits: [{
+            label: 'cm', 
+            value: 'cm'
+        }, {
+            label: 'inches', 
+            value: 'inches'
+        }],
+        weightUnits: [{
+            label: 'kg',
+            value: 'kg'
+        }, {
+            label: 'lbs', 
+            value: 'lbs'
+        }],
+        genderValues: [{
+            label: 'Male',
+            value: 'M',
+        }, {
+            label: 'Female',
+            value: 'F',
+        }],
+        exerciseHabitOptions: [
+            {
+                label: '1-2 Times per week',
+                value: '1-2',
+            },
+            {
+                label: '3-4 Times per week',
+                value: '3-4',
+            },
+            {
+                label: '5-7 Times per week',
+                value: '5-7',
+            },
+            {
+                label: 'I do not exercise in a week',
+                value: '0',
+            },
+        ],
+        dietHabitOptions: [
+            {
+                label: 'Lose Weight',
+                value: 'loseWeight',
+            },
+            {
+                label: 'Stay in Shape',
+                value: 'stayInShape',
+            },
+            {
+                label: 'Gain Muscles',
+                value: 'gainMuscles',
+            }
+        ],
+        dietRestrictions: [
+            {
+                label: 'Vegetarian',
+                value: 'vegetarian',
+            },
+            {
+                label: 'Vegan',
+                value: 'vegan',
+            },
+            {
+                label: 'No Fasting',
+                value: 'noFasting',
+            }
+        ],
+        foodAllergies: [
+            {
+                label: 'Lactose Intolerant',
+                value: 'lactose',
+            },
+            {
+                label: 'Nuts',
+                value: 'nuts',
+            },
+            {
+                label: 'Seafood',
+                value: 'seafood',
+            }
+        ]
     },
     messages: {
         diet: [

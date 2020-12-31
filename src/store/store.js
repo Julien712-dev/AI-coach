@@ -5,16 +5,17 @@ import { persistStore, persistReducer } from 'redux-persist';
 // stores for data
 import AsyncStorage from '@react-native-community/async-storage';
 import authReducer from './authSlice';
+import profileReducer from './profileSlice';
 import exerciseReducer from './exerciseSlice';
 
 const mainPersistConfig = {
-	key: 'main',
-	storage: AsyncStorage,
-	// Whitelist (Save Specific Reducers)
-	whitelist: ['auth'],
-	// Blacklist (Don't Save Specific Reducers)
-	blacklist: []
-};
+  key: 'main',
+  storage: AsyncStorage,
+  // Whitelist (Save Specific Reducers)
+  whitelist: ["auth", "profile"],
+  // Blacklist (Don"t Save Specific Reducers)
+  blacklist: []
+}
 
 // const securePersistConfig = {
 //   key: 'secure',
@@ -23,8 +24,9 @@ const mainPersistConfig = {
 // };
 
 const mainReducer = combineReducers({
-	auth: authReducer,
-	exercise: exerciseReducer
+  auth: authReducer,
+  profile: profileReducer,
+  exercise: exerciseReducer
 });
 
 const rootReducer = combineReducers({
@@ -37,6 +39,6 @@ const store = createStore(rootReducer, applyMiddleware(thunk));
 
 // Middleware: Redux Persist Persister
 const persistor = persistStore(store);
-persistor.purge();
+// persistor.purge();
 
 export { store, persistor };

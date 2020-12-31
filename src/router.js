@@ -99,11 +99,16 @@ export default function Routers({ theme }) {
 	return (
 		<NavigationContainer theme={theme}>
 			<Stack.Navigator mode='modal' screenOptions={{ headerShown: false }} initialRouteName={!!user ? 'Home' : 'Login'}>
-
-				<Stack.Screen name='Home' component={BottomTabs} />
-				<Stack.Screen name='Entrance Survey' component={EntranceSurveyScreen} />
-				<Stack.Screen name='Login' component={LoginScreen} />
-				<Stack.Screen name='Sign Up' component={SignUpScreen} />
+				{!!user ? 
+				<>
+					<Stack.Screen name='Home' component={BottomTabs} />
+					<Stack.Screen name='Entrance Survey' component={EntranceSurveyScreen} />
+				</> 
+					: 
+				<>
+					<Stack.Screen name='Login' component={LoginScreen} />
+					<Stack.Screen name='Sign Up' component={SignUpScreen} />
+				</>}
 				{/* Bottom Tab Bar is hidden for the following screens */}
 				<Stack.Screen
 					name='Edit Diet'
