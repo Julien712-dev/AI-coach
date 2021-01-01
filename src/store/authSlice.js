@@ -12,7 +12,7 @@ const authSlice = createSlice({
             reducer: (state, action) => {state.user = action.payload.user},
             prepare: () => ({ payload: { user: firebase.auth().currentUser } })
         },
-        logout: state => state.user = null
+        logout: (state, action) => {return {...state, user: null}}
     }
 });
 

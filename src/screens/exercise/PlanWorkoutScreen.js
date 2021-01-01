@@ -178,6 +178,7 @@ export default function PlanWorkoutScreen({ navigation }) {
         });
         return (
             <ScrollView style={{ padding: 20 }}>
+                <Text>{JSON.stringify(user)}</Text>
                 <Table>
                     {rows}
                 </Table>
