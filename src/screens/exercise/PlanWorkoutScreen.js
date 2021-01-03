@@ -5,8 +5,8 @@ import { StyleSheet, View, ScrollView, TouchableOpacity, TouchableWithoutFeedbac
 import { useTheme, FAB, Headline, Text, IconButton, Surface, Title, Portal, Dialog, Paragraph, Button } from 'react-native-paper';
 import StarRating from 'react-native-star-rating';
 
-import { setPlan, onSavePlan, swapWorkout, removeWorkout } from '../../store/exerciseSlice';
-import LoadingScreen from '../LoadingScreen';
+import { setPlan, onSavePlan, swapWorkout, removeWorkout } from '~/src/store/exerciseSlice';
+import LoadingScreen from '~/src/screens/LoadingScreen';
 
 const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -129,7 +129,7 @@ export default function PlanWorkoutScreen({ navigation }) {
         const onActivityPress = day => {
             const activity = plan[day];
             if (activity.type != 'rest')
-                navigation.navigate('View Workout', { day: day })
+                navigation.navigate('View Workout', { day });
         };
         const onActivityMoveUp = day => {
             const index = days.indexOf(day);
@@ -178,7 +178,6 @@ export default function PlanWorkoutScreen({ navigation }) {
         });
         return (
             <ScrollView style={{ padding: 20 }}>
-                <Text>{JSON.stringify(user)}</Text>
                 <Table>
                     {rows}
                 </Table>
