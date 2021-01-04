@@ -1,22 +1,24 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import config from '../../config';
 import moment from 'moment';
 import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import { Button, Text, Title, Card, Paragraph } from 'react-native-paper';
 import Carousel from 'react-native-snap-carousel';
 import DietLoggingFAB from './dietLoggingFAB';
+// location imports
+import * as Location from 'expo-location';
+import * as TaskManager from 'expo-task-manager';
 
 
 export default function DietScreenMain({ navigation }) {
 
-	const [time, setTime] = React.useState();
-	const [message, setMessage] = React.useState({});
-	const [coachAdvice, setCoachAdvice] = React.useState(`On a day of rest, try to reduce carbohydrate intake and go low calorie overall.`);
-	const [location, setLocation] = React.useState();
+	const [time, setTime] = useState();
+	const [message, setMessage] = useState({});
+	const [coachAdvice, setCoachAdvice] = useState(`On a day of rest, try to reduce carbohydrate intake and go low calorie overall.`);
 	// Carousels
-	const [recommendedMealCarouselActiveIndex, setRecommendedMealCarouselActiveIndex] = React.useState(0);
+	const [recommendedMealCarouselActiveIndex, setRecommendedMealCarouselActiveIndex] = useState(0);
 	// Dummy Data
-	const [recommendedMeals, setRecommendedMeals] = React.useState([
+	const [recommendedMeals, setRecommendedMeals] = useState([
 		{
 			title:"Oatmeal",
 			text: "Oatmeal",
@@ -26,9 +28,9 @@ export default function DietScreenMain({ navigation }) {
 			text: "Fried Rice",
 		}
 	]);
-	const [restaurantMenuCarouselActiveIndex, setRestaurantMenuCarouselActiveIndex] = React.useState(0);
+	const [restaurantMenuCarouselActiveIndex, setRestaurantMenuCarouselActiveIndex] = useState(0);
 	// Dummy Data
-	const [restaurantMenuItems, setRestaurantMenuItems] = React.useState([
+	const [restaurantMenuItems, setRestaurantMenuItems] = useState([
 		{
 			title:"Subway Club",
 			text: "Subway",
@@ -42,11 +44,58 @@ export default function DietScreenMain({ navigation }) {
 			text: "Glory Bing Suck",
 		}
 	]);
+	const [location, setLocation] = useState(null);
+	const [district, setDistrict] = useState(null);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		let currentTime = new Date();
 		setTime(currentTime);
-		setMessage(config.messages.diet.find(message => (message.startAt <= moment(currentTime).hour() && message.endAt > moment(currentTime).hour())))
+		setMessage(config.messages.diet.find(message => (message.startAt <= moment(currentTime).hour() && message.endAt > moment(currentTime).hour())));
+
+		// get location async
+		(async () => {
+			let { status } = await Location.requestPermissionsAsync();
+			if (status !== 'granted') {
+			  setErrorMsg('Permission to access location was denied');
+			  return;
+			}
+	  
+			let location = await Location.getCurrentPositionAsync({}).then(
+				async (response) => {
+					console.log(response);
+					let postalAddress = await Location.reverseGeocodeAsync(response.coords);
+					console.log(postalAddress);
+					setLocation(location);
+					setDistrict(postalAddress[0].district);
+				}
+			);
+
+			if (!!location) {
+				let postalAddress = await Location.reverseGeocodeAsync(location.coords);
+			}
+			// console.log("Starting Location Update");
+			// Location.startLocationUpdatesAsync('TASK_FETCH_LOCATION', {
+			//   accuracy: Location.Accuracy.Highest,
+			//   distanceInterval: 1, // minimum change (in meters) betweens updates
+			//   deferredUpdatesInterval: 10000, // minimum interval (in milliseconds) between updates
+			//   // foregroundService is how you get the task to be updated as often as would be if the app was open
+			//   foregroundService: {
+			// 	notificationTitle: 'Using your location',
+			// 	notificationBody: 'To turn off, go back to the app and switch something off.'
+			//   },
+			// });
+	
+			// subscriber = await Location.watchPositionAsync(
+			//   {
+			// 	accuracy: Accuracy.BestForNavigation,
+			// 	timeInterval: 1000,
+			// 	distanceInterval: 10,
+			//   },
+			//   () => {
+			// 	startWatching(true);
+			//   }
+			// );
+		  })();
 	}, []);
 
 	// Render function for recipe item recommendations.
@@ -133,7 +182,7 @@ export default function DietScreenMain({ navigation }) {
 				{/* <Button style={{ marginBottom: 10 }} mode='contained' onPress={() => navigation.navigate('Edit Diet')}>
 					Edit Diet
 				</Button> */}
-				<Title>Explore Restaurants Nearby!</Title>
+				<Title>Explore Restaurants in {district}!</Title>
 				<Carousel
 					layout={"default"}
 					layoutCardOffset={9}
@@ -150,3 +199,25 @@ export default function DietScreenMain({ navigation }) {
 		</View>
 	);
 }
+
+// Background Tasks for defnining 
+// console.log("Defining task");
+// TaskManager.defineTask(TASK_FETCH_LOCATION, async ({ data: { locations }, error }) => {
+//   if (error) {
+//     console.error(error);
+//     return;
+//   }
+//   const [location] = locations;
+
+//   let jobId = await AsyncStorage.getItem('jobId');
+
+//   try {
+//     const url = `/deliver-job/location/report`;
+//     await rbFleetApi.post(url, { 
+//       location, 
+//       jobId 
+//     }); // you should use post instead of get to persist data on the backend
+//   } catch (err) {
+//     console.error(err);
+//   }
+// });
