@@ -26,7 +26,7 @@ function ExerciseItem({ item }) {
 export default function ViewWorkoutScreen({ route, navigation }) {
     const { day } = route.params;
 
-    const workout = useSelector(state => state.main.exercise.plan[day]);
+    const workout = useSelector(state => state.main.exercise.draftPlan[day]);
     const dispatch = useDispatch();
     const { colors } = useTheme();
 

@@ -1,10 +1,11 @@
 import * as Firebase from 'firebase';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { Button, Text, Appbar, Title } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { logout as logoutAction } from '../store/authSlice';
+import { setPlan } from '../store/exerciseSlice';
 import LoadingScreen from './LoadingScreen';
 
 export default function HomeScreen({ navigation }) {
@@ -30,11 +31,12 @@ export default function HomeScreen({ navigation }) {
 		  // The screen is focused
 		  // Call any action
 		  setIsFetched(false);
-		  const userDatabaseRef = Firebase.database().ref(`/users/${user.uid}/profile`);
+		  const userDatabaseRef = Firebase.database().ref(`/users/${user.uid}`);
 		  userDatabaseRef.on('value', snapshot => { 
 			  let value = snapshot.val();
 			  if (!!value) {
-				setProfile(value);
+				setProfile(value.profile);
+				dispatch(setPlan({ plan: value.exercisePlan }));
 			  }
 			  setIsFetched(true);
 		  });
