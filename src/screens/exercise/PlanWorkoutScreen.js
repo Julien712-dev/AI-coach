@@ -5,8 +5,7 @@ import { StyleSheet, View, ScrollView, TouchableOpacity, TouchableWithoutFeedbac
 import { useTheme, FAB, Headline, Text, IconButton, Surface, Title, Portal, Dialog, Paragraph, Button } from 'react-native-paper';
 import StarRating from 'react-native-star-rating';
 
-import { setPlan, onSavePlan, swapWorkout, removeWorkout } from '~/src/store/exerciseSlice';
-import LoadingScreen from '~/src/screens/LoadingScreen';
+import { resetDraftPlan, saveDraftPlan, swapWorkout, removeWorkout } from '~/src/store/exerciseSlice';
 
 const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -96,22 +95,12 @@ function ActivityCard({ activity, onPress, onMoveUp, onMoveDown, onDelete }) {
 
 export default function PlanWorkoutScreen({ navigation }) {
     const uid = useSelector(state => state.main.auth.user.uid);
-    const plan = useSelector(state => state.main.exercise.plan);
+    const draftPlan = useSelector(state => state.main.exercise.draftPlan);
     const planModified = useSelector(state => state.main.exercise.planModified);
     const dispatch = useDispatch();
     const [dialogVisible, setDialogVisible] = useState(false);
     const [navigationAction, setNavigationAction] = useState(false);    // The navigation action interrupted by the 'Save?' dialog
     const { colors } = useTheme();
-
-    const planDatabaseRef = Firebase.database().ref(`/users/${uid}/exercisePlan`);
-
-    useEffect(() => {
-        planDatabaseRef.on('value', snapshot => { 
-            let value = snapshot.val();
-            dispatch(setPlan({ plan: value }));
-        });
-    }, []);
-    
     useEffect(() => {
         const unsubscribe = navigation.addListener('beforeRemove', event => {
             if (planModified) {
@@ -123,78 +112,77 @@ export default function PlanWorkoutScreen({ navigation }) {
         return unsubscribe;
     }, [navigation, planModified]);
 
-    if (plan == null)
-        return <LoadingScreen />;
-    else {
-        const onActivityPress = day => {
-            const activity = plan[day];
-            if (activity.type != 'rest')
-                navigation.navigate('View Workout', { day });
-        };
-        const onActivityMoveUp = day => {
-            const index = days.indexOf(day);
-            if (index > 0) {
-                let prevDay = days[index - 1];
-                dispatch(swapWorkout({ fromDay: prevDay, toDay: day }));
-            }
-        };
-        const onActivityMoveDown = day => {
-            const index = days.indexOf(day);
-            if (index < days.length - 1) {
-                let nextDay = days[index + 1];
-                dispatch(swapWorkout({ fromDay: nextDay, toDay: day }));
-            }
-        };
-        const onActivityDelete = day => {
-            dispatch(removeWorkout({ day }));
-        };
-        const onDialogDismiss = () => {
-            setDialogVisible(false);
-        };
-        const onSaveChanges = () => {
-            setDialogVisible(false);
-            planDatabaseRef.set(plan);
-            dispatch(onSavePlan());
-            navigation.dispatch(navigationAction);
-        };
-        const onDiscardChanges = () => {
-            setDialogVisible(false);
-            navigation.dispatch(navigationAction);
-        };
-        const onCancelChanges = () => {
-            setDialogVisible(false);
+    const planDatabaseRef = Firebase.database().ref(`/users/${uid}/exercisePlan`);
+
+    const onActivityPress = day => {
+        const activity = draftPlan[day];
+        if (activity.type != 'rest')
+            navigation.navigate('View Workout', { day });
+    };
+    const onActivityMoveUp = day => {
+        const index = days.indexOf(day);
+        if (index > 0) {
+            let prevDay = days[index - 1];
+            dispatch(swapWorkout({ fromDay: prevDay, toDay: day }));
         }
-        const rows = days.map(day => {
-            const header = day[0].toUpperCase() + day.slice(1);
-            const activity = plan[day];
-            const component = activity == undefined ?
-                <FAB icon='plus' label='Add' /> :
-                <ActivityCard activity={activity} onPress={() => onActivityPress(day)} onMoveUp={() => onActivityMoveUp(day)} onMoveDown={() => onActivityMoveDown(day)} onDelete={() => onActivityDelete(day)} />;
-            return (
-                <Row key={day} header={header}>
-                    {component}
-                </Row>
-            );
-        });
-        return (
-            <ScrollView style={{ padding: 20 }}>
-                <Table>
-                    {rows}
-                </Table>
-                <Portal>
-                    <Dialog visible={dialogVisible} onDismiss={onDialogDismiss}>
-                        <Dialog.Title>Save?</Dialog.Title>
-                        <Dialog.Content>
-                            <Paragraph>You have made changes to your workout plan.</Paragraph>
-                        </Dialog.Content>
-                        <Dialog.Actions>
-                            <Button onPress={onSaveChanges}>Save</Button>
-                            <Button color={colors.disabled} onPress={onDiscardChanges}>Don't save</Button>
-                            <Button color={colors.disabled} onPress={onCancelChanges}>Cancel</Button>
-                        </Dialog.Actions>
-                    </Dialog>
-                </Portal>
-            </ScrollView>
-        );
+    };
+    const onActivityMoveDown = day => {
+        const index = days.indexOf(day);
+        if (index < days.length - 1) {
+            let nextDay = days[index + 1];
+            dispatch(swapWorkout({ fromDay: nextDay, toDay: day }));
+        }
+    };
+    const onActivityDelete = day => {
+        dispatch(removeWorkout({ day }));
+    };
+    const onDialogDismiss = () => {
+        setDialogVisible(false);
+    };
+    const onSaveChanges = () => {
+        setDialogVisible(false);
+        planDatabaseRef.set(draftPlan);
+        dispatch(saveDraftPlan());
+        navigation.dispatch(navigationAction);
+    };
+    const onDiscardChanges = () => {
+        setDialogVisible(false);
+        dispatch(resetDraftPlan());
+        navigation.dispatch(navigationAction);
+    };
+    const onCancelChanges = () => {
+        setDialogVisible(false);
     }
+    const rows = days.map(day => {
+        const header = day[0].toUpperCase() + day.slice(1);
+        const activity = draftPlan[day];
+        const component = activity == undefined ?
+            <FAB icon='plus' label='Add' /> :
+            <ActivityCard activity={activity} onPress={() => onActivityPress(day)} onMoveUp={() => onActivityMoveUp(day)} onMoveDown={() => onActivityMoveDown(day)} onDelete={() => onActivityDelete(day)} />;
+        return (
+            <Row key={day} header={header}>
+                {component}
+            </Row>
+        );
+    });
+    return (
+        <ScrollView style={{ padding: 20 }}>
+            <Table>
+                {rows}
+            </Table>
+            <Portal>
+                <Dialog visible={dialogVisible} onDismiss={onDialogDismiss}>
+                    <Dialog.Title>Save?</Dialog.Title>
+                    <Dialog.Content>
+                        <Paragraph>You have made changes to your workout plan.</Paragraph>
+                    </Dialog.Content>
+                    <Dialog.Actions>
+                        <Button onPress={onSaveChanges}>Save</Button>
+                        <Button color={colors.disabled} onPress={onDiscardChanges}>Don't save</Button>
+                        <Button color={colors.disabled} onPress={onCancelChanges}>Cancel</Button>
+                    </Dialog.Actions>
+                </Dialog>
+            </Portal>
+        </ScrollView>
+    );
 }

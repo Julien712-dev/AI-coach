@@ -33,36 +33,42 @@ const exerciseSlice = createSlice({
     reducers: {
         setPlan: (state, action) => {
             state.plan = action.payload.plan;
+            state.draftPlan = action.payload.plan;
             state.planModified = false;
         },
-        onSavePlan: (state) => {
+        resetDraftPlan: state => {
+            state.draftPlan = state.plan;
+            state.planModified = false;
+        },
+        saveDraftPlan: state => {
+            state.plan = state.draftPlan;
             state.planModified = false;
         },
         swapWorkout: (state, action) => {
             const { fromDay, toDay } = action.payload;
-            let temp = state.plan[toDay];
-            state.plan[toDay] = state.plan[fromDay];
-            state.plan[fromDay] = temp;
+            let temp = state.draftPlan[toDay];
+            state.draftPlan[toDay] = state.draftPlan[fromDay];
+            state.draftPlan[fromDay] = temp;
             state.planModified = true;
         },
         removeWorkout: (state, action) => {
-            delete state.plan[action.payload.day];
+            delete state.draftPlan[action.payload.day];
             state.planModified = true;
         },
         swapExercise: (state, action) => {
             const { day, fromIndex, toIndex } = action.payload;
-            let sequence = state.plan[day].sequence;
+            let sequence = state.draftPlan[day].sequence;
             sequence.splice(toIndex, 0, sequence.splice(fromIndex, 1)[0]);
             state.planModified = true;
         },
         changeExerciseLength: (state, action) => {
             const { day, index, length } = action.payload;
-            state.plan[day].sequence[index].length = length;
+            state.draftPlan[day].sequence[index].length = length;
             state.planModified = true;
         }
     }
 });
 
 const { reducer, actions } = exerciseSlice;
-export const { setPlan, onSavePlan, swapWorkout, removeWorkout, swapExercise, changeExerciseLength } = actions;
+export const { setPlan, resetDraftPlan, saveDraftPlan, swapWorkout, removeWorkout, swapExercise, changeExerciseLength } = actions;
 export default reducer;
