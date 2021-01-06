@@ -16,7 +16,7 @@ function AnalysisCard({ key }) {
 	);
 }
 
-function WorkoutReminderCard({ key, workout }) {
+function WorkoutReminderCard({ key, workout, onPressStart }) {
 	const { colors } = useTheme();
 	return (
 		<Card key={key} style={{ width: '100%', marginTop: 10 }}>
@@ -25,7 +25,7 @@ function WorkoutReminderCard({ key, workout }) {
 				<Paragraph>A {workout.time} minutes {workout.name} on the schedule today!</Paragraph>
 			</Card.Content>
 			<Card.Actions>
-				<Button>Start</Button>
+				<Button onPress={onPressStart}>Start</Button>
 				<Button color={colors.disabled}>Dismiss</Button>
 			</Card.Actions>
 		</Card>
@@ -33,12 +33,16 @@ function WorkoutReminderCard({ key, workout }) {
 }
 
 export default function ExerciseMainScreen({ navigation }) {
-	const workoutToday = useSelector(state => state.main.exercise.plan[getDayOfWeek()]);
+	const today = getDayOfWeek();
+	const workoutToday = useSelector(state => state.main.exercise.plan[today]);
 	const { colors } = useTheme();
+
+	const onPressDoWorkout = () => navigation.navigate('Do Workout', { day: today });
+	const onPressPlanWorkout = () => navigation.navigate('Plan Workout');
 
 	let cards = [<AnalysisCard key='analysis' />];
 	if (workoutToday.type == 'workout')
-		cards.push(<WorkoutReminderCard key='workout-reminder' workout={workoutToday} />)
+		cards.push(<WorkoutReminderCard key='workout-reminder' workout={workoutToday} onPressStart={onPressDoWorkout} />);
 
 	return (
 		<ScrollView contentContainerStyle={{ alignItems: 'center', padding: 20 }}>
@@ -56,8 +60,8 @@ export default function ExerciseMainScreen({ navigation }) {
 			{cards}
 			<View style={{ width: '100%', marginTop: 30, flexDirection: 'row', justifyContent: 'space-around' }}>
 				<FAB icon='plus' />
-				<FAB icon='play' />
-				<FAB icon='pencil' onPress={() => navigation.navigate('Workout Plan')} />
+				<FAB icon='play' onPress={onPressDoWorkout} />
+				<FAB icon='pencil' onPress={onPressPlanWorkout} />
 			</View>
 		</ScrollView>
 	);

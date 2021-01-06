@@ -112,8 +112,6 @@ export default function PlanWorkoutScreen({ navigation }) {
         return unsubscribe;
     }, [navigation, planModified]);
 
-    const planDatabaseRef = Firebase.database().ref(`/users/${uid}/exercisePlan`);
-
     const onActivityPress = day => {
         const activity = draftPlan[day];
         if (activity.type != 'rest')
@@ -141,7 +139,7 @@ export default function PlanWorkoutScreen({ navigation }) {
     };
     const onSaveChanges = () => {
         setDialogVisible(false);
-        planDatabaseRef.set(draftPlan);
+        Firebase.database().ref(`/users/${uid}/exercisePlan`).set(draftPlan);   // Save to firebase
         dispatch(saveDraftPlan());
         navigation.dispatch(navigationAction);
     };
