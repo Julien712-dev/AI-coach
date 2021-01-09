@@ -5,9 +5,9 @@ import { useTheme, Button, FAB, Text, Headline, Paragraph, Card } from 'react-na
 import ProgressCircle from 'react-native-progress-circle';
 import { getDayOfWeek } from '~/src/Util';
 
-function AnalysisCard({ key }) {
+function AnalysisCard() {
 	return (
-		<Card key={key} style={{ width: '100%', marginTop: 10 }}>
+		<Card style={{ width: '100%', marginTop: 10 }}>
 			<Card.Title title='Analysis' />
 			<Card.Content>
 				<Paragraph>You are doing great so far! But try not to exercise immediately after lunch, which may hurt your intestine.</Paragraph>
@@ -16,10 +16,10 @@ function AnalysisCard({ key }) {
 	);
 }
 
-function WorkoutReminderCard({ key, workout, onPressStart }) {
+function WorkoutReminderCard({ workout, onPressStart }) {
 	const { colors } = useTheme();
 	return (
-		<Card key={key} style={{ width: '100%', marginTop: 10 }}>
+		<Card style={{ width: '100%', marginTop: 10 }}>
 			<Card.Title title='Reminder' />
 			<Card.Content>
 				<Paragraph>A {workout.time} minutes {workout.name} on the schedule today!</Paragraph>

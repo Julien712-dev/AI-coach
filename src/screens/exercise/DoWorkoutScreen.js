@@ -35,8 +35,6 @@ export default function DoWorkoutScreen({ navigation, route }) {
         setCameraRatio(ratios.find(r => r === cameraRatio) || ratios[ratios.length - 1])
     };
 
-    console.log(calculateAspectRatio(cameraRatio));
-
     if (hasCameraPermission === null)
         return <LoadingScreen />;
     else if (hasCameraPermission)
