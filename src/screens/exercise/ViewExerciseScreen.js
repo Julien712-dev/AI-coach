@@ -8,13 +8,13 @@ import NumericInput from 'react-native-numeric-input';
 import { changeExerciseLength } from '~/src/store/exerciseSlice';
 import MultiDivider from '~/src/components/MultiDivider';
 
-export default function ViewExerciseScreen({ route, navigation }) {
+export default function ViewExerciseScreen({ route }) {
     const { day, index } = route.params;
 
     const [dialogVisible, setDialogVisible] = useState(false);
-    const exerciseType = useSelector(state => state.main.exercise.plan[day].sequence[index].type);
-    const exerciseLength = useSelector(state => state.main.exercise.plan[day].sequence[index].length);
-    const exerciseLengthType = useSelector(state => state.main.exercise.plan[day].sequence[index].lengthType);
+    const exerciseType = useSelector(state => state.main.exercise.draftPlan[day].sequence[index].type);
+    const exerciseLength = useSelector(state => state.main.exercise.draftPlan[day].sequence[index].length);
+    const exerciseLengthType = useSelector(state => state.main.exercise.draftPlan[day].sequence[index].lengthType);
     const exerciseDescription = useSelector(state => state.main.exercise.library[exerciseType]);
     const dispatch = useDispatch();
     const { colors } = useTheme();

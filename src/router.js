@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -97,11 +97,12 @@ function BottomTabs() {
 const Stack = createStackNavigator();
 export default function Routers({ theme }) {
 
-	let user = useSelector(state => state.main.auth.user);
+	const loggedIn = useSelector(state => !!state.main.auth.user);
+	
 	return (
 		<NavigationContainer theme={theme}>
-			<Stack.Navigator mode='modal' screenOptions={{ headerShown: false }} initialRouteName={!!user ? 'Home' : 'Login'}>
-				{!!user ? 
+			<Stack.Navigator mode='modal' screenOptions={{ headerShown: false }} initialRouteName={loggedIn ? 'Home' : 'Login'}>
+				{!!loggedIn ? 
 				<>
 					<Stack.Screen name='Home' component={BottomTabs} />
 					<Stack.Screen name='Entrance Survey' component={EntranceSurveyScreen} />
