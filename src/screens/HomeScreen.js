@@ -37,7 +37,7 @@ export default function HomeScreen({ navigation }) {
 		  // Call any action
 		  setIsFetched(false);
 		  const userDatabaseRef = Firebase.database().ref(`/users/${user.uid}`);
-		  userDatabaseRef.on('value', snapshot => { 
+		  userDatabaseRef.once('value', snapshot => { 
 			  let value = snapshot.val();
 			  if (!!value) {
 				setProfile(value.profile);
