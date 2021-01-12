@@ -43,20 +43,16 @@ module.exports = {
         }],
         exerciseHabitOptions: [
             {
-                label: '1-2 Times per week',
-                value: '1-2',
+                label: 'Sedentary (Little to none).',
+                value: 'sedentary',
             },
             {
-                label: '3-4 Times per week',
-                value: '3-4',
+                label: 'Medium (Daily walk/basic workout).',
+                value: 'medium',
             },
             {
-                label: '5-7 Times per week',
-                value: '5-7',
-            },
-            {
-                label: 'I do not exercise in a week',
-                value: '0',
+                label: 'Extensive (Regular exercise habits).',
+                value: 'extensive',
             },
         ],
         dietHabitOptions: [
@@ -77,10 +73,12 @@ module.exports = {
             {
                 label: 'Vegetarian',
                 value: 'vegetarian',
+                disableIfSelected: ['meat']
             },
             {
-                label: 'Vegan',
-                value: 'vegan',
+                label: 'Meat Lover',
+                value: 'meat',
+                disableIfSelected: ['vegetarian']
             },
             {
                 label: 'No Fasting',
