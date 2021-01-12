@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { View, TouchableOpacity } from 'react-native';
+import { View, ScrollView, TouchableOpacity } from 'react-native';
 import { useTheme, Headline, Subheading, Paragraph, Chip, Portal, Dialog, Text } from 'react-native-paper';
 import { Video } from 'expo-av';
 import NumericInput from 'react-native-numeric-input';
@@ -14,7 +14,6 @@ export default function ViewExerciseScreen({ route }) {
     const [dialogVisible, setDialogVisible] = useState(false);
     const exerciseType = useSelector(state => state.main.exercise.draftPlan[day].sequence[index].type);
     const exerciseLength = useSelector(state => state.main.exercise.draftPlan[day].sequence[index].length);
-    const exerciseLengthType = useSelector(state => state.main.exercise.draftPlan[day].sequence[index].lengthType);
     const exerciseDescription = useSelector(state => state.main.exercise.library[exerciseType]);
     const dispatch = useDispatch();
     const { colors } = useTheme();
@@ -27,7 +26,7 @@ export default function ViewExerciseScreen({ route }) {
     const onChangeLength = length => dispatch(changeExerciseLength({ day, index, length }));
 
     return (
-        <View style={{ padding: 20, alignItems: 'center' }}>
+        <ScrollView contentContainerStyle={{ padding: 20, alignItems: 'center' }}>
             <Headline style={{ textAlign: 'center', color: colors.primary }}>{exerciseType}</Headline>
             <Video
                 source={exerciseDescription.video}
@@ -46,7 +45,7 @@ export default function ViewExerciseScreen({ route }) {
             <TouchableOpacity onPress={onPressLength}>
                 <View style={{ marginTop: 60 }}>
                     <Text style={{ textAlign: 'center', fontSize: 40, color: colors.primary }}>{exerciseLength}</Text>
-                    <Text style={{ textAlign: 'center', fontSize: 20, color: colors.primary }}>{exerciseLengthType}</Text>
+                    <Text style={{ textAlign: 'center', fontSize: 20, color: colors.primary }}>{exerciseDescription.lengthUnit}</Text>
                 </View>
             </TouchableOpacity>
             <Portal>
@@ -59,11 +58,11 @@ export default function ViewExerciseScreen({ route }) {
                                 minValue={1}
                                 onChange={onChangeLength}
                             />
-                            <Text style={{ fontSize: 22, marginLeft: 5 }}>{exerciseLengthType}</Text>
+                            <Text style={{ fontSize: 22, marginLeft: 5 }}>{exerciseDescription.lengthUnit}</Text>
                         </View>
                     </Dialog.Content>
                 </Dialog>
             </Portal>
-        </View>
+        </ScrollView>
     );
 }
