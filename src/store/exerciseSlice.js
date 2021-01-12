@@ -4,6 +4,7 @@ import DreamFeetVideo from '~/assets/video/dream-feet.mp4';
 const exerciseLibrary = {
     'Push up': {
         video: DreamFeetVideo,
+        lengthUnit: 'reps',
         labels: ['Arm', 'Chest'],
         instructions: [
             'Get down on all fours, placing your hands slightly wider than your shoulders.',
@@ -14,11 +15,23 @@ const exerciseLibrary = {
     },
     'Squat': {
         video: DreamFeetVideo,
+        lengthUnit: 'reps',
         labels: ['Leg', 'Glute'],
         instructions: [
             'Stand up with your feet shoulder-width apart.',
             'Bend your knees, press your hips back and stop the movement once the hip joint is slightly lower than the knees.',
             'Press your heels into the floor to return to the initial position.',
+        ]
+    },
+    'Plank': {
+        video: DreamFeetVideo,
+        lengthUnit: 'seconds',
+        labels: ['Glute', 'Core'],
+        instructions: [
+            'Get in the pushup position, only put your forearms on the ground instead of your hands. Your elbows should line up directly underneath your shoulders. Toes on the ground.',
+            'Squeeze your glutes and tighten your abdominals. Keep a neutral neck and spine.',
+            'Create a straight, strong line from head to toes – a plank, if you will.',
+            'Hold that position.'
         ]
     }
 }

@@ -21,6 +21,7 @@ import ExerciseMainScreen from './screens/exercise/ExerciseMainScreen';
 import PlanWorkoutScreen from './screens/exercise/PlanWorkoutScreen';
 import ViewWorkoutScreen from './screens/exercise/ViewWorkoutScreen';
 import ViewExerciseScreen from './screens/exercise/ViewExerciseScreen';
+import DoWorkoutScreen from './screens/exercise/DoWorkoutScreen';
 
 // Login Screen
 import LoginScreen from './screens/login/LoginScreen';
@@ -58,9 +59,10 @@ function ExerciseStackScreen() {
 	return (
 		<ExerciseStack.Navigator>
 			<ExerciseStack.Screen name='Exercise' component={ExerciseMainScreen} />
-			<ExerciseStack.Screen name='Workout Plan' component={PlanWorkoutScreen} />
+			<ExerciseStack.Screen name='Plan Workout' component={PlanWorkoutScreen} />
 			<ExerciseStack.Screen name='View Workout' component={ViewWorkoutScreen} />
 			<ExerciseStack.Screen name='View Exercise' component={ViewExerciseScreen} />
+			<ExerciseStack.Screen name='Do Workout' component={DoWorkoutScreen} />
 		</ExerciseStack.Navigator>
 	);
 }

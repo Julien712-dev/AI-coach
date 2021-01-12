@@ -14,10 +14,11 @@ const styles = StyleSheet.create({
 });
 
 function ExerciseItem({ item }) {
+    const description = useSelector(state => state.main.exercise.library[item.type]);
     return (
         <List.Item
             title={item.type}
-            description={`${item.length} ${item.lengthType}`}
+            description={`${item.length} ${description.lengthUnit}`}
             onPress={item.onPress}
         />
     );
