@@ -1,12 +1,15 @@
 import React, { useState, useReducer, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { useTheme, Headline, Text, Snackbar } from 'react-native-paper';
 import { Camera } from 'expo-camera';
+import * as tf from '@tensorflow/tfjs';
+import { bundleResourceIO } from '@tensorflow/tfjs-react-native';
 import ProgressCircle from 'react-native-progress-circle';
 import LoadingScreen from '~/src//screens/LoadingScreen';
 import MultiDivider from '~/src/components/MultiDivider';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import modelJson from '~/assets/model/exercise/model.json';
+import modelWeights from '~/assets/model/exercise/model-weights.bin';
 
 function calculateAspectRatio(ratio) {
     const [height, width] = ratio.split(':');
@@ -62,6 +65,7 @@ function CustomProgressCircle({ children, percent }) {
 export default function DoWorkoutScreen({ navigation, route }) {
     const restLength = 30;
     const { day } = route.params;
+    const [model, setModel] = useState(null);
     const [progress, advanceProgress] = useReducer(state => {
         if (state.stage == 'exercise')
             return { ...state, stage: 'rest' };
@@ -77,6 +81,13 @@ export default function DoWorkoutScreen({ navigation, route }) {
     const [cameraRef, onCameraReady, hasCameraPermission, cameraRatio] = useCamera('4:3');
 
     useEffect(() => {
+        (async () => {
+            await tf.ready();
+            setModel(await tf.loadGraphModel(bundleResourceIO(modelJson, modelWeights)));
+        })();
+    }, []);
+
+    useEffect(() => {
         if ((progress.index == workout.sequence.length - 1 && progress.stage == 'rest') || progress.index >= workout.sequence.length)
             console.log('Finish workout'); // Todo
     }, [workout, progress]);
@@ -88,7 +99,7 @@ export default function DoWorkoutScreen({ navigation, route }) {
     }, [exercise, exerciseDescription, progress, secondsElapsed, restLength]);
 
 
-    if (hasCameraPermission === null)
+    if (hasCameraPermission === null || model === null)
         return <LoadingScreen />;
     else if (hasCameraPermission) {
         if (progress.stage == 'exercise') {
