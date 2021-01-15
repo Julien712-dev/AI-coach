@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useEffect } from 'react';
+import React, { useState, useReducer, useEffect, useLayoutEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { TouchableOpacity, View } from 'react-native';
 import { useTheme, Headline, Text, Snackbar } from 'react-native-paper';
@@ -40,8 +40,8 @@ function CustomProgressCircle({ children, percent }) {
 function DoExerciseScreen({ index, exercise, onComplete }) {
     const imageWidth = 1000; 
 
+    const [tensorIterator, setTensorIterator] = useState(null);
     const description = useSelector(state => state.main.exercise.library[exercise.type]);
-
     const { colors } = useTheme();
 
     const timeElapsed = useTimer([index], 100);
@@ -50,6 +50,19 @@ function DoExerciseScreen({ index, exercise, onComplete }) {
     const [cameraRef, adjustCameraRatio, cameraRatio] = useCameraRatio('4:3');
     const cameraAspectRatio = calculateAspectRatio(cameraRatio);
 
+    useLayoutEffect(() => {
+        let animationFrame;
+        const loop = async () => {
+            if (tensorIterator != null) {
+                const tensor = await tensorIterator.next().value;
+                console.log(tensor);
+            }
+            animationFrame = requestAnimationFrame(loop);
+        };
+        loop();
+        return () => cancelAnimationFrame(animationFrame);
+    }, [tensorIterator]);
+
     useEffect(() => {
         if ((description.lengthUnit == 'seconds' && secondsElapsed >= exercise.length))
             onComplete();
@@ -57,12 +70,7 @@ function DoExerciseScreen({ index, exercise, onComplete }) {
 
     const onCameraReady = tensorIterator => {
         adjustCameraRatio();
-        const loop = async () => {
-            const tensor = await tensorIterator.next().value;
-            console.log(tensor);
-            requestAnimationFrame(loop);
-        };
-        loop();
+        setTensorIterator(tensorIterator);
     };
 
     if (description.lengthUnit == 'reps')
@@ -177,16 +185,19 @@ export default function DoWorkoutScreen({ navigation, route }) {
             // Todo
     }, [workout, progress]);
 
-    if (hasCameraPermission === null || posenetModel === null || classificationModel === null)
-        return <LoadingScreen />;
-    else if (hasCameraPermission) {
-        if (progress.stage == 'exercise')
-            return <DoExerciseScreen index={progress.index} exercise={exercise} onComplete={advanceProgress} />
-        else if (progress.stage == 'rest') {
-            const isLast = progress.index >= workout.sequence - 1;
-            const nextExercise = isLast ? null : workout.sequence[progress.index + 1];
-            return <RestScreen index={progress.index} nextExercise={nextExercise} onComplete={advanceProgress} />
-        }
+    const isInitialized = hasCameraPermission !== null && posenetModel !== null && classificationModel !== null;
+
+    if (isInitialized) {
+        if (hasCameraPermission) {
+            if (progress.stage == 'exercise')
+                return <DoExerciseScreen index={progress.index} exercise={exercise} onComplete={advanceProgress} />
+            else if (progress.stage == 'rest') {
+                const isLast = progress.index >= workout.sequence - 1;
+                const nextExercise = isLast ? null : workout.sequence[progress.index + 1];
+                return <RestScreen index={progress.index} nextExercise={nextExercise} onComplete={advanceProgress} />
+            }
+        } else
+            navigation.goBack();
     } else
-        navigation.goBack();
+        return <LoadingScreen />;
 }
