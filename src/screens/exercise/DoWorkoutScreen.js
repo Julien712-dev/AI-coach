@@ -1,47 +1,25 @@
-import React, { useState, useReducer, useEffect, useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { View } from 'react-native';
+import React, { useState, useReducer, useEffect, useLayoutEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { TouchableOpacity, View } from 'react-native';
 import { useTheme, Headline, Text, Snackbar } from 'react-native-paper';
 import { Camera } from 'expo-camera';
+import * as tf from '@tensorflow/tfjs';
+import { bundleResourceIO, cameraWithTensors } from '@tensorflow/tfjs-react-native';
+import * as posenet from '@tensorflow-models/posenet';
 import ProgressCircle from 'react-native-progress-circle';
-import LoadingScreen from '~/src//screens/LoadingScreen';
+import { useCameraPermission, useCameraRatio } from '~/src/hooks/Camera';
+import useTimer from '~/src/hooks/Timer';
+import LoadingScreen from '~/src/screens/LoadingScreen';
 import MultiDivider from '~/src/components/MultiDivider';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import classificationModelJson from '~/assets/model/exercise/model.json';
+import classificationModelWeights from '~/assets/model/exercise/model-weights.bin';
 
 function calculateAspectRatio(ratio) {
     const [height, width] = ratio.split(':');
     return width / height;
 }
 
-function useTimer(dependencies, updateInterval = 10) {
-    const [startTime, setStartTime] = useState((new Date()).getTime());
-    const [currentTime, setCurrentTime] = useState((new Date()).getTime());
-    useEffect(() => {
-        let interval = setInterval(() => setCurrentTime((new Date()).getTime()), updateInterval);
-        return () => clearInterval(interval);
-    }, []);
-    useEffect(() => {
-        setStartTime((new Date()).getTime());
-    }, dependencies);
-    return currentTime - startTime;
-}
-
-function useCamera(preferredRatio) {
-    const [hasCameraPermission, setHasCameraPermission] = useState(null);
-    const [cameraRatio, setCameraRatio] = useState(preferredRatio);
-    const cameraRef = useRef(null);
-    useEffect(() => {
-        (async () => {
-            const { status } = await Camera.requestPermissionsAsync();
-            setHasCameraPermission(status === 'granted');
-        })();
-    }, []);
-    const onCameraReady = async () => {
-        const ratios = await cameraRef.current.getSupportedRatiosAsync();
-        setCameraRatio(ratios.find(r => r === cameraRatio) || ratios[ratios.length - 1])
-    };
-    return [cameraRef, onCameraReady, hasCameraPermission, cameraRatio];
-}
+const TensorCamera = cameraWithTensors(Camera);
 
 function CustomProgressCircle({ children, percent }) {
     const { colors } = useTheme();
@@ -59,9 +37,122 @@ function CustomProgressCircle({ children, percent }) {
         </ProgressCircle>);
 }
 
+function DoExerciseScreen({ index, exercise, onComplete }) {
+    const imageWidth = 1000; 
+
+    const [tensorIterator, setTensorIterator] = useState(null);
+    const description = useSelector(state => state.main.exercise.library[exercise.type]);
+    const { colors } = useTheme();
+
+    const timeElapsed = useTimer([index], 100);
+    const secondsElapsed = Math.floor(timeElapsed / 1000);
+
+    const [cameraRef, adjustCameraRatio, cameraRatio] = useCameraRatio('4:3');
+    const cameraAspectRatio = calculateAspectRatio(cameraRatio);
+
+    useLayoutEffect(() => {
+        let animationFrame;
+        const loop = async () => {
+            if (tensorIterator != null) {
+                const tensor = await tensorIterator.next().value;
+                console.log(tensor);
+            }
+            animationFrame = requestAnimationFrame(loop);
+        };
+        loop();
+        return () => cancelAnimationFrame(animationFrame);
+    }, [tensorIterator]);
+
+    useEffect(() => {
+        if ((description.lengthUnit == 'seconds' && secondsElapsed >= exercise.length))
+            onComplete();
+    }, [exercise, description, secondsElapsed]);
+
+    const onCameraReady = tensorIterator => {
+        adjustCameraRatio();
+        setTensorIterator(tensorIterator);
+    };
+
+    if (description.lengthUnit == 'reps')
+        var progressContent = (
+            <TouchableOpacity onLongPress={onComplete}>
+                <CustomProgressCircle percent={0}>
+                    <Text style={{ fontSize: 50 }}>{exercise.length}</Text>
+                    <Text>reps</Text>
+                </CustomProgressCircle>
+            </TouchableOpacity>
+        );
+    else if (description.lengthUnit == 'seconds') {
+        const secondsLeft = Math.max(0, exercise.length - secondsElapsed);
+        const percent = Math.min(100, 100 * (timeElapsed / (exercise.length * 1000)));
+        var progressContent = (
+            <CustomProgressCircle percent={percent}>
+                <Text style={{ fontSize: 50 }}>{secondsLeft}</Text>
+                <Text>seconds left</Text>
+            </CustomProgressCircle>
+        );
+    }
+
+    return (
+        <View style={{ padding: 20, alignItems: 'center' }}>
+            <Headline style={{ textAlign: 'center', color: colors.primary }}>{exercise.type}</Headline>
+            <TensorCamera 
+                ref={cameraRef} 
+                type={Camera.Constants.Type.front} 
+                style={{ height: '60%', aspectRatio: cameraAspectRatio, marginBottom: 10 }} 
+                resizeWidth={imageWidth}
+                resizeHeight={imageWidth / cameraAspectRatio}
+                resizeDepth={3}
+                onReady={onCameraReady} 
+            />
+            <MultiDivider thickness={5} />
+            {progressContent}
+        </View>
+    );
+}
+
+function RestScreen({ index, nextExercise, onComplete }) {
+    const length = 30;
+
+    const { colors } = useTheme();
+    
+    const timeElapsed = useTimer([index], 100);
+    const secondsElapsed = Math.floor(timeElapsed / 1000);
+    const secondsLeft = Math.max(0, length - secondsElapsed);
+    const percent = Math.min(100, 100 * (timeElapsed / (length * 1000)));
+
+    // Update progress if countdown is completed
+    useEffect(() => {
+        if (secondsElapsed >= length)
+            onComplete();
+    }, [secondsElapsed, length]);
+
+    const nextTip = nextExercise != null ? (
+        <Snackbar style={{ marginTop: 'auto' }} visible={true} onDismiss={() => {}}>
+            Next up: {nextExercise.type}
+        </Snackbar>
+    ) : undefined;
+
+    return (
+        <View style={{ padding: 20, alignItems: 'center', height: '100%' }}>
+            <Headline style={{ textAlign: 'center', color: colors.primary }}>Take a rest</Headline>
+            <View style={{ minHeight: '40%', justifyContent: 'center' }}>
+                <CustomProgressCircle percent={percent}>
+                    <Text style={{ fontSize: 50 }}>{secondsLeft}</Text>
+                    <Text>seconds left</Text>
+                </CustomProgressCircle>
+            </View>
+            {nextTip}
+        </View>
+    );
+}
+
 export default function DoWorkoutScreen({ navigation, route }) {
-    const restLength = 30;
     const { day } = route.params;
+
+    const [classificationModel, setClassificationModel] = useState(null);
+    const [posenetModel, setPosenetModel] = useState(null);
+
     const [progress, advanceProgress] = useReducer(state => {
         if (state.stage == 'exercise')
             return { ...state, stage: 'rest' };
@@ -70,81 +161,43 @@ export default function DoWorkoutScreen({ navigation, route }) {
     }, { stage: 'exercise', index: 0 });
     const workout = useSelector(state => state.main.exercise.plan[day]);
     const exercise = workout.sequence[progress.index];
-    const exerciseDescription = useSelector(state => state.main.exercise.library[exercise.type]);
-    const { colors } = useTheme();
-    const timeElapsed = useTimer([progress], 100);
-    const secondsElapsed = Math.floor(timeElapsed / 1000);
-    const [cameraRef, onCameraReady, hasCameraPermission, cameraRatio] = useCamera('4:3');
 
+    const hasCameraPermission = useCameraPermission();
+
+    // Initialize tensorflow
+    useEffect(() => {
+        (async () => {
+            await tf.ready();
+            setPosenetModel(await posenet.load({
+                architecture: 'MobileNetV1',
+                outputStride: 16,
+                multiplier: 0.5,
+                quantBytes: 4
+            }));
+            setClassificationModel(await tf.loadGraphModel(bundleResourceIO(classificationModelJson, classificationModelWeights)));
+        })();
+    }, []);
+
+    // Check if workout is finished
     useEffect(() => {
         if ((progress.index == workout.sequence.length - 1 && progress.stage == 'rest') || progress.index >= workout.sequence.length)
-            console.log('Finish workout'); // Todo
+            navigation.goBack();    
+            // Todo
     }, [workout, progress]);
 
-    useEffect(() => {
-        if ((exerciseDescription.lengthUnit == 'seconds' && secondsElapsed >= exercise.length) ||
-            (progress.stage == 'rest' && secondsElapsed >= restLength))
-            advanceProgress();
-    }, [exercise, exerciseDescription, progress, secondsElapsed, restLength]);
+    const isInitialized = hasCameraPermission !== null && posenetModel !== null && classificationModel !== null;
 
-
-    if (hasCameraPermission === null)
-        return <LoadingScreen />;
-    else if (hasCameraPermission) {
-        if (progress.stage == 'exercise') {
-
-            if (exerciseDescription.lengthUnit == 'reps')
-                var progressContent = (
-                    <TouchableOpacity onLongPress={advanceProgress}>
-                        <CustomProgressCircle percent={0}>
-                            <Text style={{ fontSize: 50 }}>{exercise.length}</Text>
-                            <Text>reps</Text>
-                        </CustomProgressCircle>
-                    </TouchableOpacity>
-                );
-            else if (exerciseDescription.lengthUnit == 'seconds') {
-                const secondsLeft = Math.max(0, exercise.length - secondsElapsed);
-                const percent = Math.min(100, 100 * (timeElapsed / (exercise.length * 1000)));
-                var progressContent = (
-                    <CustomProgressCircle percent={percent}>
-                        <Text style={{ fontSize: 50 }}>{secondsLeft}</Text>
-                        <Text>seconds left</Text>
-                    </CustomProgressCircle>
-                );
+    if (isInitialized) {
+        if (hasCameraPermission) {
+            if (progress.stage == 'exercise')
+                return <DoExerciseScreen index={progress.index} exercise={exercise} onComplete={advanceProgress} />
+            else if (progress.stage == 'rest') {
+                const isLast = progress.index >= workout.sequence - 1;
+                const nextExercise = isLast ? null : workout.sequence[progress.index + 1];
+                return <RestScreen index={progress.index} nextExercise={nextExercise} onComplete={advanceProgress} />
             }
-
-            return (
-                <View style={{ padding: 20, alignItems: 'center' }}>
-                    <Headline style={{ textAlign: 'center', color: colors.primary }}>{exercise.type}</Headline>
-                    <Camera ref={cameraRef} type={Camera.Constants.Type.front} style={{ height: '60%', aspectRatio: calculateAspectRatio(cameraRatio), marginBottom: 10 }} onCameraReady={onCameraReady} />
-                    <MultiDivider thickness={5} />
-                    {progressContent}
-                </View>
-            );
-        }
-        else if (progress.stage == 'rest') {
-            const secondsLeft = Math.max(0, restLength - secondsElapsed);
-            const percent = Math.min(100, 100 * (timeElapsed / (restLength * 1000)));
-            const nextTip = (progress.index < workout.sequence.length - 1) ? (
-                <Snackbar style={{ marginTop: 'auto' }} visible={true} onDismiss={() => { }}>
-                    Next up: {workout.sequence[progress.index + 1].type}
-                </Snackbar>
-            ) : undefined;
-            return (
-                <View style={{ padding: 20, alignItems: 'center', height: '100%' }}>
-                    <Headline style={{ textAlign: 'center', color: colors.primary }}>Take a rest</Headline>
-                    <View style={{ minHeight: '40%', justifyContent: 'center' }}>
-                        <CustomProgressCircle percent={percent}>
-                            <Text style={{ fontSize: 50 }}>{secondsLeft}</Text>
-                            <Text>seconds left</Text>
-                        </CustomProgressCircle>
-                    </View>
-                    {nextTip}
-                </View>
-            );
-        }
-    }
-
-    else
-        navigation.goBack();
+        } else
+            navigation.goBack();
+    } else
+        return <LoadingScreen />;
 }
