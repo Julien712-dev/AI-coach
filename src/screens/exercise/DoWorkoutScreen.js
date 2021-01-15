@@ -1,15 +1,16 @@
 import React, { useState, useReducer, useEffect, useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { TouchableOpacity, View } from 'react-native';
 import { useTheme, Headline, Text, Snackbar } from 'react-native-paper';
 import { Camera } from 'expo-camera';
 import * as tf from '@tensorflow/tfjs';
-import { bundleResourceIO } from '@tensorflow/tfjs-react-native';
+import { bundleResourceIO, cameraWithTensors } from '@tensorflow/tfjs-react-native';
+import * as posenet from '@tensorflow-models/posenet';
 import ProgressCircle from 'react-native-progress-circle';
-import LoadingScreen from '~/src//screens/LoadingScreen';
+import LoadingScreen from '~/src/screens/LoadingScreen';
 import MultiDivider from '~/src/components/MultiDivider';
-import modelJson from '~/assets/model/exercise/model.json';
-import modelWeights from '~/assets/model/exercise/model-weights.bin';
+import classificationModelJson from '~/assets/model/exercise/model.json';
+import classificationModelWeights from '~/assets/model/exercise/model-weights.bin';
 
 function calculateAspectRatio(ratio) {
     const [height, width] = ratio.split(':');
@@ -29,7 +30,7 @@ function useTimer(dependencies, updateInterval = 10) {
     return currentTime - startTime;
 }
 
-function useCamera(preferredRatio) {
+function useCameraRatio(preferredRatio) {
     const [hasCameraPermission, setHasCameraPermission] = useState(null);
     const [cameraRatio, setCameraRatio] = useState(preferredRatio);
     const cameraRef = useRef(null);
@@ -40,11 +41,13 @@ function useCamera(preferredRatio) {
         })();
     }, []);
     const onCameraReady = async () => {
-        const ratios = await cameraRef.current.getSupportedRatiosAsync();
+        const ratios = await cameraRef.current.camera.getSupportedRatiosAsync();
         setCameraRatio(ratios.find(r => r === cameraRatio) || ratios[ratios.length - 1])
     };
     return [cameraRef, onCameraReady, hasCameraPermission, cameraRatio];
 }
+
+const TensorCamera = cameraWithTensors(Camera);
 
 function CustomProgressCircle({ children, percent }) {
     const { colors } = useTheme();
@@ -63,9 +66,10 @@ function CustomProgressCircle({ children, percent }) {
 }
 
 export default function DoWorkoutScreen({ navigation, route }) {
-    const restLength = 30;
+    const restLength = 30, fps = 5;
     const { day } = route.params;
-    const [model, setModel] = useState(null);
+    const [classificationModel, setClassificationModel] = useState(null);
+    const [posenetModel, setPosenetModel] = useState(null);
     const [progress, advanceProgress] = useReducer(state => {
         if (state.stage == 'exercise')
             return { ...state, stage: 'rest' };
@@ -78,12 +82,18 @@ export default function DoWorkoutScreen({ navigation, route }) {
     const { colors } = useTheme();
     const timeElapsed = useTimer([progress], 100);
     const secondsElapsed = Math.floor(timeElapsed / 1000);
-    const [cameraRef, onCameraReady, hasCameraPermission, cameraRatio] = useCamera('4:3');
+    const [cameraRef, adjustCameraRatio, hasCameraPermission, cameraRatio] = useCameraRatio('4:3');
 
     useEffect(() => {
         (async () => {
             await tf.ready();
-            setModel(await tf.loadGraphModel(bundleResourceIO(modelJson, modelWeights)));
+            setPosenetModel(await posenet.load({
+                architecture: 'MobileNetV1',
+                outputStride: 16,
+                multiplier: 0.5,
+                quantBytes: 4
+            }));
+            setClassificationModel(await tf.loadGraphModel(bundleResourceIO(classificationModelJson, classificationModelWeights)));
         })();
     }, []);
 
@@ -99,10 +109,23 @@ export default function DoWorkoutScreen({ navigation, route }) {
     }, [exercise, exerciseDescription, progress, secondsElapsed, restLength]);
 
 
-    if (hasCameraPermission === null || model === null)
+    if (hasCameraPermission === null || posenetModel === null || classificationModel === null)
         return <LoadingScreen />;
     else if (hasCameraPermission) {
         if (progress.stage == 'exercise') {
+
+            const imageWidth = 1000; 
+            const cameraAspectRatio = calculateAspectRatio(cameraRatio);
+
+            const onCameraReady = tensorIterator => {
+                adjustCameraRatio();
+                const loop = async () => {
+                    const tensor = await tensorIterator.next().value;
+                    console.log(tensor);
+                    requestAnimationFrame(loop);
+                };
+                loop();
+            };
 
             if (exerciseDescription.lengthUnit == 'reps')
                 var progressContent = (
@@ -127,7 +150,15 @@ export default function DoWorkoutScreen({ navigation, route }) {
             return (
                 <View style={{ padding: 20, alignItems: 'center' }}>
                     <Headline style={{ textAlign: 'center', color: colors.primary }}>{exercise.type}</Headline>
-                    <Camera ref={cameraRef} type={Camera.Constants.Type.front} style={{ height: '60%', aspectRatio: calculateAspectRatio(cameraRatio), marginBottom: 10 }} onCameraReady={onCameraReady} />
+                    <TensorCamera 
+                        ref={cameraRef} 
+                        type={Camera.Constants.Type.front} 
+                        style={{ height: '60%', aspectRatio: cameraAspectRatio, marginBottom: 10 }} 
+                        resizeWidth={imageWidth}
+                        resizeHeight={imageWidth / cameraAspectRatio}
+                        resizeDepth={3}
+                        onReady={onCameraReady} 
+                    />
                     <MultiDivider thickness={5} />
                     {progressContent}
                 </View>
