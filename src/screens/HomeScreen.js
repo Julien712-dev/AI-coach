@@ -1,5 +1,5 @@
 import * as Firebase from 'firebase';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, StatusBar, SafeAreaView } from 'react-native';
 import { Button, Title, Card, Text, Divider } from 'react-native-paper';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -68,8 +68,9 @@ export default function HomeScreen({ navigation }) {
 		return <LoadingScreen />
 	} else {
 		return (
-			<>
+			<SafeAreaView>
 			<ScrollView contentContainerStyle={{ padding: 10 }}>
+				<StatusBar barStyle="dark-content" style="auto" />
 				<View style={{ flex: 1 }}>
 					<Title>Greetings, {profile.firstName}. Stay healthy!</Title>
 
@@ -101,14 +102,18 @@ export default function HomeScreen({ navigation }) {
 									<Title style={{ marginLeft: 15 }}>Food</Title>
 								</View>
 								<View style={{ flex: 1, alignItems: 'flex-end' }}>
-									<Button icon="plus" style={{ alignSelf: 'flex-end' }}>Log food</Button>
+									<Button 
+										icon="plus" 
+										style={{ alignSelf: 'flex-end' }}
+										onPress={() => navigation.navigate('Log Diet')}
+									>Log food</Button>
 								</View>
 							</View>
 							<Divider />
 						<Card.Content style={{ marginTop: 5 }}>
 						<Text>You have not logged your diet yet.</Text>
 							<View style={{ marginTop: 5, flexDirection: 'row', justifyContent: 'center' }}>
-								<Button>Explore</Button>
+								<Button onPress={() => navigation.navigate('Diet')}> Explore</Button>
 							</View>
 
 
@@ -152,7 +157,7 @@ export default function HomeScreen({ navigation }) {
 					</Button>
 				</View>
 			</ScrollView>
-			</>
+			</SafeAreaView>
 		);
 	}
 }
