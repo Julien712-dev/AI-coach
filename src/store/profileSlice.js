@@ -23,7 +23,7 @@ const profileSlice = createSlice({
         updateTempStorage: (state, action) => {
             return {...state, ...action.payload}
         },
-        saveProfileToFirebase: (state, action) => {
+        saveProfileToFirebase: async (state, action) => {
             const userRef = action.payload;
             userRef.set({...state});
             // reset state values

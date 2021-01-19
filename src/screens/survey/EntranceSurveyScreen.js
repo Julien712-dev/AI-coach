@@ -307,9 +307,10 @@ function EntranceSurveyStepThreeScreen({ navigation, swiperRef }) {
                     style={{ marginHorizontal: 5, width: 130 }} 
                     mode="contained"
                     onPress={() => {
+                        const conflictingOptions = ['vegetarian', 'meat'];
                         let setObj = {
                             dietHabit: !!dietHabit ? dietHabit : undefined,
-                            dietRestrictions: !!dietRestrictions ? dietRestrictions : undefined,
+                            dietRestrictions: !!dietRestrictions ? conflictingOptions.every(co => dietRestrictions.includes(co)) ? dietRestrictions.filter(el => !conflictingOptions.includes(el)) : dietRestrictions : undefined,
                             foodAllergies: foodAllergies || undefined,
                         }
                         dispatch(updateTempStorage(setObj));
@@ -359,7 +360,7 @@ export default function EntranceSurveyScreen({ navigation }) {
 		  // Call any action
 		  setIsFetched(false);
 		  const userDatabaseRef = Firebase.database().ref(`/users/${user.uid}`);
-		  userDatabaseRef.on('value', snapshot => { 
+		  userDatabaseRef.once('value', snapshot => { 
 			  let value = snapshot.val();
 			  if (!!value) {
 				setProfile(value);
