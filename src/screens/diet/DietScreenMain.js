@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import config from '../../config';
 import moment from 'moment';
 import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import { Button, Text, Title, Card, Paragraph } from 'react-native-paper';
 import Carousel from 'react-native-snap-carousel';
 import DietLoggingFAB from './dietLoggingFAB';
+import { computeNutritionValues } from '../../hooks/Nutrition';
 // location imports
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
@@ -46,12 +48,12 @@ export default function DietScreenMain({ navigation }) {
 	]);
 	const [location, setLocation] = useState(null);
 	const [district, setDistrict] = useState(null);
+	let profileRedux = useSelector(state => state.main.auth.profile) || {};
 
 	useEffect(() => {
 		let currentTime = new Date();
 		setTime(currentTime);
 		setMessage(config.messages.diet.find(message => (message.startAt <= moment(currentTime).hour() && message.endAt > moment(currentTime).hour())));
-
 		// get location async
 		(async () => {
 			let { status } = await Location.requestPermissionsAsync();
@@ -98,6 +100,21 @@ export default function DietScreenMain({ navigation }) {
 		  })();
 	}, []);
 
+	// When the user first login, force the user to complete his profile.
+	useEffect(() => {
+		const unsubscribe = navigation.addListener('focus', () => {
+			console.log('unsub func triggered');
+			// The screen is focused
+			// Call any action
+			console.log(profileRedux);
+			let x = computeNutritionValues(profileRedux);
+			console.log(x);
+		});
+	
+		// Return the function to unsubscribe from the event so it gets removed on unmount
+		return unsubscribe;
+		}, [navigation]);
+
 	// Render function for recipe item recommendations.
 	function _renderRecipeRecommendations({item,index}){
 		return (
@@ -142,8 +159,6 @@ export default function DietScreenMain({ navigation }) {
 					padding: 5,
 					borderBottomLeftRadius: 5,
 					borderBottomRightRadius: 5,
-					// marginLeft: 5,
-					// marginRight: 5, 
 					}}>
 					<Text style={{fontSize: 30}}>{item.title}</Text>
 					<Text>{item.text}</Text>
@@ -179,14 +194,10 @@ export default function DietScreenMain({ navigation }) {
 						<Paragraph>{coachAdvice}</Paragraph>
 					</Card.Content>
 				</Card>
-				{/* <Button style={{ marginBottom: 10 }} mode='contained' onPress={() => navigation.navigate('Edit Diet')}>
-					Edit Diet
-				</Button> */}
 				<Title>Explore Restaurants in {district}!</Title>
 				<Carousel
 					layout={"default"}
 					layoutCardOffset={9}
-					// ref={ref => this.carousel = ref}
 					data={restaurantMenuItems}
 					containerCustomStyle={{overflow: "visible"}}
 					sliderWidth={250}
