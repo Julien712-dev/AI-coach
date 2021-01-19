@@ -12,10 +12,13 @@ const authSlice = createSlice({
             reducer: (state, action) => {state.user = action.payload.user},
             prepare: () => ({ payload: { user: firebase.auth().currentUser } })
         },
-        logout: (state, action) => {return {...state, user: null}}
+        logout: (state, action) => {return {...state, user: null, profile: null}},
+        saveProfileToReducer: (state, action) => {
+            state.profile = action.payload.profile;
+        },
     }
 });
 
 const { reducer, actions } = authSlice;
-export const { login, logout } = actions;
+export const { login, logout, saveProfileToReducer } = actions;
 export default reducer;

@@ -8,8 +8,9 @@ import { Button, Text, Title, Card, Paragraph, TextInput, Chip, RadioButton, Sna
 import DropDown from 'react-native-paper-dropdown';
 import Carousel from 'react-native-snap-carousel';
 import LoadingScreen from "../LoadingScreen";
-import { updateTempStorage, saveProfileToFirebase } from "../../store/profileSlice.js";
+import { updateTempStorage, saveProfileToFirebase, clearTempStorage } from "../../store/profileSlice.js";
 import Swiper from 'react-native-swiper';
+import { saveProfileToReducer } from '../../store/authSlice';
 
 const renderSurveyOptions = (props) => {
     let {
@@ -29,22 +30,21 @@ const renderSurveyOptions = (props) => {
 
 function EntranceSurveyStepOneScreen({ navigation, swiperRef }) {
 
-    const [firstName, setFirstName] = useState(null);
-    const [lastName, setLastName] = useState(null);
-    const [height, setHeight] = useState(null);
-    const [heightUnit, setHeightUnit] = useState('cm');
-    const [weight, setWeight] = useState(null);
-    const [weightUnit, setWeightUnit] = useState('kg');
-    const [age, setAge] = useState(null);
-    const [sex, setSex] = useState(null);
+    let currentProfile = useSelector(state => state.main.auth.profile) || {} ;
+    const [firstName, setFirstName] = useState(currentProfile.firstName || null);
+    const [lastName, setLastName] = useState(currentProfile.lastName || null);
+    const [height, setHeight] = useState(currentProfile.height || null);
+    const [heightUnit, setHeightUnit] = useState(currentProfile.heightUnit || 'cm');
+    const [weight, setWeight] = useState(currentProfile.weight || null);
+    const [weightUnit, setWeightUnit] = useState(currentProfile.weightUnit || 'kg');
+    const [age, setAge] = useState(currentProfile.age || null);
+    const [sex, setSex] = useState(currentProfile.sex || null);
     const [isValid, setIsValid] = useState(false);
     const [showHeightDropDown, setShowHeightDropDown] = useState(false);
     const [showWeightDropDown, setShowWeightDropDown] = useState(false);
     const [showSexDropDown, setShowSexDropDown] = useState(false);
 
     const dispatch = useDispatch();
-
-	let user = useSelector(state => state.main.auth.user);
     const surveyFields = [firstName, lastName, height, weight, age, sex];
 
     const validateSurvey = () => {
@@ -129,12 +129,13 @@ function EntranceSurveyStepOneScreen({ navigation, swiperRef }) {
                         firstName: !!firstName ? firstName: undefined,
                         lastName: !!lastName ? lastName: undefined, 
                         height: !!height ? height: undefined, 
-                        weight: !!weight ? weight: undefined, 
+                        weight: !!weight ? weight: undefined,
+                        age: !!age ? age: undefined,
                         heightUnit: !!heightUnit ? heightUnit: undefined, 
                         weightUnit: !!weightUnit ? weightUnit: undefined,
                         sex: !!sex? sex: undefined
                     }
-                    dispatch(updateTempStorage(setObj));
+                    dispatch(updateTempStorage({...setObj}));
                     // const userFireBaseProfileRef = Firebase.database().ref(`/users/${user.uid}/profile`);
                     // dispatch(saveProfileToFirebase(userFireBaseProfileRef));
                     swiperRef.current.scrollBy(1)
@@ -151,13 +152,14 @@ function renderChipOfSingleChoice() {
 
 function EntranceSurveyStepTwoScreen({ navigation, swiperRef }) {
 
+    let currentProfile = useSelector(state => state.main.auth.profile) || {} ;
     const [value, setValue] = useState();
     const [isSelected, setIsSelected] = useState(false);
-    const [exerciseHabit, setExerciseHabit] = useState(null);
+    const [exerciseHabit, setExerciseHabit] = useState(currentProfile.exerciseHabit || null);
     const [isValid, setIsValid] = useState(false);
 
     const dispatch = useDispatch();
-    
+
     const surveyFields = [exerciseHabit]
     const validateSurvey = () => {
         for (var surveyField of surveyFields) {
@@ -199,7 +201,7 @@ function EntranceSurveyStepTwoScreen({ navigation, swiperRef }) {
                         let setObj = {
                             exerciseHabit: !!exerciseHabit ? exerciseHabit : undefined
                         }
-                        dispatch(updateTempStorage(setObj));
+                        dispatch(updateTempStorage({...setObj}));
                         swiperRef.current.scrollBy(1);
                     }}
                 >NEXT</Button>
@@ -210,7 +212,7 @@ function EntranceSurveyStepTwoScreen({ navigation, swiperRef }) {
 
 function MultipleChoiceChip({ index, option, selectedElements, setValueFunction }) {
 
-    const [selected, setSelected] = useState(false);
+    const [selected, setSelected] = useState(selectedElements.includes(option.value));
     const handleChipSelection = (props) => {
         let {
             item,
@@ -221,13 +223,14 @@ function MultipleChoiceChip({ index, option, selectedElements, setValueFunction 
         let newSelectedElements = selectedElements || [];
         if (selectedElements.includes(item.value)) {
             // remove
-            newSelectedElements = newSelectedElements.filter(el => el != item.value);
+            // newSelectedElements = newSelectedElements.filter(el => el != item.value);
+            setValueFunction(selectedElements.filter(el => el != item.value))
         } else {
             // add
-            newSelectedElements.push(item.value);
+            setValueFunction([...selectedElements, item.value]);
+            // newSelectedElements.push(item.value);
         }
-        console.log(newSelectedElements);
-        setValueFunction(newSelectedElements);
+        // setValueFunction(newSelectedElements);
     }
 
     return (
@@ -247,15 +250,18 @@ function MultipleChoiceChip({ index, option, selectedElements, setValueFunction 
 
 function EntranceSurveyStepThreeScreen({ navigation, swiperRef }) {
 
+    let currentProfile = useSelector(state => state.main.auth.profile) || {} ;
+
     const [isValid, setIsValid] = useState(false);
     const [alert, setAlert] = useState('');
     const [visible, setVisible] = useState(false);
-    const [dietHabit, setDietHabit] = useState('');
-    const [dietRestrictions, setDietRestrictions] = useState([]);
-    const [foodAllergies, setFoodAllergies] = useState([]);
+    const [dietHabit, setDietHabit] = useState(currentProfile.dietHabit || '');
+    const [dietRestrictions, setDietRestrictions] = useState(currentProfile.dietRestrictions || []);
+    const [foodAllergies, setFoodAllergies] = useState(currentProfile.foodAllergies || []);
     const dispatch = useDispatch();
 
     let user = useSelector(state => state.main.auth.user);
+    let tempProfile = useSelector(state => state.main.profile) || {} ;
     
     const surveyFields = [dietHabit]
     const validateSurvey = () => {
@@ -267,8 +273,8 @@ function EntranceSurveyStepThreeScreen({ navigation, swiperRef }) {
 
     useEffect(() => {
         validateSurvey();
-    }, surveyFields)
-
+    }, surveyFields);
+ 
     return (
         <View style={{ flex: 1 }}>
             <View style={{ height: 420 }}>
@@ -313,11 +319,17 @@ function EntranceSurveyStepThreeScreen({ navigation, swiperRef }) {
                             dietRestrictions: !!dietRestrictions ? conflictingOptions.every(co => dietRestrictions.includes(co)) ? dietRestrictions.filter(el => !conflictingOptions.includes(el)) : dietRestrictions : undefined,
                             foodAllergies: foodAllergies || undefined,
                         }
-                        dispatch(updateTempStorage(setObj));
+                        // dispatch(updateTempStorage({...setObj}));
                         setAlert('Your profile has been updated')
                         setVisible(true);
                         const userFireBaseProfileRef = Firebase.database().ref(`/users/${user.uid}/profile`);
-                        dispatch(saveProfileToFirebase(userFireBaseProfileRef));
+                        userFireBaseProfileRef.set({
+                            ...tempProfile,
+                            ...setObj
+                        });
+                        console.log(tempProfile);
+                        dispatch(saveProfileToReducer({ profile: { ...tempProfile, ...setObj }}));
+                        dispatch(clearTempStorage());
                         setTimeout(() => {
                             navigation.goBack();
                         }, 1000)
@@ -348,32 +360,41 @@ export default function EntranceSurveyScreen({ navigation }) {
         <EntranceSurveyStepThreeScreen key={`PAGE-2`} navigation={navigation} swiperRef={swiperRef} />
     ];
 
-
-    const onStepPress = (position) => {
-        setCurrentPage(position);
-    };
+    // useEffect(() => {
+    //     (async () => {
+	// 	  setIsFetched(false);
+	// 	  const userDatabaseRef = Firebase.database().ref(`/users/${user.uid}`);
+	// 	    userDatabaseRef.once('value', snapshot => { 
+	// 		  let value = snapshot.val();
+	// 		  if (!!value) {
+	// 			setProfile(value);
+	// 		  }
+	// 		  setIsFetched(true);
+	// 	  });
+    //     })();
+    // }, [])
 
     // When the user first login, force the user to complete his profile.
-	useEffect(() => {
-		const unsubscribe = navigation.addListener('focus', () => {
-		  // The screen is focused
-		  // Call any action
-		  setIsFetched(false);
-		  const userDatabaseRef = Firebase.database().ref(`/users/${user.uid}`);
-		  userDatabaseRef.once('value', snapshot => { 
-			  let value = snapshot.val();
-			  if (!!value) {
-				setProfile(value);
-			  }
-			  setIsFetched(true);
-		  });
-		});
+	// useEffect(() => {
+	// 	const unsubscribe = navigation.addListener('focus', () => {
+	// 	  // The screen is focused
+	// 	  // Call any action
+	// 	  setIsFetched(false);
+	// 	  const userDatabaseRef = Firebase.database().ref(`/users/${user.uid}`);
+	// 	    userDatabaseRef.once('value', snapshot => { 
+	// 		  let value = snapshot.val();
+	// 		  if (!!value) {
+	// 			setProfile(value);
+	// 		  }
+	// 		  setIsFetched(true);
+	// 	  });
+	// 	});
 	
-		// Return the function to unsubscribe from the event so it gets removed on unmount
-		return unsubscribe;
-	  }, [navigation]);
+	// 	// Return the function to unsubscribe from the event so it gets removed on unmount
+	// 	return unsubscribe;
+	//   }, [navigation]);
 
-    if (!user || !isFetched) {
+    if (!user) {
         return (<LoadingScreen />)
     } else {
     return (

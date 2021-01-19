@@ -78,7 +78,7 @@ export default function HomeScreen({ navigation }) {
 	}, [isFetched]);
 
 	useEffect(() => {
-        (async () => {
+        (() => {
 			setIsFetched(false);
 			const userDatabaseRef = Firebase.database().ref(`/users/${user.uid}`);
 			userDatabaseRef.once('value', snapshot => { 
@@ -87,9 +87,10 @@ export default function HomeScreen({ navigation }) {
 				  dispatch(saveProfileToReducer({ profile: value.profile }));
 				  setProfile(value.profile);
 				  dispatch(setPlan({ plan: value.exercisePlan }));
+				  console.log(value.profile);
   
 				  plan = value.exercisePlan;
-				  console.log(plan);
+				//   console.log(plan);
 				  for (var prop in plan) {
 					  if (moment().day(prop).day() == today.day()) {
 						  // console.log(plan[prop]);
