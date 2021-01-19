@@ -159,6 +159,20 @@ module.exports = {
         'carb': 4,
         'fat': 9
     },
+    nutritionDailyRecommendedRange: {
+        'protein': {
+            min: 0.1,
+            max: 0.35
+        },
+        'carb': {
+            min: 0.45,
+            max: 0.65
+        },
+        'fat': {
+            min: 0.2,
+            max: 0.35
+        }
+    },
     referenceNuritionValues: {
         1.4: {
             6: {
