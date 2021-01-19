@@ -34,6 +34,7 @@
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-39.0.2.tar.gz",
+    "react-native-console-time-polyfill": "^1.2.1",
     "react-native-drax": "^0.7.2",
     "react-native-fs": "^2.16.6",
     "react-native-gesture-handler": "~1.7.0",
