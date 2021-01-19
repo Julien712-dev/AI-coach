@@ -14,7 +14,7 @@ DetailsScreen['navigationOptions'] = screenProps => ({
 // screen for demo purpose
 export default function DetailsScreen({ navigation }) {
 
-	const [searchByName, results, errorMessage] = searchRecipe()
+	const { searchByName, results, errorMessage } = searchRecipe()
 
 	//const [results, setResults] = useState([]);
 	const [searchQuery, setSearchQuery] = React.useState('');
