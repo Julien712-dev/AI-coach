@@ -1,10 +1,11 @@
-import { registerRootComponent } from 'expo'
+import { registerRootComponent } from 'expo';
 import React from 'react';
 import Firebase from 'firebase';
 import { Provider as PaperProvider, DefaultTheme as PaperDefaultTheme } from 'react-native-paper';
 import { DefaultTheme as NavigationDefaultTheme } from '@react-navigation/native';
 import { DraxProvider } from 'react-native-drax';
 import merge from 'deepmerge';
+import 'react-native-console-time-polyfill';
 
 // State saving
 import { PersistGate } from 'redux-persist/integration/react';
