@@ -3,6 +3,8 @@ import { View, ScrollView } from 'react-native';
 import { Text, Searchbar, Button, Divider } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+import searchRecipe from '~/src/hooks/searchRecipe'
+
 // Overriding the header
 DetailsScreen['navigationOptions'] = screenProps => ({
 	title: "",
@@ -12,7 +14,9 @@ DetailsScreen['navigationOptions'] = screenProps => ({
 // screen for demo purpose
 export default function DetailsScreen({ navigation }) {
 
-	const [results, setResults] = useState([]);
+	const [searchByName, results, errorMessage] = searchRecipe()
+
+	//const [results, setResults] = useState([]);
 	const [searchQuery, setSearchQuery] = React.useState('');
 
 	const onChangeSearch = query => setSearchQuery(query);
@@ -29,7 +33,7 @@ export default function DetailsScreen({ navigation }) {
 				<Divider />
 				<Divider />
 				<Text style={{fontSize: 16, alignSelf: "center", marginVertical: 5}}>Can't find your diet?</Text>
-				<Button icon="pencil" mode="contained" style={{ width: 200, alignSelf: "center", marginTop: 10 }} onPress={() => navigation.navigate('Log Diet Details')}>
+				<Button icon="pencil" mode="contained" style={{ width: 200, alignSelf: "center", marginTop: 10 }} onPress={() => searchByName(searchQuery)}>
 					Log Manually
 				</Button>
 			</ScrollView>
