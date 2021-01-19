@@ -5,12 +5,14 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 
-import { logout as logoutAction } from '../store/authSlice';
+import { logout as logoutAction, saveProfileToReducer } from '../store/authSlice';
 import { setPlan } from '../store/exerciseSlice';
 import LoadingScreen from './LoadingScreen';
 
 export default function HomeScreen({ navigation }) {
 	let user = useSelector(state => state.main.auth.user) || {};
+	let currentProfile = useSelector(state => state.main.auth.profile) || {};
+	let currentPlan = useSelector(state => state.main.exercise.plan);
 	var plan = {};
 	const [isFetched, setIsFetched] = useState(false);
 	const [profile, setProfile] = useState(null);
@@ -33,25 +35,36 @@ export default function HomeScreen({ navigation }) {
 	useEffect(() => {
 		const unsubscribe = navigation.addListener('focus', () => {
 			console.log('unsub func triggered');
-		  // The screen is focused
-		  // Call any action
-		  setIsFetched(false);
-		  const userDatabaseRef = Firebase.database().ref(`/users/${user.uid}`);
-		  userDatabaseRef.once('value', snapshot => { 
-			  let value = snapshot.val();
-			  if (!!value) {
-				setProfile(value.profile);
-				dispatch(setPlan({ plan: value.exercisePlan }));
-				plan = value.exercisePlan;
-				for (var prop in plan) {
-					if (moment().day(prop).day() == today.day()) {
-						console.log(plan[prop]);
-						setWorkoutOfTheDay(plan[prop]);
+			// The screen is focused
+			// Call any action
+				//   setIsFetched(false);
+				//   const userDatabaseRef = Firebase.database().ref(`/users/${user.uid}`);
+				//   userDatabaseRef.once('value', snapshot => { 
+				// 	  let value = snapshot.val();
+				// 	  if (!!value) {
+				// 		dispatch(saveProfileToReducer({ profile: value.profile }));
+				// 		setProfile(value.profile);
+				// 		dispatch(setPlan({ plan: value.exercisePlan }));
+
+				// 		plan = value.exercisePlan;
+				// 		for (var prop in plan) {
+				// 			if (moment().day(prop).day() == today.day()) {
+				// 				// console.log(plan[prop]);
+				// 				setWorkoutOfTheDay(plan[prop]);
+				// 			}
+				// 		}
+				// 		setIsFetched(true);
+				// 	  }
+				//   });
+				if (!!currentPlan) {
+					console.log('plan stored in redux');
+					console.log(currentPlan);
+					for (var prop in currentPlan) {
+						if (moment().day(prop).day() == today.day()) {
+							setWorkoutOfTheDay(currentPlan[prop]);
+						}
 					}
 				}
-				setIsFetched(true);
-			  }
-		  });
 		});
 	
 		// Return the function to unsubscribe from the event so it gets removed on unmount
@@ -63,6 +76,32 @@ export default function HomeScreen({ navigation }) {
 			navigation.navigate('Entrance Survey');
 		};
 	}, [isFetched]);
+
+	useEffect(() => {
+        (async () => {
+			setIsFetched(false);
+			const userDatabaseRef = Firebase.database().ref(`/users/${user.uid}`);
+			userDatabaseRef.once('value', snapshot => { 
+				let value = snapshot.val();
+				if (!!value) {
+				  dispatch(saveProfileToReducer({ profile: value.profile }));
+				  setProfile(value.profile);
+				  dispatch(setPlan({ plan: value.exercisePlan }));
+  
+				  plan = value.exercisePlan;
+				  console.log(plan);
+				  for (var prop in plan) {
+					  if (moment().day(prop).day() == today.day()) {
+						  // console.log(plan[prop]);
+						  setWorkoutOfTheDay(plan[prop]);
+					  }
+				  }
+				  setIsFetched(true);
+				}
+			});
+
+        })();
+	}, []);
 
 	if (!isFetched) {
 		return <LoadingScreen />
