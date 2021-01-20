@@ -15,7 +15,8 @@
     },
     "entryPoint": "./src/App.js",
     "assetBundlePatterns": [
-      "**/*"
+      "**/*",
+      "assets/images/*"
     ],
     "ios": {
       "supportsTablet": true
