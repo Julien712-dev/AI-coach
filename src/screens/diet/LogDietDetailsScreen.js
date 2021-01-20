@@ -64,15 +64,19 @@ export default function LogDietDetailsScreen({navigation}) {
                         right: <TextInput.Icon name={'menu-down'} />,
                     }}
                 />
+                <Text>Food Item Name</Text>
                 <TextInput
                     style={{ marginVertical: 15 }}
+                    mode='outlined'
                     label="Food Item Name"
                     value={itemName}
                     onChangeText={item => setItemName(item)}
                 />
+                <Text>Nutrients</Text>
                 <TextInput
                     style={{ marginVertical: 10 }}
                     label="Amount of Calories"
+                    mode='outlined'
                     value={calorieAmount}
                     onChangeText={item => setCalorieAmount(item)}
                 />
