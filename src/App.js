@@ -59,6 +59,10 @@ function App() {
 		const imageAssets = cacheImages([
 			require('../assets/image/male-athlete.jpg'),
 			require('../assets/image/female-athlete.jpg'),
+			require('../assets/image/arm-workout.jpg'),
+			require('../assets/image/exercise-survey-bg.jpg'),
+			require('../assets/image/rest-day.jpg'),
+			reqire('../assets/image/survey-background.jpg')
 		  ]);
 	  
 		//   const fontAssets = cacheFonts([FontAwesome.font]);

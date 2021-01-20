@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import firebase from 'firebase';
 import { View, ScrollView, StyleSheet, Keyboard, TouchableWithoutFeedback, ImageBackground, StatusBar } from 'react-native';
-import { FAB, Portal, Provider, Card, TextInput, Button, ActivityIndicator, Snackbar, Text } from 'react-native-paper';
+import { FAB, Portal, Provider, Card, TextInput, Button, ActivityIndicator, Snackbar, Text, Title } from 'react-native-paper';
 import { login } from '../../store/authSlice';
+import LoadingScreen from '../LoadingScreen';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('')
@@ -11,6 +12,7 @@ const LoginScreen = ({ navigation }) => {
   const [visible, setVisible] = useState(false)
   const [alert, setAlert] = useState('')
   const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('');
 
   const dispatch = useDispatch();
 
@@ -26,7 +28,7 @@ const LoginScreen = ({ navigation }) => {
         loginSuccess();
       })
       .catch(() => {
-        setLoading(false)
+        setLoading(false);
         setAlert('Login Failed')
         setVisible(true)
       })
@@ -68,7 +70,11 @@ const LoginScreen = ({ navigation }) => {
       </View>
 
       <View style={{ marginTop: 200 }}>
-        <Card style={{ marginHorizontal: 10, width: 350, opacity: 0.9 }}>
+        <Card style={{ marginHorizontal: 10, width: 350, backgroundColor: 'transparent' }}>
+          <View style={{ marginLeft: 15, marginTop: 10, alignSelf: "flex-start"  }}>
+              <Title style={{ fontSize: 28 }}>Welcome, Athlete!</Title>
+              <Text>Sign in to use Coach.ai.</Text>
+          </View>
           <Card.Content>
           <TextInput
             style={styles.textInputStyle}
@@ -78,6 +84,12 @@ const LoginScreen = ({ navigation }) => {
             autoCompleteType='email'
             keyboardType='email-address'
             value={email}
+            // theme={{ colors: { 
+            //   text: 'white',
+            //   placeholder: 'white',
+            //   primary: 'white',
+            //   underlineColor: 'white'
+            // } }}
             onChangeText={email => setEmail(email)}
           />
 
@@ -90,6 +102,12 @@ const LoginScreen = ({ navigation }) => {
             secureTextEntry={true}
             value={password}
             onChangeText={password => setPassword(password)}
+            // theme={{ colors: {
+            //   text: 'white',
+            //   placeholder: 'white',
+            //   primary: 'white',
+            //   underlineColor: 'white'
+            // } }}
           />
 
           <View style={{ flexDirection: 'row', marginBottom: 5 }}>
@@ -106,7 +124,7 @@ const LoginScreen = ({ navigation }) => {
           </Card.Content>
         </Card>
 
-        {loading ? <ActivityIndicator animating={true} /> : <ActivityIndicator animating={false} /> }
+        {/* {loading ? <ActivityIndicator animating={true} /> : <ActivityIndicator animating={false} /> } */}
 
         <View style={{flexDirection: 'row', alignItems: 'stretch'}}>
             <Button 
@@ -120,6 +138,7 @@ const LoginScreen = ({ navigation }) => {
       </View>
 
       <Snackbar visible={visible} onDismiss={onDismissSnackBar} duration={3000}>{alert}</Snackbar>
+      {loading && <LoadingScreen text={'Logging you in'} />}
     </View>
     </TouchableWithoutFeedback>
   )
@@ -143,7 +162,8 @@ const styles = StyleSheet.create({
   bakcgroundImage: {
     flex: 1, 
     width: null, 
-    height: null
+    height: null,
+    opacity: 0.5
   },
   btnStyle:{
     marginHorizontal: 10,
@@ -153,7 +173,8 @@ const styles = StyleSheet.create({
   textInputStyle:{
     margin: 10,
     height: 50,
-    backgroundColor: "transparent"
+    fontWeight: '700',
+    backgroundColor: "transparent",
   },
   errorTextStyle:{
     fontSize: 20,

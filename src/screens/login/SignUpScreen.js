@@ -77,9 +77,9 @@ export default function SignUpScreen({ navigation }) {
         <Button icon="close" style={{ position: 'absolute', top:20, right:0 }} onPress={() => navigation.goBack()}>Skip</Button>
 
         <View>
-          <Card style={{ marginHorizontal: 10, width: 350, opacity: 0.9 }}>
+          <Card style={{ marginHorizontal: 10, width: 350, opacity: 0.9, backgroundColor: 'transparent' }}>
             <View style={{ marginLeft: 15, marginTop: 10, alignSelf: "flex-start"  }}>
-              <Title>Sign Up</Title>
+              <Title style={{ fontSize: 28 }}>Sign Up to Coach.ai</Title>
               <Text>Enjoy an intelligent fitness journey.</Text>
             </View>
             <Card.Content>
@@ -138,7 +138,8 @@ const styles = StyleSheet.create({
     bakcgroundImage: {
       flex: 1, 
       width: null, 
-      height: null
+      height: null,
+      opacity: 0.5
     },
     btnStyle:{
       marginHorizontal: 10,
