@@ -86,7 +86,7 @@ export default function DietScreenMain({ navigation }) {
 
 			await searchByName({
 				type: meal.meal,
-				// minCalories: nutritionValues.dailyRecommendedCalories * 0.7 * meal.weight,
+				minCalories: (meal.meal == 'breakfast' || meal.meal == 'snack') ? undefined : nutritionValues.dailyRecommendedCalories * 0.55 * meal.weight,
 				maxCalories: nutritionValues.dailyRecommendedCalories * meal.weight,
 				maxCarbs: nutritionValues.maximumDailyCarbsInGrams * meal.weight,
 				maxProtein: nutritionValues.maximumDailyProteinInGrams * meal.weight,
