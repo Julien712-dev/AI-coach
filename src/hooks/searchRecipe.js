@@ -23,6 +23,16 @@ export default () => {
     console.log('hi');
     setErrorMessage('')
     try {
+      console.log({
+        type,
+        minCarbs,
+        maxCarbs,
+        maxProtein,
+        minCalories,
+        maxCalories,
+        maxFat
+      })
+
       const response = await spoonacular.get('/complexSearch', {
         params: { 
           apiKey,
