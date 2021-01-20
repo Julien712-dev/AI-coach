@@ -33,7 +33,7 @@ export default () => {
           maxProtein,
           maxFat,
           type,
-          number: 3
+          number: 4
         }
       })
       setResults(response.data.results)
