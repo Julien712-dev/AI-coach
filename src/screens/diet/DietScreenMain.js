@@ -6,7 +6,7 @@ import { View, StyleSheet, ScrollView, SafeAreaView, ImageBackground } from 'rea
 import { Button, Text, Title, Card, Paragraph } from 'react-native-paper';
 import Carousel from 'react-native-snap-carousel';
 import DietLoggingFAB from './dietLoggingFAB';
-import { computeNutritionValues } from '../../hooks/Nutrition';
+import { computeNutritionValues, getCoachAdvice } from '../../hooks/Nutrition';
 import searchRecipe from '../../hooks/searchRecipe';
 // location imports
 import * as Location from 'expo-location';
@@ -18,7 +18,7 @@ export default function DietScreenMain({ navigation }) {
 
 	const [time, setTime] = useState();
 	const [message, setMessage] = useState({});
-	const [coachAdvice, setCoachAdvice] = useState(`On a day of rest, try to reduce carbohydrate intake and go low calorie overall.`);
+	const [coachAdvice, setCoachAdvice] = useState('');
 	const { searchByName, searchByNutrients, results, errorMessage } = searchRecipe();
 	// Carousels
 	const [recommendedMealCarouselActiveIndex, setRecommendedMealCarouselActiveIndex] = useState(0);
@@ -58,6 +58,7 @@ export default function DietScreenMain({ navigation }) {
 		let meal = config.messages.diet.find(message => (message.startAt <= moment(currentTime).hour() && message.endAt > moment(currentTime).hour()));
 		setTime(currentTime);
 		setMessage(meal);
+		setCoachAdvice(getCoachAdvice(profileRedux));
 		// get location async
 		(async () => {
 			let { status } = await Location.requestPermissionsAsync();
