@@ -33,7 +33,7 @@ export default function DetailsScreen({ navigation }) {
 				<Divider />
 				<Divider />
 				<Text style={{fontSize: 16, alignSelf: "center", marginVertical: 5}}>Can't find your diet?</Text>
-				<Button icon="pencil" mode="contained" style={{ width: 200, alignSelf: "center", marginTop: 10 }} onPress={() => searchByName(searchQuery)}>
+				<Button icon="pencil" mode="contained" style={{ width: 200, alignSelf: "center", marginTop: 10 }} onPress={() => navigation.navigate('Log Diet Details')}>
 					Log Manually
 				</Button>
 			</ScrollView>
