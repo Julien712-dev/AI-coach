@@ -1,5 +1,5 @@
 import * as Firebase from 'firebase';
-import { View, StyleSheet, ScrollView, StatusBar, SafeAreaView } from 'react-native';
+import { View, StyleSheet, ScrollView, StatusBar, SafeAreaView, ImageBackground } from 'react-native';
 import { Button, Title, Card, Text, Divider } from 'react-native-paper';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -31,40 +31,21 @@ export default function HomeScreen({ navigation }) {
 			});
 	}
 
-	// When the user first login, force the user to complete his profile.
+	// This functions fires every time when the user clicks into home screen
 	useEffect(() => {
 		const unsubscribe = navigation.addListener('focus', () => {
 			console.log('unsub func triggered');
 			// The screen is focused
 			// Call any action
-				//   setIsFetched(false);
-				//   const userDatabaseRef = Firebase.database().ref(`/users/${user.uid}`);
-				//   userDatabaseRef.once('value', snapshot => { 
-				// 	  let value = snapshot.val();
-				// 	  if (!!value) {
-				// 		dispatch(saveProfileToReducer({ profile: value.profile }));
-				// 		setProfile(value.profile);
-				// 		dispatch(setPlan({ plan: value.exercisePlan }));
-
-				// 		plan = value.exercisePlan;
-				// 		for (var prop in plan) {
-				// 			if (moment().day(prop).day() == today.day()) {
-				// 				// console.log(plan[prop]);
-				// 				setWorkoutOfTheDay(plan[prop]);
-				// 			}
-				// 		}
-				// 		setIsFetched(true);
-				// 	  }
-				//   });
-				if (!!currentPlan) {
-					console.log('plan stored in redux');
-					console.log(currentPlan);
-					for (var prop in currentPlan) {
-						if (moment().day(prop).day() == today.day()) {
-							setWorkoutOfTheDay(currentPlan[prop]);
-						}
+			
+			// Listen to profile update and update workout of the day.
+			if (!!currentPlan) {
+				for (var prop in currentPlan) {
+					if (moment().day(prop).day() == today.day()) {
+						setWorkoutOfTheDay(currentPlan[prop]);
 					}
 				}
+			}
 		});
 	
 		// Return the function to unsubscribe from the event so it gets removed on unmount
@@ -87,13 +68,10 @@ export default function HomeScreen({ navigation }) {
 				  dispatch(saveProfileToReducer({ profile: value.profile }));
 				  setProfile(value.profile);
 				  dispatch(setPlan({ plan: value.exercisePlan }));
-				  console.log(value.profile);
   
 				  plan = value.exercisePlan;
-				//   console.log(plan);
 				  for (var prop in plan) {
 					  if (moment().day(prop).day() == today.day()) {
-						  // console.log(plan[prop]);
 						  setWorkoutOfTheDay(plan[prop]);
 					  }
 				  }
@@ -153,7 +131,7 @@ export default function HomeScreen({ navigation }) {
 						<Card.Content style={{ marginTop: 5 }}>
 						<Text>You have not logged your diet yet.</Text>
 							<View style={{ marginTop: 5, flexDirection: 'row', justifyContent: 'center' }}>
-								<Button onPress={() => navigation.navigate('Diet')}> Explore</Button>
+								<Button onPress={() => navigation.navigate('Diet')}>Explore Recommendations</Button>
 							</View>
 
 
