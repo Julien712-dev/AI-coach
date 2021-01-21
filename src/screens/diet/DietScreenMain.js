@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import config from '../../config';
 import moment from 'moment';
-import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+import { View, StyleSheet, ScrollView, SafeAreaView, ImageBackground } from 'react-native';
 import { Button, Text, Title, Card, Paragraph } from 'react-native-paper';
 import Carousel from 'react-native-snap-carousel';
 import DietLoggingFAB from './dietLoggingFAB';
+import { computeNutritionValues, getCoachAdvice } from '../../hooks/Nutrition';
+import searchRecipe from '../../hooks/searchRecipe';
 // location imports
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
+import LoadingScreen from '../LoadingScreen';
 
 
 export default function DietScreenMain({ navigation }) {
 
 	const [time, setTime] = useState();
 	const [message, setMessage] = useState({});
-	const [coachAdvice, setCoachAdvice] = useState(`On a day of rest, try to reduce carbohydrate intake and go low calorie overall.`);
+	const [coachAdvice, setCoachAdvice] = useState('');
+	const { searchByName, searchByNutrients, results, errorMessage } = searchRecipe();
 	// Carousels
 	const [recommendedMealCarouselActiveIndex, setRecommendedMealCarouselActiveIndex] = useState(0);
 	// Dummy Data
@@ -46,12 +51,14 @@ export default function DietScreenMain({ navigation }) {
 	]);
 	const [location, setLocation] = useState(null);
 	const [district, setDistrict] = useState(null);
+	let profileRedux = useSelector(state => state.main.auth.profile) || {};
 
 	useEffect(() => {
 		let currentTime = new Date();
+		let meal = config.messages.diet.find(message => (message.startAt <= moment(currentTime).hour() && message.endAt > moment(currentTime).hour()));
 		setTime(currentTime);
-		setMessage(config.messages.diet.find(message => (message.startAt <= moment(currentTime).hour() && message.endAt > moment(currentTime).hour())));
-
+		setMessage(meal);
+		setCoachAdvice(getCoachAdvice(profileRedux));
 		// get location async
 		(async () => {
 			let { status } = await Location.requestPermissionsAsync();
@@ -73,42 +80,48 @@ export default function DietScreenMain({ navigation }) {
 			if (!!location) {
 				let postalAddress = await Location.reverseGeocodeAsync(location.coords);
 			}
-			// console.log("Starting Location Update");
-			// Location.startLocationUpdatesAsync('TASK_FETCH_LOCATION', {
-			//   accuracy: Location.Accuracy.Highest,
-			//   distanceInterval: 1, // minimum change (in meters) betweens updates
-			//   deferredUpdatesInterval: 10000, // minimum interval (in milliseconds) between updates
-			//   // foregroundService is how you get the task to be updated as often as would be if the app was open
-			//   foregroundService: {
-			// 	notificationTitle: 'Using your location',
-			// 	notificationBody: 'To turn off, go back to the app and switch something off.'
-			//   },
-			// });
-	
-			// subscriber = await Location.watchPositionAsync(
-			//   {
-			// 	accuracy: Accuracy.BestForNavigation,
-			// 	timeInterval: 1000,
-			// 	distanceInterval: 10,
-			//   },
-			//   () => {
-			// 	startWatching(true);
-			//   }
-			// );
+
+			let nutritionValues = computeNutritionValues(profileRedux);
+			console.log(nutritionValues);
+
+			await searchByName({
+				type: meal.meal,
+				minCalories: (meal.meal == 'breakfast' || meal.meal == 'snack') ? undefined : nutritionValues.dailyRecommendedCalories * 0.55 * meal.weight,
+				maxCalories: nutritionValues.dailyRecommendedCalories * meal.weight,
+				maxCarbs: nutritionValues.maximumDailyCarbsInGrams * meal.weight,
+				maxProtein: nutritionValues.maximumDailyProteinInGrams * meal.weight,
+				maxFat: nutritionValues.maximumDailyFatsInGrams * meal.weight
+			});
+
 		  })();
 	}, []);
 
+	// Fires when users click into the screen
+	useEffect(() => {
+		const unsubscribe = navigation.addListener('focus', () => {
+			// The screen is focused
+			// Call any action
+		});
+	
+		// Return the function to unsubscribe from the event so it gets removed on unmount
+		return unsubscribe;
+		}, [navigation]);
+
 	// Render function for recipe item recommendations.
 	function _renderRecipeRecommendations({item,index}){
+		let calorieObj = (item.nutrition.nutrients || []).find(nutrient => nutrient.title=="Calories")
 		return (
 			<View style={{borderRadius: 8}}>
 				<View style={{
 					backgroundColor:'black',
 					height: 140,
-					padding: 5,
 					borderTopLeftRadius: 5,
 					borderTopRightRadius: 5,
 				}}>
+					<ImageBackground source={{ uri: item.image }} style={{     
+						flex: 1,
+    					resizeMode: "cover",
+    					justifyContent: "center"}} />
 				</View>
 				<View style={{
 					backgroundColor:'floralwhite',
@@ -117,8 +130,8 @@ export default function DietScreenMain({ navigation }) {
 					borderBottomLeftRadius: 5,
 					borderBottomRightRadius: 5,
 					}}>
-					<Text style={{fontSize: 30}}>{item.title}</Text>
-					<Text>{item.text}</Text>
+					<Text style={{ fontSize: 16, fontWeight: '700' }}>{item.title}</Text>
+					<Text>{Math.round(calorieObj.amount)} kcal</Text>
 				</View>
 			</View>
 		)
@@ -130,10 +143,9 @@ export default function DietScreenMain({ navigation }) {
 			<View style={{borderRadius: 8}}>
 				<View style={{
 					backgroundColor:'black',
-					borderTopLeftRadius: 5,
-					borderTopRightRadius: 5,
+					borderTopLeftRadius: 1,
+					borderTopRightRadius: 1,
 					height: 140,
-					padding: 5,
 				}}>
 				</View>
 				<View style={{
@@ -142,8 +154,6 @@ export default function DietScreenMain({ navigation }) {
 					padding: 5,
 					borderBottomLeftRadius: 5,
 					borderBottomRightRadius: 5,
-					// marginLeft: 5,
-					// marginRight: 5, 
 					}}>
 					<Text style={{fontSize: 30}}>{item.title}</Text>
 					<Text>{item.text}</Text>
@@ -151,6 +161,8 @@ export default function DietScreenMain({ navigation }) {
 		  </View>
         )
     }
+
+	if (!results) return (<LoadingScreen />)
 
 	return (
 		<View style={{flex:1}}>
@@ -166,7 +178,7 @@ export default function DietScreenMain({ navigation }) {
 					layoutCardOffset={5}
 					activeSlideOffset={5}
 					// ref={ref => this.carousel = ref}
-					data={recommendedMeals}
+					data={results}
 					containerCustomStyle={{overflow: "visible"}}
 					sliderWidth={250}
 					itemWidth={300}
@@ -179,14 +191,10 @@ export default function DietScreenMain({ navigation }) {
 						<Paragraph>{coachAdvice}</Paragraph>
 					</Card.Content>
 				</Card>
-				{/* <Button style={{ marginBottom: 10 }} mode='contained' onPress={() => navigation.navigate('Edit Diet')}>
-					Edit Diet
-				</Button> */}
 				<Title>Explore Restaurants in {district}!</Title>
 				<Carousel
 					layout={"default"}
 					layoutCardOffset={9}
-					// ref={ref => this.carousel = ref}
 					data={restaurantMenuItems}
 					containerCustomStyle={{overflow: "visible"}}
 					sliderWidth={250}
@@ -199,25 +207,3 @@ export default function DietScreenMain({ navigation }) {
 		</View>
 	);
 }
-
-// Background Tasks for defnining 
-// console.log("Defining task");
-// TaskManager.defineTask(TASK_FETCH_LOCATION, async ({ data: { locations }, error }) => {
-//   if (error) {
-//     console.error(error);
-//     return;
-//   }
-//   const [location] = locations;
-
-//   let jobId = await AsyncStorage.getItem('jobId');
-
-//   try {
-//     const url = `/deliver-job/location/report`;
-//     await rbFleetApi.post(url, { 
-//       location, 
-//       jobId 
-//     }); // you should use post instead of get to persist data on the backend
-//   } catch (err) {
-//     console.error(err);
-//   }
-// });

@@ -1,6 +1,9 @@
 import { registerRootComponent } from 'expo';
-import React from 'react';
+import React, { useState } from 'react';
 import Firebase from 'firebase';
+import { Image } from 'react-native';
+import AppLoading from 'expo-app-loading';
+import { Asset } from 'expo-asset';
 import { Provider as PaperProvider, DefaultTheme as PaperDefaultTheme } from 'react-native-paper';
 import { DefaultTheme as NavigationDefaultTheme } from '@react-navigation/native';
 import { DraxProvider } from 'react-native-drax';
@@ -38,7 +41,43 @@ const theme = {
 	},
 }
 
+function cacheImages(images) {
+	return images.map(image => {
+	  if (typeof image === 'string') {
+		return Image.prefetch(image);
+	  } else {
+		return Asset.fromModule(image).downloadAsync();
+	  }
+	});
+}
+
+  
 function App() {
+
+	const [isReady, setIsReady] = useState(false);
+	async function loadResourcesAsync () {
+		const imageAssets = cacheImages([
+			require('../assets/image/male-athlete.jpg'),
+			require('../assets/image/female-athlete.jpg'),
+			require('../assets/image/arm-workout.jpg'),
+			require('../assets/image/exercise-survey-bg.jpg'),
+			require('../assets/image/rest-day.jpg'),
+			require('../assets/image/survey-background.jpg')
+		  ]);
+	  
+		//   const fontAssets = cacheFonts([FontAwesome.font]);
+	  
+		await Promise.all([...imageAssets]);
+	}
+
+	if (!isReady) return (
+		<AppLoading
+		startAsync={loadResourcesAsync}
+		onFinish={() => setIsReady(true)}
+		onError={console.warn}
+	  />
+	);
+
 	return (
 		<PaperProvider theme={theme}>
 			<DraxProvider>
