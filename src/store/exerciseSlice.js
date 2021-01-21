@@ -41,7 +41,8 @@ const exerciseSlice = createSlice({
     initialState: {
         plan: null,
         planModified: false,
-        library: exerciseLibrary
+        library: exerciseLibrary,
+        ongoingWorkout: {}
     },
     reducers: {
         setPlan: (state, action) => {
@@ -78,10 +79,30 @@ const exerciseSlice = createSlice({
             const { day, index, length } = action.payload;
             state.draftPlan[day].sequence[index].length = length;
             state.planModified = true;
+        },
+        startWorkout: (state, action) => {
+            const { day } = action.payload;
+            state.ongoingWorkout = {
+                plan: JSON.parse(JSON.stringify(state.plan[day])),
+                progress: { stage: 'exercise', index: 0 },
+                videos: [],
+            }
+        },
+        completeRest: state => {
+            const { progress } = state.ongoingWorkout;
+            progress.stage = 'exercise';
+            progress.index++;
+        },
+        completeExercise: (state, action) => {
+            const { video } = action.payload;
+            const { plan, progress, videos } = state.ongoingWorkout;
+            videos[progress.index] = video;
+            progress.stage = 'rest';
+            console.log(videos);
         }
     }
 });
 
 const { reducer, actions } = exerciseSlice;
-export const { setPlan, resetDraftPlan, saveDraftPlan, swapWorkout, removeWorkout, swapExercise, changeExerciseLength } = actions;
+export const { setPlan, resetDraftPlan, saveDraftPlan, swapWorkout, removeWorkout, swapExercise, changeExerciseLength, startWorkout, completeExercise, completeRest } = actions;
 export default reducer;
