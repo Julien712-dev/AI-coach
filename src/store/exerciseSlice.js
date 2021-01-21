@@ -98,7 +98,6 @@ const exerciseSlice = createSlice({
             const { plan, progress, videos } = state.ongoingWorkout;
             videos[progress.index] = video;
             progress.stage = 'rest';
-            console.log(videos);
         }
     }
 });
