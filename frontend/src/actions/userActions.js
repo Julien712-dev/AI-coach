@@ -1,10 +1,17 @@
 import React from 'react'
 import firebase from 'firebase'
 
-export function onSignUp(params) {
-  const { email, password, name } = params
-  firebase.auth().createUserWithEmailAndPassword
+export const updateFavList = async (recipeId) => {
+  console.log('in updateFavList');
+  const { currentUser } = firebase.auth()
+  // replace 123 with real user id later !!!
+  const favListRef = firebase.database().ref(`/users/123/profile/favList`)
+  favListRef.update({[recipeId]: 1})
 }
 
-
-export default Register
+export const updateBlkList = async (recipeId) => {
+  console.log('in updateBlkList');
+  const { currentUser } = firebase.auth()
+  const blkListRef = firebase.database().ref(`/users/123/profile/blkList`)
+  blkListRef.update({[recipeId]: 1})
+}
