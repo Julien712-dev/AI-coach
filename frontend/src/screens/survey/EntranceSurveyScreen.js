@@ -494,6 +494,6 @@ const styles = StyleSheet.create({
         flex: 1, 
         width: null, 
         height: null,
-        opacity: 0.4
+        opacity: 0.2
     },
 })
