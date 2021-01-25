@@ -1,55 +1,22 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { TouchableOpacity, View } from 'react-native';
 import { useTheme, Headline, Text, Snackbar } from 'react-native-paper';
 import { CAMERA } from 'expo-permissions';
 import { Camera } from 'expo-camera';
-import * as tf from '@tensorflow/tfjs';
 import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
-import * as posenet from '@tensorflow-models/posenet';
 import ProgressCircle from 'react-native-progress-circle';
 import usePermissions from '~/src/hooks/usePermissions';
 import useCameraRatio from '~/src/hooks/useCameraRatio';
+import useExerciseClassifier from '~/src/hooks/useExerciseClassifier';
 import useTimer from '~/src/hooks/useTimer';
 import LoadingScreen from '~/src/screens/LoadingScreen';
 import MultiDivider from '~/src/components/MultiDivider';
 import { startWorkout, completeRest, completeExercise } from '~/src/store/exerciseSlice';
-import exerciseClassifier from '~/src/api/exerciseClassifier';
 
 function calculateAspectRatio(ratio) {
     const [height, width] = ratio.split(':');
     return width / height;
-}
-
-function useExerciseClassifier(posenetModel, index) {
-    const [imageIterator, setImageIterator] = useState(null);
-
-    // Collect tensors from camera
-    useLayoutEffect(() => {
-        let animationFrame;
-        const predict = async imageTensor => {
-            // const image = await imageTensor.dataSync();
-            console.time('Pose estimation');
-            const pose = await posenetModel.estimateSinglePose(imageTensor);
-            console.timeEnd('Pose estimation');
-            imageTensor.dispose();
-            const timestamp = (new Date()).getTime();
-            // const frame = { image, timestamp };
-            const response = await exerciseClassifier.post('/update', { frame: 'test', exerciseId: index });
-        }
-        const loop = async () => {
-            if (imageIterator != null) {
-                const imageTensor = await imageIterator.next().value;
-                if (imageTensor != null)
-                    predict(imageTensor);
-            }
-            animationFrame = requestAnimationFrame(loop);
-        };
-        loop();
-        return () => cancelAnimationFrame(animationFrame);
-    }, [imageIterator]);
-
-    return setImageIterator;
 }
 
 const TensorCamera = cameraWithTensors(Camera);
@@ -70,7 +37,7 @@ function CustomProgressCircle({ children, percent }) {
         </ProgressCircle>);
 }
 
-function DoExerciseScreen({ posenetModel, index, exercise, onComplete }) {
+function DoExerciseScreen({ index, exercise, onComplete, classification, setImageIterator }) {
     const imageWidth = 300;
 
     const description = useSelector(state => state.main.exercise.library[exercise.type]);
@@ -82,7 +49,7 @@ function DoExerciseScreen({ posenetModel, index, exercise, onComplete }) {
     const [cameraRef, adjustCameraRatio, cameraRatio] = useCameraRatio('4:3', { tensor: true });
     const cameraAspectRatio = calculateAspectRatio(cameraRatio);
 
-    const setImageIterator = useExerciseClassifier(posenetModel, index);
+    useEffect(() => console.log(classification), [classification]);
 
     // Check if countdown is finished
     useEffect(() => {
@@ -172,31 +139,13 @@ function RestScreen({ index, nextExercise, onComplete }) {
 export default function DoWorkoutScreen({ navigation, route }) {
     const { day } = route.params;
 
-    const [ posenetModel, setPosenetModel ] = useState(null);
     const { plan, progress } = useSelector(state => state.main.exercise.ongoingWorkout);
     const exercise = plan != null ? plan.sequence[progress.index] : undefined;
     const dispatch = useDispatch();
 
     const permissions = usePermissions([CAMERA]);
 
-    // Initialize tensorflow
-    useEffect(() => {
-        const initialize = async () => {
-            await tf.ready();
-            setPosenetModel(await posenet.load({
-                architecture: 'MobileNetV1',
-                outputStride: 16,
-                multiplier: 0.5,
-                quantBytes: 4
-            }));
-        };
-        const cleanup = () => {
-            posenetModel?.dispose();
-            setPosenetModel(null);
-        };
-        initialize();
-        return cleanup;
-    }, []);
+    const [isClassifierReady, classification, setImageIterator] = useExerciseClassifier({ fps: 5, windowSize: 5, step: 3 }, progress?.index);
 
     useEffect(() => { dispatch(startWorkout({ day })); }, [day]);
 
@@ -207,14 +156,14 @@ export default function DoWorkoutScreen({ navigation, route }) {
         // Todo
     }, [plan, progress, navigation]);
 
-    if (plan == null || permissions == null || permissions.status == 'undecided' || posenetModel == null)
+    if (plan == null || permissions == null || permissions.status == 'undecided' || !isClassifierReady)
         return <LoadingScreen />;
     else if (permissions.status == 'denied')
         navigation.goBack();
     else {
         if (progress.stage == 'exercise') {
             const onCompleteExercise = video => dispatch(completeExercise({ video }));
-            return <DoExerciseScreen posenetModel={posenetModel} index={progress.index} exercise={exercise} onComplete={onCompleteExercise} />
+            return <DoExerciseScreen index={progress.index} exercise={exercise} onComplete={onCompleteExercise} classification={classification} setImageIterator={setImageIterator} />
         }
         else if (progress.stage == 'rest') {
             const onCompleteRest = () => dispatch(completeRest());
