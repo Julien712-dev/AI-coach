@@ -131,7 +131,7 @@ export default function DietScreenMain({ navigation }) {
 					borderBottomRightRadius: 5,
 					}}>
 					<Text style={{ fontSize: 16, fontWeight: '700' }}>{item.title}</Text>
-					<Text>{Math.round(calorieObj.amount)} kcal</Text>
+					<Text>{ !!calorieObj ? Math.round(calorieObj.amount) : 0} kcal</Text>
 				</View>
 			</View>
 		)
