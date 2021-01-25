@@ -118,35 +118,45 @@ export default function DietScreenMain({ navigation }) {
 				<Text style={{marginBottom: 10}}>
 					{message.message}
 				</Text>
-				<Carousel
-					layout={"default"}
-					layoutCardOffset={5}
-					activeSlideOffset={5}
-					// ref={ref => this.carousel = ref}
-					data={results}
-					containerCustomStyle={{overflow: "visible"}}
-					sliderWidth={250}
-					itemWidth={300}
-					renderItem={_renderRecipeRecommendations}
-					onSnapToItem = { index => setRecommendedMealCarouselActiveIndex(index) }
-				/>
+				<View style={{ marginVertical: 15, alignItems: 'center', justifyContent: 'center' }}>
+					<Carousel
+						layout={"default"}
+						layoutCardOffset={5}
+						activeSlideOffset={5}
+						// ref={ref => this.carousel = ref}
+						data={results}
+						containerCustomStyle={{overflow: "visible"}}
+						sliderWidth={300}
+						itemWidth={300}
+						renderItem={_renderRecipeRecommendations}
+						onSnapToItem = { index => setRecommendedMealCarouselActiveIndex(index) }
+					/>
+				</View>
 				<Card style={{ width: '100%', marginTop: 10, marginBottom: 15 }}>
 					<Card.Title title={`Coach's Advice:`}/>
 					<Card.Content>
 						<Paragraph>{coachAdvice}</Paragraph>
 					</Card.Content>
 				</Card>
-				<Title>Explore Restaurants in {district}!</Title>
-				<Carousel
-					layout={"default"}
-					layoutCardOffset={9}
-					data={restaurantMenuItems}
-					containerCustomStyle={{overflow: "visible"}}
-					sliderWidth={250}
-					itemWidth={300}
-					renderItem={_renderRestaurantMenuItems}
-					onSnapToItem = { index => setRestaurantMenuCarouselActiveIndex(index) }
-				/>
+				<Title style={{fontSize: 25}}>
+					Dining out?
+				</Title>
+				<Text style={{marginBottom: 10}}>
+					Stay healthy while eating outside!
+				</Text>
+				<View style={{ marginVertical: 15, alignItems: 'center', justifyContent: 'center' }}>
+					<Carousel
+						layout={"default"}
+						layoutCardOffset={9}
+						data={restaurantMenuItems}
+						containerCustomStyle={{overflow: "visible"}}
+						sliderWidth={300}
+						itemWidth={300}
+						renderItem={_renderRestaurantMenuItems}
+						onSnapToItem = { index => setRestaurantMenuCarouselActiveIndex(index) }
+					/>
+				</View>
+				<View style={{ marginBottom: 80 }}></View>
 			</ScrollView>
 			<DietLoggingFAB navigation={navigation} />
 		</View>
