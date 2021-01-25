@@ -18,7 +18,12 @@ export default function LogDietDetailsScreen({navigation}) {
     const [showDropDown, setShowDropDown] = useState(false);
     const [mealSelected, setMealSelected] = useState();
     const [itemName, setItemName] = useState('');
-    const [calorieAmount, setCalorieAmount] = useState('');
+    const [calorieAmount, setCalorieAmount] = useState(0);
+    const [proteinAmount, setProteinAmount] = useState(0);
+    const [fatAmount, setFatAmount] = useState(0);
+    const [carbAmount, setCarbAmount] = useState(0);
+    const [description, setDescription] = useState('');
+    const [loggedItems, setLoggedItems] = useState([]);
 
     const onSaveChanges = () => {
         setDialogVisible(false);
@@ -64,33 +69,65 @@ export default function LogDietDetailsScreen({navigation}) {
                         right: <TextInput.Icon name={'menu-down'} />,
                     }}
                 />
-                <Text>Food Item Name</Text>
-                <TextInput
-                    style={{ marginVertical: 15 }}
-                    mode='outlined'
-                    label="Food Item Name"
-                    value={itemName}
-                    onChangeText={item => setItemName(item)}
-                />
-                <Text>Nutrients</Text>
-                <TextInput
-                    style={{ marginVertical: 10 }}
-                    label="Amount of Calories"
-                    mode='outlined'
-                    value={calorieAmount}
-                    onChangeText={item => setCalorieAmount(item)}
-                />
+                <View style={{ marginTop: 10 }}>
+                    <Text>About the item</Text>
+                    <TextInput
+                        style={{ marginTop: 5, backgroundColor: 'transparent' }}
+                        label="Food Item Name"
+                        value={itemName}
+                        onChangeText={item => setItemName(item)}
+                    />
+                    <TextInput
+                        style={{ marginTop: 5, backgroundColor: 'transparent' }}
+                        label="Description (Optional)"
+                        value={description}
+                        onChangeText={item => setDescription(item)}
+                    />
+                </View>
+                <View style={{ marginVertical: 10}}>
+                    <Text>Nutrients</Text>
+                    <TextInput
+                        style={{ marginTop: 5, backgroundColor: 'transparent' }}
+                        keyboardType={"number-pad"}
+                        label="Calories (in KCals)"
+                        value={calorieAmount}
+                        onChangeText={item => setCalorieAmount(item)}
+                    />
+                    <TextInput
+                        style={{ marginTop: 5, backgroundColor: 'transparent' }}
+                        keyboardType={"number-pad"}
+                        label="Proteins (in grams)"
+                        value={proteinAmount}
+                        onChangeText={item => setProteinAmount(item)}
+                    />
+                    <TextInput
+                        style={{ marginTop: 5, backgroundColor: 'transparent' }}
+                        keyboardType={"number-pad"}
+                        label="Carbs (in grams)"
+                        value={carbAmount}
+                        onChangeText={item => setCarbAmount(item)}
+                    />
+                    <TextInput
+                        style={{ marginTop: 5, backgroundColor: 'transparent' }}
+                        keyboardType={"number-pad"}
+                        label="Fats (in grams)"
+                        value={fatAmount}
+                        onChangeText={item => setFatAmount(item)}
+                    />
+                </View>
+                <Button icon='check' mode='contained'>ADD</Button>
 			</ScrollView>
             <Provider>
                 <Portal>
                     <FAB 
                         small 
                         style={{position: "absolute", alignSelf: 'flex-end', margin: 16, right: 0, bottom: 0}} 
-                        icon={`check`} 
-                        label={`Confirm`} 
+                        icon={`plus`} 
+                        label={`Log ${!!loggedItems.length? `(1 added)` : ``}`} 
                     />
                 </Portal>
             </Provider>
+            <View style={{ marginBottom: 50 }}></View>
 		</View>
     )
 }
