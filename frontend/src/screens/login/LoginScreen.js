@@ -12,7 +12,6 @@ const LoginScreen = ({ navigation }) => {
   const [visible, setVisible] = useState(false)
   const [alert, setAlert] = useState('')
   const [loading, setLoading] = useState(false)
-  const [errorMessage, setErrorMessage] = useState('');
 
   const dispatch = useDispatch();
 
@@ -33,12 +32,6 @@ const LoginScreen = ({ navigation }) => {
         setVisible(true)
       })
   }
-
-  const loginSuccess = () => {
-    console.log('login success')
-    setAlert('login Successful!!')
-    setVisible(true)
-  };
 
   const loginAsTrialUser = () => {
     setLoading(true)
