@@ -10,7 +10,7 @@ import { setPlan } from '../store/exerciseSlice';
 import LoadingScreen from './LoadingScreen';
 import Carousel from 'react-native-snap-carousel';
 const REST_DAY_IMAGE = require('../../assets/image/rest-day.jpg');
-const ARM_WORKOUT_IMAGE = require('../../assets/image/arm-workout.jpg');
+const ARM_WORKOUT_IMAGE = require('../../assets/image/exercise-survey-bg.jpg');
 
 // Render function for recipe item recommendations.
 function _renderInsights( { item, index } ){
@@ -130,7 +130,6 @@ export default function HomeScreen({ navigation }) {
 				<StatusBar barStyle="dark-content" style="auto" />
 				<View style={{ flex: 1 }}>
 					<Title>Greetings, {profile.firstName}. Stay healthy!</Title>
-					<Title>Insights</Title>
 					<View style={{ marginVertical: 15, alignItems: 'center', justifyContent: 'center' }}>
 						<Carousel
 							layout={"default"}
@@ -138,7 +137,7 @@ export default function HomeScreen({ navigation }) {
 							activeSlideOffset={5}
 							data={['a', 'b', 'c']}
 							containerCustomStyle={{overflow: "visible"}}
-							sliderWidth={300}
+							sliderWidth={350}
 							itemWidth={310}
 							renderItem={_renderInsights}
 							onSnapToItem = { index => setInsightCarouselActiveIndex(index) }
@@ -161,12 +160,12 @@ export default function HomeScreen({ navigation }) {
 							</View>
 							<Divider />
 						<Card.Content style={{ marginTop: 5 }}>
-						<Text>You have not logged your diet yet.</Text>
-							<View style={{ marginTop: 5, flexDirection: 'row', justifyContent: 'center' }}>
-								<Button onPress={() => navigation.navigate('Diet')}>Explore Recommendations</Button>
-							</View>
-
-
+						<View style={{ borderWidth: 2, padding: 10, borderStyle: 'dashed', borderColor: 'blue', minHeight: 100, alignItems: 'center', justifyContent: 'center' }}>
+							<Text>You have not logged your diet yet. Logged food will be shown here.</Text>
+						</View>
+						<View style={{ marginTop: 5, flexDirection: 'row', justifyContent: 'center' }}>
+							<Button onPress={() => navigation.navigate('Diet')}>Explore Recommendations</Button>
+						</View>
 						</Card.Content>
 						</Card>
 					</View>
@@ -192,7 +191,7 @@ export default function HomeScreen({ navigation }) {
 									</View>
 								</ImageBackground>
 							</View>
-						: <View style={{ height: 170, width: '100%', borderRadius: 30, }}>
+						: <View style={{ height: 170, width: '100%', borderRadius: 20, }}>
 							<ImageBackground source={ARM_WORKOUT_IMAGE} style={styles.bakcgroundImage}>
 								<View style={styles.textOverImageWrapper}>
 									<Title style={styles.titleOverImage}>{workoutOfTheDay.name}</Title>
