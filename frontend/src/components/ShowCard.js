@@ -9,7 +9,7 @@ export default ShowCard = ({title, id, description, image, enableLike}) => {
   return (
     <Card>
       <Card.Cover style={{ height: 140 }}source={{ uri: image }} />
-      <Card.Content style={{ marginBottom: 20 }}>
+      <Card.Content style={{ marginBottom: 50 }}>
         <Title>{title}</Title>
         <Paragraph>{description}</Paragraph>
       </Card.Content>
@@ -26,7 +26,8 @@ export default ShowCard = ({title, id, description, image, enableLike}) => {
 const styles = StyleSheet.create({
   iconContainer: {
     height: 30,
-    marginBottom: 10,
+    marginTop: 10,
+    marginBottom: 5,
     position: 'absolute',
     flexDirection: 'row',
     right: 0,
