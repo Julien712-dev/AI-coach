@@ -58,17 +58,19 @@ export default function DietScreenMain({ navigation }) {
 				let postalAddress = await Location.reverseGeocodeAsync(location.coords);
 			}
 
-			let nutritionValues = computeNutritionValues(profileRedux);
-			console.log(nutritionValues);
-
-			await searchByName({
-				type: meal.meal,
-				minCalories: (meal.meal == 'breakfast' || meal.meal == 'snack') ? undefined : nutritionValues.dailyRecommendedCalories * 0.55 * meal.weight,
-				maxCalories: nutritionValues.dailyRecommendedCalories * meal.weight,
-				maxCarbs: nutritionValues.maximumDailyCarbsInGrams * meal.weight,
-				maxProtein: nutritionValues.maximumDailyProteinInGrams * meal.weight,
-				maxFat: nutritionValues.maximumDailyFatsInGrams * meal.weight
-			});
+			if (!!profileRedux) {
+				let nutritionValues = computeNutritionValues(profileRedux);
+				console.log(nutritionValues);
+	
+				await searchByName({
+					type: meal.meal,
+					minCalories: (meal.meal == 'breakfast' || meal.meal == 'snack') ? undefined : nutritionValues.dailyRecommendedCalories * 0.55 * meal.weight,
+					maxCalories: nutritionValues.dailyRecommendedCalories * meal.weight,
+					maxCarbs: nutritionValues.maximumDailyCarbsInGrams * meal.weight,
+					maxProtein: nutritionValues.maximumDailyProteinInGrams * meal.weight,
+					maxFat: nutritionValues.maximumDailyFatsInGrams * meal.weight
+				});
+			}
 
 			let restaurants = await getRestaurantRecommendations();
 			setRestaurantMenuItems(restaurants);
