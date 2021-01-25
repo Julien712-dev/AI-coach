@@ -7,6 +7,14 @@ export default () => {
   const [results, setResults] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
 
+  const cuisineTypeGenerator = () => {
+    const cuisineTypesAvailable = ['Chinese', 'Japanese', 'Korean', 'French', 'American', 'Thai', 'Vietnamese', 'Italian']
+    var n = 2
+        randomItems = cuisineTypesAvailable.sort(() => .5 - Math.random()).slice(0, n);
+    
+    return randomItems.toString();
+  }
+
   const searchByName = async ({ 
       keyword, 
       type = 'lunch', 
@@ -20,7 +28,6 @@ export default () => {
       minFat,
       maxFat 
     }) => {
-    console.log('hi');
     setErrorMessage('')
     try {
       console.log({
@@ -33,15 +40,19 @@ export default () => {
         maxFat
       })
 
+      let cuisineTypes = cuisineTypeGenerator();
+      console.log(cuisineTypes)
       const response = await spoonacular.get('/complexSearch', {
         params: { 
           apiKey,
-          cuisine: 'Chinese,French,Japanese,Korean',
+          cuisine: cuisineTypes,
           minCalories,
           maxCalories,
-          maxCarbs,
-          maxProtein,
-          maxFat,
+          // maxCarbs,
+          // maxProtein,
+          minProtein: 0,
+          minCarbs: 0,
+          minFat: 0,
           type,
           number: 4
         }
