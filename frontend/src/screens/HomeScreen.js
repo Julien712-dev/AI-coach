@@ -113,10 +113,9 @@ export default function HomeScreen({ navigation }) {
 						  setWorkoutOfTheDay(plan[prop]);
 					  }
 				  }
-				  setIsFetched(true);
 				}
+				setIsFetched(true);
 			});
-
         })();
 	}, []);
 
