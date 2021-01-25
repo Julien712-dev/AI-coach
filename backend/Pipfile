@@ -5,11 +5,12 @@ name = "pypi"
 
 [scripts]
 start = "python main.py"
+test = "cd test && test.bat"
 deploy = "set PYTHONIOENCODING=UTF-8 && pipenv lock -r > requirements.txt && gcloud app deploy"
-
 
 [packages]
 flask = "*"
+tensorflow = "*"
 
 [dev-packages]
 
