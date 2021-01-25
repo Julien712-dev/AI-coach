@@ -20,36 +20,12 @@ export default function DietScreenMain({ navigation }) {
 	const [time, setTime] = useState();
 	const [message, setMessage] = useState({});
 	const [coachAdvice, setCoachAdvice] = useState('');
-	const { searchByName, searchByNutrients, results, errorMessage } = searchRecipe();
+	const { searchByName, searchByNutrients, getRestaurantRecommendations, results, errorMessage } = searchRecipe();
 	// Carousels
 	const [recommendedMealCarouselActiveIndex, setRecommendedMealCarouselActiveIndex] = useState(0);
-	// Dummy Data
-	const [recommendedMeals, setRecommendedMeals] = useState([
-		{
-			title:"Oatmeal",
-			text: "Oatmeal",
-		},
-		{
-			title:"Fried Rice",
-			text: "Fried Rice",
-		}
-	]);
 	const [restaurantMenuCarouselActiveIndex, setRestaurantMenuCarouselActiveIndex] = useState(0);
 	// Dummy Data
-	const [restaurantMenuItems, setRestaurantMenuItems] = useState([
-		{
-			title:"Subway Club",
-			text: "Subway",
-		}, 
-		{
-			title:"Oatmeal",
-			text: "Cafe de Coral",
-		},
-		{
-			title:"Fried Rice",
-			text: "Glory Bing Suck",
-		}
-	]);
+	const [restaurantMenuItems, setRestaurantMenuItems] = useState([]);
 	const [location, setLocation] = useState(null);
 	const [district, setDistrict] = useState(null);
 	let profileRedux = useSelector(state => state.main.auth.profile) || {};
@@ -94,6 +70,9 @@ export default function DietScreenMain({ navigation }) {
 				maxFat: nutritionValues.maximumDailyFatsInGrams * meal.weight
 			});
 
+			let restaurants = await getRestaurantRecommendations();
+			setRestaurantMenuItems(restaurants);
+
 		  })();
 	}, []);
 
@@ -112,29 +91,6 @@ export default function DietScreenMain({ navigation }) {
 	function _renderRecipeRecommendations({item,index}){
     let calorieObj = (item.nutrition.nutrients || []).find(nutrient => nutrient.title=="Calories")
 		return (
-			// <View style={{borderRadius: 8}}>
-			// 	<View style={{
-			// 		backgroundColor:'black',
-			// 		height: 140,
-			// 		borderTopLeftRadius: 5,
-			// 		borderTopRightRadius: 5,
-			// 	}}>
-			// 		<ImageBackground source={{ uri: item.image }} style={{     
-			// 			flex: 1,
-    		// 			resizeMode: "cover",
-    		// 			justifyContent: "center"}} />
-			// 	</View>
-			// 	<View style={{
-			// 		backgroundColor:'floralwhite',
-			// 		height: 80,
-			// 		padding: 5,
-			// 		borderBottomLeftRadius: 5,
-			// 		borderBottomRightRadius: 5,
-			// 		}}>
-			// 		<Text style={{ fontSize: 16, fontWeight: '700' }}>{item.title}</Text>
-			// 		<Text>{ !!calorieObj ? Math.round(calorieObj.amount) : 0} kcal</Text>
-			// 	</View>
-			// </View>
 			<ShowCard title={item.title} id={item.id} description={`${Math.round(calorieObj.amount)} kcal`} image={item.image}/>
 		)
 	}
@@ -142,25 +98,12 @@ export default function DietScreenMain({ navigation }) {
 	// Render function for restaurant menu item recommendations.
 	function _renderRestaurantMenuItems({item,index}){
         return (
-			<View style={{borderRadius: 8}}>
-				<View style={{
-					backgroundColor:'black',
-					borderTopLeftRadius: 1,
-					borderTopRightRadius: 1,
-					height: 140,
-				}}>
-				</View>
-				<View style={{
-					backgroundColor:'floralwhite',
-					height: 80,
-					padding: 5,
-					borderBottomLeftRadius: 5,
-					borderBottomRightRadius: 5,
-					}}>
-					<Text style={{fontSize: 30}}>{item.title}</Text>
-					<Text>{item.text}</Text>
-				</View>
-		  </View>
+			<ShowCard 
+				title={item.recommendedItem.itemName} 
+				id={item.address} 
+				description={`${item.name}\n\n${item.address}`} 
+				image={item.image} 
+			/>
         )
     }
 
