@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import spoonacular from '../api/spoonacular'
+import Firebase from 'firebase';
+import '@firebase/firestore'
 
 export default () => {
   const apiKey = '24d701faa961453a88deb86494e8e39d'
@@ -108,9 +110,31 @@ export default () => {
     return resultsArray
   }
 
-  // useEffect(() => {
-  //   searchByName('noodle')
-  // }, [])
+  const getRestaurantRecommendations = async () => {
 
-  return {searchByName, searchByNutrients, searchSimilarRecipes, results, errorMessage}
+    try {
+      let foodItems = [];
+      const snapshot = await Firebase.firestore().collection('restaurants').where('menuDataWithNutritionInfo', '>', []).get();
+      snapshot.forEach(doc => {
+        let restaurantData = doc.data();
+        let recommendedItem = restaurantData.menuDataWithNutritionInfo[0];
+        let properItemFound = false;
+        for (var item of restaurantData.menuDataWithNutritionInfo) {
+          if (item.nutritionValues == 'N.A.') continue; 
+          else {
+            properItemFound = true;
+            recommendedItem = item;
+          }
+        }
+        if (properItemFound) foodItems.push({...restaurantData, recommendedItem});
+      })
+
+      return foodItems.slice(0,5);
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  return {searchByName, searchByNutrients, searchSimilarRecipes, getRestaurantRecommendations, results, errorMessage}
 }
