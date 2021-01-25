@@ -8,7 +8,7 @@ import moment from 'moment';
 import { logout as logoutAction, saveProfileToReducer } from '../store/authSlice';
 import { setPlan } from '../store/exerciseSlice';
 import LoadingScreen from './LoadingScreen';
-import Carousel from 'react-native-snap-carousel';
+import Carousel, { Pagination } from 'react-native-snap-carousel';
 const REST_DAY_IMAGE = require('../../assets/image/rest-day.jpg');
 const ARM_WORKOUT_IMAGE = require('../../assets/image/exercise-survey-bg.jpg');
 
@@ -70,7 +70,6 @@ export default function HomeScreen({ navigation }) {
 	// This functions fires every time when the user clicks into home screen
 	useEffect(() => {
 		const unsubscribe = navigation.addListener('focus', () => {
-			console.log('unsub func triggered');
 			// The screen is focused
 			// Call any action
 		});
@@ -129,7 +128,19 @@ export default function HomeScreen({ navigation }) {
 			<ScrollView contentContainerStyle={{ padding: 10 }}>
 				<StatusBar barStyle="dark-content" style="auto" />
 				<View style={{ flex: 1 }}>
-					<Title>Greetings, {profile.firstName}. Stay healthy!</Title>
+					<Title style={{ alignSelf: 'center', color: 'white' }}>See how far you have gone!</Title>
+					<View style={{  
+						position: 'absolute',
+						alignSelf: 'center',
+						zIndex: -99,
+						top: -250,
+						width: 600, 
+						height: 600,
+						overflow: 'hidden',
+						borderRadius: 600 / 2, 
+						backgroundColor: "#1E90FF"}}>
+					</View>
+
 					<View style={{ marginVertical: 15, alignItems: 'center', justifyContent: 'center' }}>
 						<Carousel
 							layout={"default"}
@@ -142,9 +153,19 @@ export default function HomeScreen({ navigation }) {
 							renderItem={_renderInsights}
 							onSnapToItem = { index => setInsightCarouselActiveIndex(index) }
 						/>
+						<Pagination
+							dotsLength={3}
+							activeDotIndex={insightCarouselActiveIndex}
+							containerStyle={{ paddingVertical: 8 }}
+							dotColor={'white'}
+							dotStyle={styles.paginationDot}
+							inactiveDotColor={'grey'}
+							inactiveDotOpacity={0.4}
+							inactiveDotScale={0.6}
+						/>
 					</View>
 					
-					<View style={{ marginBottom: 20 }}>
+					<View style={{ marginVertical: 20 }}>
 						<Card>
 							<View style={{ flexDirection: 'row', marginTop: 5 }}>
 								<View>
@@ -160,12 +181,20 @@ export default function HomeScreen({ navigation }) {
 							</View>
 							<Divider />
 						<Card.Content style={{ marginTop: 5 }}>
-						<View style={{ borderWidth: 2, padding: 10, borderStyle: 'dashed', borderColor: 'blue', minHeight: 100, alignItems: 'center', justifyContent: 'center' }}>
-							<Text>You have not logged your diet yet. Logged food will be shown here.</Text>
-						</View>
-						<View style={{ marginTop: 5, flexDirection: 'row', justifyContent: 'center' }}>
-							<Button onPress={() => navigation.navigate('Diet')}>Explore Recommendations</Button>
-						</View>
+							<View style={{
+								marginTop: 10,
+								borderWidth: 2, 
+								padding: 10, 
+								borderStyle: 'dashed', 
+								borderColor: '#1E90FF', 
+								minHeight: 100, 
+								alignItems: 'center', 
+								justifyContent: 'center' }}>
+								<Text>You have not logged your diet yet. Logged food will be shown here.</Text>
+							</View>
+							<View style={{ marginTop: 5, flexDirection: 'row', justifyContent: 'center' }}>
+								<Button onPress={() => navigation.navigate('Diet')}>Explore Recommendations</Button>
+							</View>
 						</Card.Content>
 						</Card>
 					</View>
