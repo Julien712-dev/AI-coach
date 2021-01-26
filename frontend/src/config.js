@@ -264,5 +264,91 @@ module.exports = {
                 F: 2200
             }
         }
+    },
+    defaultExercisePlan: {
+        "fri": {
+            "level": 4,
+            "name": "Arm workout",
+            "sequence": [{
+              "length": 20,
+              "type": "Push up"
+            }, {
+              "length": 30,
+              "type": "Squat"
+            }],
+            "time": 20,
+            "type": "workout"
+          },
+          "mon": {
+            "level": 4,
+            "name": "Arm workout",
+            "sequence": [{
+              "length": 20,
+              "type": "Push up"
+            }, {
+              "length": 30,
+              "type": "Squat"
+            }, {
+              "length": 30,
+              "type": "Plank"
+            }],
+            "time": 20,
+            "type": "workout"
+          },
+          "sat": {
+            "level": 4,
+            "name": "Arm workout",
+            "sequence": [{
+              "length": 20,
+              "type": "Push up"
+            }, {
+              "length": 30,
+              "type": "Squat"
+            }],
+            "time": 20,
+            "type": "workout"
+          },
+          "sun": {
+            "level": 4,
+            "name": "Arm workout",
+            "sequence": [{
+              "length": 20,
+              "type": "Push up"
+            }, {
+              "length": 30,
+              "type": "Squat"
+            }],
+            "time": 20,
+            "type": "workout"
+          },
+          "thu": {
+            "level": 4,
+            "name": "Arm workout",
+            "sequence": [{
+              "length": 20,
+              "type": "Push up"
+            }, {
+              "length": 30,
+              "type": "Squat"
+            }],
+            "time": 20,
+            "type": "workout"
+          },
+          "tue": {
+            "type": "rest"
+          },
+          "wed": {
+            "level": 4,
+            "name": "Arm workout",
+            "sequence": [{
+              "length": 20,
+              "type": "Push up"
+            }, {
+              "length": 30,
+              "type": "Squat"
+            }],
+            "time": 20,
+            "type": "workout"
+          }
     }
 }

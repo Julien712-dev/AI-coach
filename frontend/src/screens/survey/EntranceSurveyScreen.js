@@ -10,6 +10,7 @@ import LoadingScreen from "../LoadingScreen";
 import { updateTempStorage, saveProfileToFirebase, clearTempStorage } from "../../store/profileSlice.js";
 import Swiper from 'react-native-swiper';
 import { saveProfileToReducer } from '../../store/authSlice';
+import { setPlan } from '../../store/exerciseSlice';
 
 const EXERCISE_SURVEY_BACKGROUND_IMAGE = require('../../../assets/image/survey-background.jpg');
 
@@ -360,8 +361,12 @@ function EntranceSurveyStepThreeScreen({ navigation, swiperRef }) {
                             ...tempProfile,
                             ...setObj
                         });
-                        console.log(tempProfile);
+                        const userFireBaseExercisePlanRef = Firebase.database().ref(`/users/${user.uid}/exercisePlan`);
+                        userFireBaseExercisePlanRef.set({
+                            ...config.defaultExercisePlan
+                        });
                         dispatch(saveProfileToReducer({ profile: { ...tempProfile, ...setObj }}));
+                        dispatch(setPlan({ plan: {...config.defaultExercisePlan} }));
                         dispatch(clearTempStorage());
                         setTimeout(() => {
                             navigation.goBack();
@@ -385,7 +390,7 @@ export default function EntranceSurveyScreen({ navigation }) {
     const swiperRef = useRef(null);
 
     let user = useSelector(state => state.main.auth.user) || {};
-    let tempProfile = useSelector(state => state.main.profile);
+    let tempProfile = useSelector(state => state.main.auth.profile);
 
     const PAGES = [
         <EntranceSurveyStepOneScreen key={`PAGE-0`} navigation={navigation} swiperRef={swiperRef} />, 
@@ -441,6 +446,7 @@ export default function EntranceSurveyScreen({ navigation }) {
                 >
                 </ImageBackground>
             </View>
+            {tempProfile &&             
             <Button 
                 icon="close" 
                 style={{ position: 'absolute', top:20, right:0, color: 'white' }}
@@ -448,11 +454,11 @@ export default function EntranceSurveyScreen({ navigation }) {
                 //   text: 'black',
                 //   primary: 'black',
                 // } }}
-                onPress={() => navigation.goBack()}>Skip</Button>
-                <View style={{ padding: 20, marginTop: 50, justifyContent: 'center', flex: 1 }}>
-                    <Text style={{ fontWeight: '700' }}>Set up your profile for a better user experience! </Text>
-                </View>
-            {/* </View> */}
+                onPress={() => navigation.goBack()}>CLOSE
+            </Button>}
+            <View style={{ padding: 20, marginTop: 50, justifyContent: 'center', flex: 1 }}>
+                <Text style={{ fontWeight: '700' }}>Set up your profile for a better user experience! </Text>
+            </View>
             <Swiper
                 ref={swiperRef}
                 style={{ height: 530 }}
@@ -494,6 +500,6 @@ const styles = StyleSheet.create({
         flex: 1, 
         width: null, 
         height: null,
-        opacity: 0.4
+        opacity: 0.2
     },
 })

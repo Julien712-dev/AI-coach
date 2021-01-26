@@ -8,9 +8,9 @@ import moment from 'moment';
 import { logout as logoutAction, saveProfileToReducer } from '../store/authSlice';
 import { setPlan } from '../store/exerciseSlice';
 import LoadingScreen from './LoadingScreen';
-import Carousel from 'react-native-snap-carousel';
+import Carousel, { Pagination } from 'react-native-snap-carousel';
 const REST_DAY_IMAGE = require('../../assets/image/rest-day.jpg');
-const ARM_WORKOUT_IMAGE = require('../../assets/image/arm-workout.jpg');
+const ARM_WORKOUT_IMAGE = require('../../assets/image/exercise-survey-bg.jpg');
 
 // Render function for recipe item recommendations.
 function _renderInsights( { item, index } ){
@@ -70,7 +70,6 @@ export default function HomeScreen({ navigation }) {
 	// This functions fires every time when the user clicks into home screen
 	useEffect(() => {
 		const unsubscribe = navigation.addListener('focus', () => {
-			console.log('unsub func triggered');
 			// The screen is focused
 			// Call any action
 		});
@@ -114,10 +113,9 @@ export default function HomeScreen({ navigation }) {
 						  setWorkoutOfTheDay(plan[prop]);
 					  }
 				  }
-				  setIsFetched(true);
 				}
+				setIsFetched(true);
 			});
-
         })();
 	}, []);
 
@@ -129,8 +127,19 @@ export default function HomeScreen({ navigation }) {
 			<ScrollView contentContainerStyle={{ padding: 10 }}>
 				<StatusBar barStyle="dark-content" style="auto" />
 				<View style={{ flex: 1 }}>
-					<Title>Greetings, {profile.firstName}. Stay healthy!</Title>
-					<Title>Insights</Title>
+					<Title style={{ alignSelf: 'center', color: 'white' }}>See how far you have gone!</Title>
+					<View style={{  
+						position: 'absolute',
+						alignSelf: 'center',
+						zIndex: -99,
+						top: -250,
+						width: 600, 
+						height: 600,
+						overflow: 'hidden',
+						borderRadius: 600 / 2, 
+						backgroundColor: "#1E90FF"}}>
+					</View>
+
 					<View style={{ marginVertical: 15, alignItems: 'center', justifyContent: 'center' }}>
 						<Carousel
 							layout={"default"}
@@ -138,14 +147,24 @@ export default function HomeScreen({ navigation }) {
 							activeSlideOffset={5}
 							data={['a', 'b', 'c']}
 							containerCustomStyle={{overflow: "visible"}}
-							sliderWidth={300}
+							sliderWidth={350}
 							itemWidth={310}
 							renderItem={_renderInsights}
 							onSnapToItem = { index => setInsightCarouselActiveIndex(index) }
 						/>
+						<Pagination
+							dotsLength={3}
+							activeDotIndex={insightCarouselActiveIndex}
+							containerStyle={{ paddingVertical: 8 }}
+							dotColor={'white'}
+							dotStyle={styles.paginationDot}
+							inactiveDotColor={'grey'}
+							inactiveDotOpacity={0.4}
+							inactiveDotScale={0.6}
+						/>
 					</View>
 					
-					<View style={{ marginBottom: 20 }}>
+					<View style={{ marginVertical: 20 }}>
 						<Card>
 							<View style={{ flexDirection: 'row', marginTop: 5 }}>
 								<View>
@@ -161,12 +180,20 @@ export default function HomeScreen({ navigation }) {
 							</View>
 							<Divider />
 						<Card.Content style={{ marginTop: 5 }}>
-						<Text>You have not logged your diet yet.</Text>
+							<View style={{
+								marginTop: 10,
+								borderWidth: 2, 
+								padding: 10, 
+								borderStyle: 'dashed', 
+								borderColor: '#1E90FF', 
+								minHeight: 100, 
+								alignItems: 'center', 
+								justifyContent: 'center' }}>
+								<Text>You have not logged your diet yet. Logged food will be shown here.</Text>
+							</View>
 							<View style={{ marginTop: 5, flexDirection: 'row', justifyContent: 'center' }}>
 								<Button onPress={() => navigation.navigate('Diet')}>Explore Recommendations</Button>
 							</View>
-
-
 						</Card.Content>
 						</Card>
 					</View>
@@ -182,30 +209,37 @@ export default function HomeScreen({ navigation }) {
 							</View>
 						</View>
 						<Divider />
-						<Card.Content style={{ marginTop: 5 }}>
-						{workoutOfTheDay.type == 'rest' ? 
-							<View style={{ height: 170, width: '100%', borderRadius: 20 }}>
-								<ImageBackground source={REST_DAY_IMAGE} style={styles.bakcgroundImage}>
+						{!!workoutOfTheDay && 
+							<Card.Content style={{ marginTop: 5 }}>
+							{workoutOfTheDay.type == 'rest' ? 
+								<View style={{ height: 170, width: '100%', borderRadius: 20 }}>
+									<ImageBackground source={REST_DAY_IMAGE} style={styles.bakcgroundImage}>
+										<View style={styles.textOverImageWrapper}>
+											<Title style={styles.titleOverImage}>REST DAY!</Title>
+											<Text style={{ fontWeight: "600", color: "white" }}>Try to relax and let your body recover!</Text>
+										</View>
+									</ImageBackground>
+								</View>
+							: <View style={{ height: 170, width: '100%', borderRadius: 20, }}>
+								<ImageBackground source={ARM_WORKOUT_IMAGE} style={styles.bakcgroundImage}>
 									<View style={styles.textOverImageWrapper}>
-										<Title style={styles.titleOverImage}>REST DAY!</Title>
-										<Text style={{ fontWeight: "600", color: "white" }}>Try to relax and let your body recover!</Text>
+										<Title style={styles.titleOverImage}>{workoutOfTheDay.name}</Title>
+										<Text style={{ fontWeight: "600", color: "white" }}>{workoutOfTheDay.description || `This workout is intended for building your arm strength.`}</Text>
 									</View>
 								</ImageBackground>
-							</View>
-						: <View style={{ height: 170, width: '100%', borderRadius: 30, }}>
-							<ImageBackground source={ARM_WORKOUT_IMAGE} style={styles.bakcgroundImage}>
-								<View style={styles.textOverImageWrapper}>
-									<Title style={styles.titleOverImage}>{workoutOfTheDay.name}</Title>
-									<Text style={{ fontWeight: "600", color: "white" }}>{workoutOfTheDay.description || `This workout is intended for building your arm strength.`}</Text>
+							</View>}
+							{!!workoutOfTheDay &&
+							<View style={{ marginVertical: 5, flexDirection: 'row', justifyContent: 'center' }}>
+								{workoutOfTheDay.type != 'rest' && 
+									<Button onPress={() => navigation.navigate('Exercise')}>Do Workout</Button>}
+							</View>}
+							</Card.Content>}
+						{!workoutOfTheDay && 
+							<Card.Content>
+								<View style={{ height: 170, width: '100%', borderRadius: 20 }}>
+									<Text>Complete your survey to access your workout recommendations.</Text>
 								</View>
-							</ImageBackground>
-						</View>
-						}
-						{workoutOfTheDay.type != 'rest' && 
-						<View style={{ marginTop: 5, flexDirection: 'row', justifyContent: 'center' }}>
-							<Button onPress={() => navigation.navigate('Exercise')}>Do Workout</Button>
-						</View>}
-						</Card.Content>
+							</Card.Content>}
 						</Card>
 					</View>
 

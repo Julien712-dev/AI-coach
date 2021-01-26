@@ -20,36 +20,12 @@ export default function DietScreenMain({ navigation }) {
 	const [time, setTime] = useState();
 	const [message, setMessage] = useState({});
 	const [coachAdvice, setCoachAdvice] = useState('');
-	const { searchByName, searchByNutrients, results, errorMessage } = searchRecipe();
+	const { searchByName, searchByNutrients, getRestaurantRecommendations, results, errorMessage } = searchRecipe();
 	// Carousels
 	const [recommendedMealCarouselActiveIndex, setRecommendedMealCarouselActiveIndex] = useState(0);
-	// Dummy Data
-	const [recommendedMeals, setRecommendedMeals] = useState([
-		{
-			title:"Oatmeal",
-			text: "Oatmeal",
-		},
-		{
-			title:"Fried Rice",
-			text: "Fried Rice",
-		}
-	]);
 	const [restaurantMenuCarouselActiveIndex, setRestaurantMenuCarouselActiveIndex] = useState(0);
 	// Dummy Data
-	const [restaurantMenuItems, setRestaurantMenuItems] = useState([
-		{
-			title:"Subway Club",
-			text: "Subway",
-		}, 
-		{
-			title:"Oatmeal",
-			text: "Cafe de Coral",
-		},
-		{
-			title:"Fried Rice",
-			text: "Glory Bing Suck",
-		}
-	]);
+	const [restaurantMenuItems, setRestaurantMenuItems] = useState([]);
 	const [location, setLocation] = useState(null);
 	const [district, setDistrict] = useState(null);
 	let profileRedux = useSelector(state => state.main.auth.profile) || {};
@@ -82,17 +58,22 @@ export default function DietScreenMain({ navigation }) {
 				let postalAddress = await Location.reverseGeocodeAsync(location.coords);
 			}
 
-			let nutritionValues = computeNutritionValues(profileRedux);
-			console.log(nutritionValues);
+			if (!!profileRedux) {
+				let nutritionValues = computeNutritionValues(profileRedux);
+				console.log(nutritionValues);
+	
+				await searchByName({
+					type: meal.meal,
+					minCalories: (meal.meal == 'breakfast' || meal.meal == 'snack') ? undefined : nutritionValues.dailyRecommendedCalories * 0.55 * meal.weight,
+					maxCalories: nutritionValues.dailyRecommendedCalories * meal.weight,
+					maxCarbs: nutritionValues.maximumDailyCarbsInGrams * meal.weight,
+					maxProtein: nutritionValues.maximumDailyProteinInGrams * meal.weight,
+					maxFat: nutritionValues.maximumDailyFatsInGrams * meal.weight
+				});
+			}
 
-			await searchByName({
-				type: meal.meal,
-				minCalories: (meal.meal == 'breakfast' || meal.meal == 'snack') ? undefined : nutritionValues.dailyRecommendedCalories * 0.55 * meal.weight,
-				maxCalories: nutritionValues.dailyRecommendedCalories * meal.weight,
-				maxCarbs: nutritionValues.maximumDailyCarbsInGrams * meal.weight,
-				maxProtein: nutritionValues.maximumDailyProteinInGrams * meal.weight,
-				maxFat: nutritionValues.maximumDailyFatsInGrams * meal.weight
-			});
+			let restaurants = await getRestaurantRecommendations();
+			setRestaurantMenuItems(restaurants);
 
 		  })();
 	}, []);
@@ -119,25 +100,12 @@ export default function DietScreenMain({ navigation }) {
 	// Render function for restaurant menu item recommendations.
 	function _renderRestaurantMenuItems({item,index}){
         return (
-			<View style={{borderRadius: 8}}>
-				<View style={{
-					backgroundColor:'black',
-					borderTopLeftRadius: 1,
-					borderTopRightRadius: 1,
-					height: 140,
-				}}>
-				</View>
-				<View style={{
-					backgroundColor:'floralwhite',
-					height: 80,
-					padding: 5,
-					borderBottomLeftRadius: 5,
-					borderBottomRightRadius: 5,
-					}}>
-					<Text style={{fontSize: 30}}>{item.title}</Text>
-					<Text>{item.text}</Text>
-				</View>
-		  </View>
+			<ShowCard 
+				title={item.recommendedItem.itemName} 
+				id={item.address} 
+				description={`${item.name}\n\n${item.address}`} 
+				image={item.image} 
+			/>
         )
     }
 
@@ -152,35 +120,45 @@ export default function DietScreenMain({ navigation }) {
 				<Text style={{marginBottom: 10}}>
 					{message.message}
 				</Text>
-				<Carousel
-					layout={"default"}
-					layoutCardOffset={5}
-					activeSlideOffset={5}
-					// ref={ref => this.carousel = ref}
-					data={results}
-					containerCustomStyle={{overflow: "visible"}}
-					sliderWidth={250}
-					itemWidth={300}
-					renderItem={_renderRecipeRecommendations}
-					onSnapToItem = { index => setRecommendedMealCarouselActiveIndex(index) }
-				/>
+				<View style={{ marginVertical: 15, alignItems: 'center', justifyContent: 'center' }}>
+					<Carousel
+						layout={"default"}
+						layoutCardOffset={5}
+						activeSlideOffset={5}
+						// ref={ref => this.carousel = ref}
+						data={results}
+						containerCustomStyle={{overflow: "visible"}}
+						sliderWidth={300}
+						itemWidth={300}
+						renderItem={_renderRecipeRecommendations}
+						onSnapToItem = { index => setRecommendedMealCarouselActiveIndex(index) }
+					/>
+				</View>
 				<Card style={{ width: '100%', marginTop: 10, marginBottom: 15 }}>
 					<Card.Title title={`Coach's Advice:`}/>
 					<Card.Content>
 						<Paragraph>{coachAdvice}</Paragraph>
 					</Card.Content>
 				</Card>
-				<Title>Explore Restaurants in {district}!</Title>
-				<Carousel
-					layout={"default"}
-					layoutCardOffset={9}
-					data={restaurantMenuItems}
-					containerCustomStyle={{overflow: "visible"}}
-					sliderWidth={250}
-					itemWidth={300}
-					renderItem={_renderRestaurantMenuItems}
-					onSnapToItem = { index => setRestaurantMenuCarouselActiveIndex(index) }
-				/>
+				<Title style={{fontSize: 25}}>
+					Dining out?
+				</Title>
+				<Text style={{marginBottom: 10}}>
+					Stay healthy while eating outside!
+				</Text>
+				<View style={{ marginVertical: 15, alignItems: 'center', justifyContent: 'center' }}>
+					<Carousel
+						layout={"default"}
+						layoutCardOffset={9}
+						data={restaurantMenuItems}
+						containerCustomStyle={{overflow: "visible"}}
+						sliderWidth={300}
+						itemWidth={300}
+						renderItem={_renderRestaurantMenuItems}
+						onSnapToItem = { index => setRestaurantMenuCarouselActiveIndex(index) }
+					/>
+				</View>
+				<View style={{ marginBottom: 80 }}></View>
 			</ScrollView>
 			<DietLoggingFAB navigation={navigation} />
 		</View>
