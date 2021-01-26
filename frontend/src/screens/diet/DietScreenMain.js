@@ -12,6 +12,7 @@ import searchRecipe from '../../hooks/searchRecipe';
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import LoadingScreen from '../LoadingScreen';
+import ShowCard from '../../components/ShowCard'
 
 
 export default function DietScreenMain({ navigation }) {
@@ -109,31 +110,9 @@ export default function DietScreenMain({ navigation }) {
 
 	// Render function for recipe item recommendations.
 	function _renderRecipeRecommendations({item,index}){
-		let calorieObj = (item.nutrition.nutrients || []).find(nutrient => nutrient.title=="Calories")
+    let calorieObj = (item.nutrition.nutrients || []).find(nutrient => nutrient.title=="Calories")
 		return (
-			<View style={{borderRadius: 8}}>
-				<View style={{
-					backgroundColor:'black',
-					height: 140,
-					borderTopLeftRadius: 5,
-					borderTopRightRadius: 5,
-				}}>
-					<ImageBackground source={{ uri: item.image }} style={{     
-						flex: 1,
-    					resizeMode: "cover",
-    					justifyContent: "center"}} />
-				</View>
-				<View style={{
-					backgroundColor:'floralwhite',
-					height: 80,
-					padding: 5,
-					borderBottomLeftRadius: 5,
-					borderBottomRightRadius: 5,
-					}}>
-					<Text style={{ fontSize: 16, fontWeight: '700' }}>{item.title}</Text>
-					<Text>{Math.round(calorieObj.amount)} kcal</Text>
-				</View>
-			</View>
+			<ShowCard title={item.title} id={item.id} description={`${Math.round(calorieObj.amount)} kcal`} image={item.image}/>
 		)
 	}
 

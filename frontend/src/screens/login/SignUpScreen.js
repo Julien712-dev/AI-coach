@@ -18,47 +18,26 @@ export default function SignUpScreen({ navigation }) {
 
   const registerButtonPress = () => {
     setLoading(true)
+    if (!email || !password) {
+      setAlert('Registration Failed. Please fill in your email/password.');
+      setVisible(true);
+      return
+    }
     firebase.auth().createUserWithEmailAndPassword(email, password)
       .then(() => { 
-        setLoading(false); 
+        setLoading(false);
         setAlert('Registration Succeeded!'); 
         setVisible(true);
         navigation.navigate('Login');
     })
-      .catch(() => {
+      .catch((error) => {
+        console.log('register error', error);
         setLoading(false);
-        if (!email || !password) {
-            setAlert('Registration Failed. Please fill in your email/password.');
-        } else {
-            setAlert('Registration Failed.');
-        }
+        setAlert('Registration Failed.');
         setVisible(true);
       });
     // navigation.navigate('Sign Up');
   }
-
-  const loginButtonPress = () => {
-    setLoading(true)
-    firebase.auth().signInWithEmailAndPassword(email, password)
-      .then(() => {
-        dispatch(login());
-        loginSuccess();
-      })
-      .catch(() => {
-        setLoading(false)
-        setAlert('Login Failed')
-        setVisible(true)
-      })
-  }
-
-  const loginSuccess = () => {
-    console.log('login success')
-    setAlert('login Successful!!')
-    setVisible(true)
-    setTimeout(() => {
-      navigation.navigate('Home')
-    }, 1000)
-  };
 
   const onDismissSnackBar = () => setVisible(false)
 
