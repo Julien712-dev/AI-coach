@@ -209,30 +209,37 @@ export default function HomeScreen({ navigation }) {
 							</View>
 						</View>
 						<Divider />
-						<Card.Content style={{ marginTop: 5 }}>
-						{workoutOfTheDay.type == 'rest' ? 
-							<View style={{ height: 170, width: '100%', borderRadius: 20 }}>
-								<ImageBackground source={REST_DAY_IMAGE} style={styles.bakcgroundImage}>
+						{!!workoutOfTheDay && 
+							<Card.Content style={{ marginTop: 5 }}>
+							{workoutOfTheDay.type == 'rest' ? 
+								<View style={{ height: 170, width: '100%', borderRadius: 20 }}>
+									<ImageBackground source={REST_DAY_IMAGE} style={styles.bakcgroundImage}>
+										<View style={styles.textOverImageWrapper}>
+											<Title style={styles.titleOverImage}>REST DAY!</Title>
+											<Text style={{ fontWeight: "600", color: "white" }}>Try to relax and let your body recover!</Text>
+										</View>
+									</ImageBackground>
+								</View>
+							: <View style={{ height: 170, width: '100%', borderRadius: 20, }}>
+								<ImageBackground source={ARM_WORKOUT_IMAGE} style={styles.bakcgroundImage}>
 									<View style={styles.textOverImageWrapper}>
-										<Title style={styles.titleOverImage}>REST DAY!</Title>
-										<Text style={{ fontWeight: "600", color: "white" }}>Try to relax and let your body recover!</Text>
+										<Title style={styles.titleOverImage}>{workoutOfTheDay.name}</Title>
+										<Text style={{ fontWeight: "600", color: "white" }}>{workoutOfTheDay.description || `This workout is intended for building your arm strength.`}</Text>
 									</View>
 								</ImageBackground>
-							</View>
-						: <View style={{ height: 170, width: '100%', borderRadius: 20, }}>
-							<ImageBackground source={ARM_WORKOUT_IMAGE} style={styles.bakcgroundImage}>
-								<View style={styles.textOverImageWrapper}>
-									<Title style={styles.titleOverImage}>{workoutOfTheDay.name}</Title>
-									<Text style={{ fontWeight: "600", color: "white" }}>{workoutOfTheDay.description || `This workout is intended for building your arm strength.`}</Text>
+							</View>}
+							{!!workoutOfTheDay &&
+							<View style={{ marginVertical: 5, flexDirection: 'row', justifyContent: 'center' }}>
+								{workoutOfTheDay.type != 'rest' && 
+									<Button onPress={() => navigation.navigate('Exercise')}>Do Workout</Button>}
+							</View>}
+							</Card.Content>}
+						{!workoutOfTheDay && 
+							<Card.Content>
+								<View style={{ height: 170, width: '100%', borderRadius: 20 }}>
+									<Text>Complete your survey to access your workout recommendations.</Text>
 								</View>
-							</ImageBackground>
-						</View>
-						}
-						{workoutOfTheDay.type != 'rest' && 
-						<View style={{ marginTop: 5, flexDirection: 'row', justifyContent: 'center' }}>
-							<Button onPress={() => navigation.navigate('Exercise')}>Do Workout</Button>
-						</View>}
-						</Card.Content>
+							</Card.Content>}
 						</Card>
 					</View>
 
