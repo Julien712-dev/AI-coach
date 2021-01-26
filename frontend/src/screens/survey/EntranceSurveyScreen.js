@@ -446,19 +446,19 @@ export default function EntranceSurveyScreen({ navigation }) {
                 >
                 </ImageBackground>
             </View>
+            {tempProfile &&             
             <Button 
                 icon="close" 
                 style={{ position: 'absolute', top:20, right:0, color: 'white' }}
-                disabled={!tempProfile}
                 // theme={{ colors: { 
                 //   text: 'black',
                 //   primary: 'black',
                 // } }}
-                onPress={() => navigation.goBack()}>Skip</Button>
-                <View style={{ padding: 20, marginTop: 50, justifyContent: 'center', flex: 1 }}>
-                    <Text style={{ fontWeight: '700' }}>Set up your profile for a better user experience! </Text>
-                </View>
-            {/* </View> */}
+                onPress={() => navigation.goBack()}>CLOSE
+            </Button>}
+            <View style={{ padding: 20, marginTop: 50, justifyContent: 'center', flex: 1 }}>
+                <Text style={{ fontWeight: '700' }}>Set up your profile for a better user experience! </Text>
+            </View>
             <Swiper
                 ref={swiperRef}
                 style={{ height: 530 }}
