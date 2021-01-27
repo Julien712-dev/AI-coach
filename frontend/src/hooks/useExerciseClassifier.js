@@ -74,7 +74,7 @@ export default function useExerciseClassifier(step, index) {
     const [classification, setClassification] = useMountedState(null);
 
     const [fps, setFps] = useReducer((state, action) => {
-        const availableFps = [3, 4, 5];
+        const availableFps = [5];
         const minAvailableFps = Math.min(...availableFps);
         if (availableFps.includes(action))
             return action;
