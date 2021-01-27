@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 
 import * as tf from '@tensorflow/tfjs'
 import * as mobilenet from '@tensorflow-models/mobilenet'
-import { fetch } from '@tensorflow/tfjs-react-native'
+import { fetch, bundleResourceIO } from '@tensorflow/tfjs-react-native'
 
 import Constants from 'expo-constants'
 import * as Permissions from 'expo-permissions'
@@ -17,11 +17,18 @@ export default function TFModel() {
   const [predictions, setPredictions] = useState('')
   const [model, setModel] = useState(null)
 
-  useEffect(() => {
+  useEffect( async () => {
+    await prepareModel()
+    return () => {
+      model?.dispose()
+    }
+  }, [])
+
+  /*useEffect(() => {
     (async () => {
       await prepareModel()
     })()
-  }, [])
+  }, [])*/
 
   const prepareModel = async () => {
     console.log('inside model loading');
@@ -30,7 +37,7 @@ export default function TFModel() {
       const modelJson = require('../../assets/model/food/model.json');
       //const modelWeights = require('../path/to/model_weights.bin');
       const m = await tf
-        .loadLayersModel('../../assets/model/food/model.json')//bundleResourceIO(modelJson, modelWeights))
+        .loadLayersModel(bundleResourceIO(modelJson, 3))//bundleResourceIO(modelJson, modelWeights))
         .catch(err => console.log(err))
       setModel(m)
     }
