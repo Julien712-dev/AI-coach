@@ -27,7 +27,11 @@ export default function TFModel() {
     console.log('inside model loading');
     await tf.ready()
     if (!model) {
-      m = await mobilenet.load({version: 2, alpha: 1.0})
+      const modelJson = require('../../assets/model/food/model.json');
+      //const modelWeights = require('../path/to/model_weights.bin');
+      const m = await tf
+        .loadLayersModel('../../assets/model/food/model.json')//bundleResourceIO(modelJson, modelWeights))
+        .catch(err => console.log(err))
       setModel(m)
     }
     setReady(true)
@@ -51,8 +55,10 @@ export default function TFModel() {
   }
 
   const classifyImage = async (uri) => {
+    await prepareModel()
     if (model === undefined || model === null || ready === false) {
       console.log('model loading error');
+      return
     }
     console.log('received image from: ', uri);
     try {

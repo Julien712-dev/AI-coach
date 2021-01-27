@@ -24,7 +24,7 @@ export default function useCamera () {
   const takePicture = async ({ cameraRef }) => {
     if (!cameraRef) return
     const hd = await cameraRef.current.takePictureAsync()
-    const ld = await ImageManipulator.manipulateAsync(hd.uri, [{resize: {width: 300, height: 300}}])
+    const ld = await ImageManipulator.manipulateAsync(hd.uri, [{resize: {width: 256, height: 256}}])
 
     setHdPhoto(hd)
     setLdPhoto(ld)
