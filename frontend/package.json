@@ -14,6 +14,7 @@
     "@react-navigation/native": "^5.7.4",
     "@react-navigation/stack": "^5.9.1",
     "@reduxjs/toolkit": "^1.5.0",
+    "@tensorflow-models/mobilenet": "^2.0.4",
     "@tensorflow-models/posenet": "^2.2.1",
     "@tensorflow/tfjs": "^2.8.4",
     "@tensorflow/tfjs-react-native": "^0.5.0",
@@ -22,11 +23,14 @@
     "deepmerge": "^4.2.2",
     "expo": "~39.0.2",
     "expo-app-loading": "^1.0.1",
+    "expo-asset": "~8.2.0",
     "expo-av": "~8.6.0",
     "expo-camera": "~9.0.0",
     "expo-gl": "~9.1.1",
     "expo-gl-cpp": "~9.1.2",
+    "expo-image-manipulator": "^9.0.0",
     "expo-location": "~9.0.0",
+    "expo-permissions": "~9.3.0",
     "expo-secure-store": "^9.2.0",
     "expo-status-bar": "~1.0.2",
     "expo-task-manager": "~8.5.0",
@@ -55,9 +59,7 @@
     "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0",
-    "redux-thunk": "^2.3.0",
-    "expo-permissions": "~9.3.0",
-    "expo-asset": "~8.2.0"
+    "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0"

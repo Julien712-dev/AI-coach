@@ -15,6 +15,7 @@ import DietScreenMain from './screens/diet/DietScreenMain';
 import EditDietScreen from './screens/diet/EditDietScreen';
 import LogDietScreen from './screens/diet/LogDietScreen';
 import LogDietDetailsScreen from './screens/diet/LogDietDetailsScreen';
+import FoodClassifyScreen from './screens/diet/FoodClassifyScreen';
 
 // Exercise Screens
 import ExerciseMainScreen from './screens/exercise/ExerciseMainScreen';
@@ -49,6 +50,7 @@ function DietStackScreen() {
 			<DietStack.Screen name='Edit Diet' component={EditDietScreen} />
 			<DietStack.Screen name='Log Diet' component={LogDietScreen} />
 			<DietStack.Screen name='Log Diet Details' component={LogDietDetailsScreen} />
+      <DietStack.Screen name='Classify Food' component={FoodClassifyScreen} />
 		</DietStack.Navigator>
 	)
 }

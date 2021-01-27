@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
-import { Button, Text, Title, Card, Paragraph } from 'react-native-paper';
+import { StyleSheet } from 'react-native';
+import { Button, Title, Card, Paragraph } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
-import { updateFavList, updateBlkList } from '../actions/userActions'
+import { updateFavList, updateBlkList } from '../actions/profileActions'
 
 export default ShowCard = ({title, id, description, image, enableLike}) => {
   return (

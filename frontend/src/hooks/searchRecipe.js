@@ -97,9 +97,5 @@ export default () => {
     return resultsArray
   }
 
-  // useEffect(() => {
-  //   searchByName('noodle')
-  // }, [])
-
   return {searchByName, searchByNutrients, searchSimilarRecipes, results, errorMessage}
 }
