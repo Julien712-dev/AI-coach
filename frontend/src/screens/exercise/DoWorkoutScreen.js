@@ -145,7 +145,7 @@ export default function DoWorkoutScreen({ navigation, route }) {
 
     const permissions = usePermissions([CAMERA]);
 
-    const [isClassifierReady, classification, setImageIterator] = useExerciseClassifier({ fps: 5, windowSize: 5, step: 3 }, progress?.index);
+    const [isClassifierReady, classification, setImageIterator] = useExerciseClassifier(3, progress?.index);
 
     useEffect(() => { dispatch(startWorkout({ day })); }, [day]);
 

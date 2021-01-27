@@ -54,12 +54,35 @@ function extractFrames(frames, idealTimes) {
     });
 }
 
-export default function useExerciseClassifier({ fps, windowSize, step }, index) {
+function calculateFps(frames, windowSize) {
+    const lastIndex = frames.length - 1;
+    let startIndex = lastIndex;
+    while (startIndex > 0 && frames[lastIndex].timestamp - frames[startIndex].timestamp < 1000 * windowSize)
+        startIndex--;
+    const numFrames = lastIndex - startIndex + 1;
+    const numSeconds = (frames[lastIndex].timestamp - frames[startIndex].timestamp) / 1000;
+    const fps = numFrames / numSeconds;
+    return Math.floor(fps);
+}
+
+export default function useExerciseClassifier(step, index) {
+    const windowSize = 5;
+
     const [posenetModel, setPosenetModel] = useState(null);
     const [imageIterator, setImageIterator] = useState(null);
     const [isClassifying, setIsClassifying] = useState(false);
     const [classification, setClassification] = useMountedState(null);
 
+    const [fps, setFps] = useReducer((state, action) => {
+        const availableFps = [3, 4, 5];
+        const minAvailableFps = Math.min(...availableFps);
+        if (availableFps.includes(action))
+            return action;
+        else if (action < minAvailableFps)
+            return minAvailableFps;
+        else
+            return Math.max(...availableFps.filter(afps => afps <= action));
+    }, 3);
     const [frames, addFrame] = useReducer((state, action) => {
         if (Array.isArray(action) && action.length == 0)
             return []; // Reset frames
@@ -113,19 +136,20 @@ export default function useExerciseClassifier({ fps, windowSize, step }, index) 
 
         const classify = async () => {
             setIsClassifying(true);
+            setFps(calculateFps(frames, windowSize));
             let idealTimes = [...new Array(windowSize * fps).keys()].map(index => latestTime - index * (1 / fps) * 1000);
             idealTimes.reverse();
             let idealFrames = extractFrames(frames, idealTimes);
             const usedFramedLength = idealFrames.filter((value, index, array) => array.indexOf(value) == index).length;
             const timeseries = [idealFrames.map(frame => frame.pose)];
-            const result = await exerciseClassifier.post('/classify', { timeseries });
+            const result = await exerciseClassifier.post('/classify', { fps, timeseries });
             const classLabel = result.data[0];
-            setClassification({ timestamp: latestTime, usedFramedLength, classLabel });
+            setClassification({ timestamp: latestTime, usedFramedLength, fps, classLabel });
             setIsClassifying(false);
         };
         classify();
 
-    }, [frames, classification, isClassifying]);
+    }, [frames, windowSize, step, fps, classification, isClassifying]);
 
     // Collect tensors from camera
     useLayoutEffect(() => {
