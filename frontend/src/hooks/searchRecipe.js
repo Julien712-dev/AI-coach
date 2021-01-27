@@ -1,11 +1,21 @@
 import { useState, useEffect } from 'react'
 import spoonacular from '../api/spoonacular'
+import Firebase from 'firebase';
+import '@firebase/firestore'
 
 export default () => {
   const apiKey = '24d701faa961453a88deb86494e8e39d'
 
   const [results, setResults] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
+
+  const cuisineTypeGenerator = () => {
+    const cuisineTypesAvailable = ['Chinese', 'Japanese', 'Korean', 'French', 'American', 'Thai', 'Vietnamese', 'Italian']
+    var n = 2
+        randomItems = cuisineTypesAvailable.sort(() => .5 - Math.random()).slice(0, n);
+    
+    return randomItems.toString();
+  }
 
   const searchByName = async ({ 
       keyword, 
@@ -20,7 +30,6 @@ export default () => {
       minFat,
       maxFat 
     }) => {
-    console.log('hi');
     setErrorMessage('')
     try {
       console.log({
@@ -33,15 +42,19 @@ export default () => {
         maxFat
       })
 
+      let cuisineTypes = cuisineTypeGenerator();
+      console.log(cuisineTypes)
       const response = await spoonacular.get('/complexSearch', {
         params: { 
           apiKey,
-          cuisine: 'Chinese,French,Japanese,Korean',
+          cuisine: cuisineTypes,
           minCalories,
           maxCalories,
-          maxCarbs,
-          maxProtein,
-          maxFat,
+          // maxCarbs,
+          // maxProtein,
+          minProtein: 0,
+          minCarbs: 0,
+          minFat: 0,
           type,
           number: 4
         }
@@ -97,5 +110,31 @@ export default () => {
     return resultsArray
   }
 
-  return {searchByName, searchByNutrients, searchSimilarRecipes, results, errorMessage}
+  const getRestaurantRecommendations = async () => {
+
+    try {
+      let foodItems = [];
+      const snapshot = await Firebase.firestore().collection('restaurants').where('menuDataWithNutritionInfo', '>', []).get();
+      snapshot.forEach(doc => {
+        let restaurantData = doc.data();
+        let recommendedItem = restaurantData.menuDataWithNutritionInfo[0];
+        let properItemFound = false;
+        for (var item of restaurantData.menuDataWithNutritionInfo) {
+          if (item.nutritionValues == 'N.A.') continue; 
+          else {
+            properItemFound = true;
+            recommendedItem = item;
+          }
+        }
+        if (properItemFound) foodItems.push({...restaurantData, recommendedItem});
+      })
+
+      return foodItems.slice(0,5);
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  return {searchByName, searchByNutrients, searchSimilarRecipes, getRestaurantRecommendations, results, errorMessage}
 }

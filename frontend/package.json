@@ -21,7 +21,7 @@
     "axios": "^0.21.1",
     "babel-plugin-root-import": "^6.6.0",
     "deepmerge": "^4.2.2",
-    "expo": "~39.0.2",
+    "expo": "^39.0.5",
     "expo-app-loading": "^1.0.1",
     "expo-asset": "~8.2.0",
     "expo-av": "~8.6.0",

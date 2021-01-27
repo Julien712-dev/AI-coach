@@ -8,28 +8,29 @@ import { updateFavList, updateBlkList } from '../actions/profileActions'
 export default ShowCard = ({title, id, description, image, enableLike}) => {
   return (
     <Card>
-    <Card.Cover style={{height: 140}}source={{ uri: image }} />
-    <Card.Content>
-      <Title>{title}</Title>
-      <Paragraph>{description}</Paragraph>
-    </Card.Content>
-    <Card.Actions style={styles.iconContainer}>
-      <Button onPress={() => {updateBlkList(id)}}>
-        <Ionicons name="heart-dislike-outline" size={24} color="black" />
-      </Button>
-      <Button onPress={() => {updateFavList(id)}}>
-        <Ionicons name="heart-outline" size={24} color="black" />
-      </Button>
-    </Card.Actions>
+      <Card.Cover style={{ height: 140 }}source={{ uri: image }} />
+      <Card.Content style={{ marginBottom: 50 }}>
+        <Title>{title}</Title>
+        <Paragraph>{description}</Paragraph>
+      </Card.Content>
+      <Card.Actions style={styles.iconContainer}>
+          <Button icon='close' onPress={() => {updateBlkList(id)}}>
+          </Button>
+          <Button icon='heart-outline' onPress={() => {updateFavList(id)}}>
+          </Button>
+      </Card.Actions>
     </Card>
   )
 }
 
 const styles = StyleSheet.create({
   iconContainer: {
+    height: 30,
+    marginTop: 10,
+    marginBottom: 5,
     position: 'absolute',
     flexDirection: 'row',
-    right: 10,
-    bottom: 5
+    right: 0,
+    bottom: 0
   }
 })
