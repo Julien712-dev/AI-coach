@@ -6,6 +6,7 @@ import LoadingScreen from '../LoadingScreen';
 import Firebase from 'firebase';
 import DropDown from 'react-native-paper-dropdown';
 import moment from 'moment';
+import { setLogs } from '../../store/authSlice';
 
 export default function LogDietDetailsScreen({navigation}) {
 
@@ -48,35 +49,43 @@ export default function LogDietDetailsScreen({navigation}) {
 
     const onSaveChanges = () => {
         setLoading(true);
+        setMessage('Meals logged.');
         const today = moment().format('YYYYMMDD');
+        let updateObj = {};
         for (let loggedItem of loggedItems) {
             let userDatabaseLogRef = Firebase.database().ref(`/users/${user.uid}/logs/${today}/diet/${loggedItem.meal}`);
-            userDatabaseLogRef.once('value', snapshot => { 
+            userDatabaseLogRef.once('value', snapshot => {
                 let value = snapshot.val();
                 if (!!value) {
-                    console.log('value found');
                     console.log(value);
                     let newUserDatabaseLogRef = Firebase.database().ref(`/users/${user.uid}/logs/${today}/diet`);
                     if (Array.isArray(value)) {
                         newUserDatabaseLogRef.update({
                             [mealSelected]: [...value, loggedItem]
                         });
-                    } else {
-                        newUserDatabaseLogRef.update({
-                            [mealSelected]: [value, loggedItem]
-                        });
+                        updateObj[mealSelected] = [...value, loggedItem]
                     }
     
                 } else {
                     let newUserDatabaseLogRef = Firebase.database().ref(`/users/${user.uid}/logs/${today}/diet`);
                     newUserDatabaseLogRef.update({
-                        [loggedItem.meal]: loggedItem
+                        [loggedItem.meal]: [loggedItem]
                     });
                 }
                 setVisible(true);
-                setLoading(false);
             });
         }
+        // fetch from realtime db again
+        let userDatabaseDietRef = Firebase.database().ref(`/users/${user.uid}/logs`);
+        userDatabaseDietRef.once('value', snapshot => { 
+            let value = snapshot.val();
+            if (!!value) {
+                console.log('value found');
+                console.log(value);
+                dispatch(setLogs({ logs: value }));
+            }
+            setLoading(false);
+        });
         setTimeout(() => {
             navigation.goBack();
         }, 1000);

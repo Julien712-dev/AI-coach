@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 
-import { logout as logoutAction, saveProfileToReducer } from '../store/authSlice';
+import { logout as logoutAction, saveProfileToReducer, setLogs } from '../store/authSlice';
 import { setPlan } from '../store/exerciseSlice';
 import LoadingScreen from './LoadingScreen';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
@@ -48,9 +48,11 @@ export default function HomeScreen({ navigation }) {
 	let user = useSelector(state => state.main.auth.user) || {};
 	let currentProfile = useSelector(state => state.main.auth.profile) || {};
 	let currentPlan = useSelector(state => state.main.exercise.plan);
+	let logs = useSelector(state => state.main.auth.logs) || {};
 	var plan = {};
 	const [isFetched, setIsFetched] = useState(false);
 	const [profile, setProfile] = useState(null);
+	const [logsOfTheDay, setLogsOfTheDay] = useState(null);
 	const [workoutOfTheDay, setWorkoutOfTheDay] = useState(null);
 	const [insightCarouselActiveIndex, setInsightCarouselActiveIndex] = useState(0);
 	const today = moment();
@@ -90,6 +92,13 @@ export default function HomeScreen({ navigation }) {
 		}
 	}, [currentPlan]);
 
+	// Listen to log update and update the logs for diet and exercise
+	useEffect(() => {
+		if (!!logs) {
+			console.log('logs are updated.')
+		}
+	}, [logs])
+
 	useEffect(() => {
 		if (!profile && isFetched) {
 			navigation.navigate('Entrance Survey');
@@ -106,6 +115,7 @@ export default function HomeScreen({ navigation }) {
 				  dispatch(saveProfileToReducer({ profile: value.profile }));
 				  setProfile(value.profile);
 				  dispatch(setPlan({ plan: value.exercisePlan }));
+				  dispatch(setLogs({ logs: value.logs }));
   
 				  plan = value.exercisePlan;
 				  for (var prop in plan) {
@@ -186,10 +196,70 @@ export default function HomeScreen({ navigation }) {
 								padding: 10, 
 								borderStyle: 'dashed', 
 								borderColor: '#1E90FF', 
-								minHeight: 100, 
-								alignItems: 'center', 
-								justifyContent: 'center' }}>
-								<Text>You have not logged your diet yet. Logged food will be shown here.</Text>
+								minHeight: 100,  }}>
+								{!!logs[today.format('YYYYMMDD')] ?
+								<View style={{ width: '100%' }}>
+									<Title>Your logged meals today: </Title>
+									{!!logs[today.format('YYYYMMDD')]['diet']['breakfast'] &&
+									<View style={{ width: '100%', marginVertical: 5 }}>
+										<Divider />
+										<Title>Breakfast</Title>
+										{logs[today.format('YYYYMMDD')]['diet']['breakfast'].map((item, index) =>
+											<View key={index} style={{ width: '100%', flexDirection: 'row' }}>
+												<View>
+													<Text style={{ alignSelf: 'flex-start' }}>{item.itemName}</Text>
+												</View>
+												<View style={{ flex: 1, alignItems: 'flex-end' }}>
+													<Text style={{ alignSelf: 'flex-end' }}>{`${item.calorieAmount} kcal`}</Text>
+												</View>
+											</View>)}
+									</View>}
+									{!!logs[today.format('YYYYMMDD')]['diet']['lunch'] &&
+									<View style={{ width: '100%', marginVertical: 5 }}>
+										<Divider />
+										<Title>Lunch</Title>
+										{logs[today.format('YYYYMMDD')]['diet']['lunch'].map((item, index) =>
+											<View key={index} style={{ width: '100%', flexDirection: 'row' }}>
+												<View>
+													<Text style={{ alignSelf: 'flex-start' }}>{item.itemName}</Text>
+												</View>
+												<View style={{ flex: 1, alignItems: 'flex-end' }}>
+													<Text style={{ alignSelf: 'flex-end' }}>{`${item.calorieAmount} kcal`}</Text>
+												</View>
+											</View>)}
+									</View>}
+									{!!logs[today.format('YYYYMMDD')]['diet']['snack'] &&
+									<View style={{ width: '100%', marginVertical: 5 }}>
+										<Divider />
+										<Title>Snack</Title>
+										{logs[today.format('YYYYMMDD')]['diet']['snack'].map((item, index) =>
+											<View key={index} style={{ width: '100%', flexDirection: 'row' }}>
+												<View>
+													<Text style={{ alignSelf: 'flex-start' }}>{item.itemName}</Text>
+												</View>
+												<View style={{ flex: 1, alignItems: 'flex-end' }}>
+													<Text style={{ alignSelf: 'flex-end' }}>{`${item.calorieAmount} kcal`}</Text>
+												</View>
+											</View>)}
+									</View>}
+									{!!logs[today.format('YYYYMMDD')]['diet']['dinner'] &&
+									<View style={{ width: '100%' }}>
+										<Divider />
+										<Title>Dinner</Title>
+										{logs[today.format('YYYYMMDD')]['diet']['dinner'].map((item, index) =>
+											<View key={index} style={{ width: '100%', flexDirection: 'row' }}>
+												<View>
+													<Text style={{ alignSelf: 'flex-start' }}>{item.itemName}</Text>
+												</View>
+												<View style={{ flex: 1, alignItems: 'flex-end' }}>
+													<Text style={{ alignSelf: 'flex-end' }}>{`${item.calorieAmount} kcal`}</Text>
+												</View>
+											</View>)}
+									</View>}
+									{/* <Text>{JSON.stringify(logs[today.format('YYYYMMDD')]['diet'])}</Text> */}
+								</View>
+ 								:
+								<Text>You have not logged your diet yet. Logged food will be shown here.</Text>}
 							</View>
 							<View style={{ marginTop: 5, flexDirection: 'row', justifyContent: 'center' }}>
 								<Button onPress={() => navigation.navigate('Diet')}>Explore Recommendations</Button>
