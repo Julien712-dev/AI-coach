@@ -60,7 +60,6 @@ export default () => {
         }
       })
       setResults(response.data.results)
-      console.log(response.data.results);
     } catch(e) {
       console.log(e)
       setErrorMessage('Problems in searchbyName')
@@ -106,7 +105,6 @@ export default () => {
       }
     }
 
-    console.log(resultsArray);
     return resultsArray
   }
 
@@ -139,7 +137,6 @@ export default () => {
         if (properItemFound) foodItems.push({...restaurantData, recommendedItem});
       })
 
-      console.log(foodItems.length)
       return foodItems.slice(0,5);
 
     } catch (error) {
