@@ -48,17 +48,11 @@ const Header = ({ scene, previous, navigation }) => {
 		  />
 		) : (
 		  <TouchableOpacity>
-			<Avatar.Image
-			  size={40}
-			  source={{
-				uri:
-				  'https://pbs.twimg.com/profile_images/952545910990495744/b59hSXUd_400x400.jpg',
-			  }}
-			/>
+			<Avatar.Icon size={40} icon="account-circle-outline" />
 		  </TouchableOpacity>
 		)}
 		<Appbar.Content
-		  title={previous ? title : <Ionicons name='ios-apps' size={40} color={'white'} />}
+		  title={previous ? title : <Ionicons name='ios-walk' size={40} color={'white'} />}
 		/>
 	  </Appbar.Header>
 	);
@@ -85,6 +79,16 @@ function HomeStackScreen() {
 				name='Details' 
 				component={DetailsScreen}
 				options={{ headerTitle: 'My Diet' }}
+			/>
+			<HomeStack.Screen 
+				name='Log Diet' 
+				component={LogDietScreen} 
+				options={{ headerTitle: 'Log Diet' }}
+			/>
+			<HomeStack.Screen 
+				name='Log Diet Details'
+				component={LogDietDetailsScreen}
+				options={{ headerTitle: 'Log Diet Details' }}
 			/>
 			<HomeStack.Screen name='Login' component={LoginScreen} />
 		</HomeStack.Navigator>
