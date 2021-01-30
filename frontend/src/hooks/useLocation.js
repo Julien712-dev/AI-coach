@@ -1,14 +1,21 @@
 import { useState, useEffect } from 'react'
-import { requestPermissionAsync, getCurrentPositionAsync, Accuracy, reverseGeocodeAsync } from 'expo-location'
+import { requestPermissionsAsync, getCurrentPositionAsync, Accuracy, reverseGeocodeAsync } from 'expo-location'
 
 // run callback whenever receive a new position update
 export default  () => {
+  const [grant, setGrant] = useState(false)
   const [location, setLocation] = useState(null)
   const [district, setDistrict] = useState(null)
 
+
   useEffect( async () => {
-    await requestPermissionAsync()
+    let { status } = await requestPermissionsAsync()
+    setGrant(status)
+    return () => {
+      
+    }
   }, [])
+  
 
   const updateLocation = async () => {
     await getCurrentPositionAsync({accuracy: Accuracy.Balanced})
@@ -22,5 +29,5 @@ export default  () => {
       })
   }
 
-  return { updateLocation, location, district }
+  return { updateLocation, grant, location, district }
 }

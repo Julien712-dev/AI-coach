@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import config from '../../config';
-import moment from 'moment';
+import moment, { updateLocale } from 'moment';
 import { View, StyleSheet, ScrollView, SafeAreaView, ImageBackground, RefreshControl } from 'react-native';
 import { Button, Text, Title, Card, Paragraph } from 'react-native-paper';
 import Carousel from 'react-native-snap-carousel';
@@ -12,13 +12,14 @@ import searchRecipe from '../../hooks/searchRecipe';
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 
-import Constants from 'expo-constants';
+// import Constants from 'expo-constants';
 
 
 import LoadingScreen from '../LoadingScreen';
 import ShowCard from '../../components/ShowCard'
+import Popup from '../../components/Popup'
 
-
+import useLocation from '../../hooks/useLocation'
 
 export default function DietScreenMain({ navigation }) {
 
@@ -30,9 +31,10 @@ export default function DietScreenMain({ navigation }) {
 	const [recommendedMealCarouselActiveIndex, setRecommendedMealCarouselActiveIndex] = useState(0);
 	const [restaurantMenuCarouselActiveIndex, setRestaurantMenuCarouselActiveIndex] = useState(0);
 	// Dummy Data
-	const [restaurantMenuItems, setRestaurantMenuItems] = useState([]);
-	const [location, setLocation] = useState(null);
-  const [district, setDistrict] = useState(null);
+  const [restaurantMenuItems, setRestaurantMenuItems] = useState([]);
+  const { updateLocation, grant, location, district } = useLocation()
+	//const [location, setLocation] = useState(null);
+  //const [district, setDistrict] = useState(null);
   
   const [refreshing, setRefreshing] = React.useState(false);
 
@@ -43,28 +45,19 @@ export default function DietScreenMain({ navigation }) {
 		let meal = config.messages.diet.find(message => (message.startAt <= moment(currentTime).hour() && message.endAt > moment(currentTime).hour()));
 		setTime(currentTime);
 		setMessage(meal);
-		setCoachAdvice(getCoachAdvice(profileRedux));
+    setCoachAdvice(getCoachAdvice(profileRedux));
+
+
+    
 		// get location async
 		(async () => {
 			let { status } = await Location.requestPermissionsAsync();
 			if (status !== 'granted') {
 			  setErrorMsg('Permission to access location was denied');
 			  return;
-			}
-	  
-			let location = await Location.getCurrentPositionAsync({}).then(
-				async (response) => {
-					console.log(response);
-					let postalAddress = await Location.reverseGeocodeAsync(response.coords);
-					console.log(postalAddress);
-					setLocation(location);
-					setDistrict(postalAddress[0].district);
-				}
-			);
-
-			if (!!location) {
-				let postalAddress = await Location.reverseGeocodeAsync(location.coords);
-			}
+      }
+      
+      await updateLocation()
 
 			if (!!profileRedux) {
 				let nutritionValues = computeNutritionValues(profileRedux);
@@ -121,20 +114,21 @@ export default function DietScreenMain({ navigation }) {
 
 	// Render function for restaurant menu item recommendations.
 	function _renderRestaurantMenuItems({item,index}){
-        return (
+    return (
 			<ShowCard 
 				title={item.recommendedItem.itemName} 
 				id={item.address} 
 				description={`${item.name}\n\n${item.address}`} 
 				image={item.image} 
 			/>
-        )
+    )
     }
 
 	if (!results) return (<LoadingScreen />)
 
 	return (
 		<View style={{flex:1}}>
+
 			<ScrollView contentContainerStyle={{padding: 20}} refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>

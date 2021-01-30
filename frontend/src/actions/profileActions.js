@@ -13,3 +13,4 @@ export const updateBlkList = async (recipeId) => {
   const blkListRef = firebase.database().ref(`/users/123/profile/blkList`)
   blkListRef.update({[recipeId]: 1})
 }
+
