@@ -24,22 +24,19 @@ export default function TFModel() {
     }
   }, [])
 
-  /*useEffect(() => {
-    (async () => {
-      await prepareModel()
-    })()
-  }, [])*/
-
   const prepareModel = async () => {
     console.log('inside model loading');
     await tf.ready()
     if (!model) {
-      const modelJson = require('../../assets/model/food/model.json');
-      //const modelWeights = require('../path/to/model_weights.bin');
+      // For custom model, have some layer bug
+      /*const modelJson = require('../../assets/model/food/model.json');
+      const modelWeights = require('../path/to/model_weights.bin');
       const m = await tf
-        .loadLayersModel(bundleResourceIO(modelJson, 3))//bundleResourceIO(modelJson, modelWeights))
-        .catch(err => console.log(err))
+        .loadLayersModel(bundleResourceIO(modelJson, 3))
+        .catch(err => console.log(err))*/
+      const m = await mobilenet.load({version: 2, alpha: 1.0})
       setModel(m)
+      
     }
     setReady(true)
     console.log('loading model success');

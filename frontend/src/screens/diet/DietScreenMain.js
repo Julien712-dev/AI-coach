@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import config from '../../config';
 import moment from 'moment';
-import { View, StyleSheet, ScrollView, SafeAreaView, ImageBackground } from 'react-native';
+import { View, StyleSheet, ScrollView, SafeAreaView, ImageBackground, RefreshControl } from 'react-native';
 import { Button, Text, Title, Card, Paragraph } from 'react-native-paper';
 import Carousel from 'react-native-snap-carousel';
 import DietLoggingFAB from './dietLoggingFAB';
@@ -11,8 +11,13 @@ import searchRecipe from '../../hooks/searchRecipe';
 // location imports
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
+
+import Constants from 'expo-constants';
+
+
 import LoadingScreen from '../LoadingScreen';
 import ShowCard from '../../components/ShowCard'
+
 
 
 export default function DietScreenMain({ navigation }) {
@@ -27,7 +32,10 @@ export default function DietScreenMain({ navigation }) {
 	// Dummy Data
 	const [restaurantMenuItems, setRestaurantMenuItems] = useState([]);
 	const [location, setLocation] = useState(null);
-	const [district, setDistrict] = useState(null);
+  const [district, setDistrict] = useState(null);
+  
+  const [refreshing, setRefreshing] = React.useState(false);
+
 	let profileRedux = useSelector(state => state.main.auth.profile) || {};
 
 	useEffect(() => {
@@ -87,7 +95,21 @@ export default function DietScreenMain({ navigation }) {
 	
 		// Return the function to unsubscribe from the event so it gets removed on unmount
 		return unsubscribe;
-		}, [navigation]);
+    }, [navigation]);
+  
+  
+    const wait = (timeout) => {
+      return new Promise(resolve => {
+        setTimeout(resolve, timeout);
+      });
+    }
+  
+    const onRefresh = React.useCallback(() => {
+      setRefreshing(true);
+      console.log('refresh pressed');
+      wait(2000).then(() => setRefreshing(false));
+    }, []);
+    
 
 	// Render function for recipe item recommendations.
 	function _renderRecipeRecommendations({item,index}){
@@ -113,7 +135,9 @@ export default function DietScreenMain({ navigation }) {
 
 	return (
 		<View style={{flex:1}}>
-			<ScrollView contentContainerStyle={{padding: 20}}>
+			<ScrollView contentContainerStyle={{padding: 20}} refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
 				<Title style={{fontSize: 25}}>
 					{message.title}
 				</Title>
