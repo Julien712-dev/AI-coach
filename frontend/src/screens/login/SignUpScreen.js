@@ -56,8 +56,8 @@ export default function SignUpScreen({ navigation }) {
         <Button icon="close" style={{ position: 'absolute', top:20, right:0 }} onPress={() => navigation.goBack()}>Skip</Button>
 
         <View>
-          <Card style={{ marginHorizontal: 10, width: 350, opacity: 0.9, backgroundColor: 'transparent' }}>
-            <View style={{ marginLeft: 15, marginTop: 10, alignSelf: "flex-start"  }}>
+          <Card style={{ marginHorizontal: 10, width: 350, backgroundColor: 'rgba(255, 255, 255, 0.7)' }}>
+            <View style={{ marginLeft: 15, marginTop: 10, alignSelf: "flex-start" }}>
               <Title style={{ fontSize: 28 }}>Sign Up to Coach.ai</Title>
               <Text>Enjoy an intelligent fitness journey.</Text>
             </View>

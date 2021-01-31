@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import * as firebase from 'firebase';
 
 const profileSlice = createSlice({
     name: 'profile',

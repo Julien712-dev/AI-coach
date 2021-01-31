@@ -2,6 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { Appbar, Avatar } from 'react-native-paper';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -26,15 +27,69 @@ import DoWorkoutScreen from './screens/exercise/DoWorkoutScreen';
 // Login Screen
 import LoginScreen from './screens/login/LoginScreen';
 import SignUpScreen from './screens/login/SignUpScreen';
+import { TouchableOpacity } from 'react-native';
+
+
+const Header = ({ scene, previous, navigation }) => {
+	const { options } = scene.descriptor;
+	const title =
+	  options.headerTitle !== undefined
+		? options.headerTitle
+		: options.title !== undefined
+		? options.title
+		: scene.route.name;
+  
+	return (
+	  <Appbar.Header theme={{ colors: { primary: '#1E90FF' } }}>
+		{previous ? (
+		  <Appbar.BackAction
+			onPress={navigation.goBack}
+			color={'white'}
+		  />
+		) : (
+		  <TouchableOpacity>
+			<Avatar.Icon size={40} icon="account-circle-outline" />
+		  </TouchableOpacity>
+		)}
+		<Appbar.Content
+		  title={previous ? title : <Ionicons name='ios-walk' size={40} color={'white'} />}
+		/>
+	  </Appbar.Header>
+	);
+  };
 
 // Stacks
 const HomeStack = createStackNavigator();
 
 function HomeStackScreen() {
 	return (
-		<HomeStack.Navigator>
-			<HomeStack.Screen name='Home' component={HomeScreen} />
-			<HomeStack.Screen name='Details' component={DetailsScreen} />
+		<HomeStack.Navigator
+		initialRouteName="Home Main"
+		headerMode="screen"
+		screenOptions={{
+		header: ({ scene, previous, navigation }) => (
+			<Header scene={scene} previous={previous} navigation={navigation} />
+		),}}>
+			<HomeStack.Screen 
+				name='Home' 
+				component={HomeScreen}
+				options={{ headerTitle: 'Home' }}
+			/>
+			<HomeStack.Screen 
+				name='Details' 
+				component={DetailsScreen}
+				options={{ headerTitle: 'My Diet' }}
+			/>
+			<HomeStack.Screen 
+				name='Log Diet' 
+				component={LogDietScreen} 
+				options={{ headerTitle: 'Log Diet' }}
+			/>
+			<HomeStack.Screen 
+				name='Log Diet Details'
+				component={LogDietDetailsScreen}
+				options={{ headerTitle: 'Log Diet Details' }}
+			/>
 			<HomeStack.Screen name='Login' component={LoginScreen} />
 		</HomeStack.Navigator>
 	);
@@ -44,11 +99,33 @@ const DietStack = createStackNavigator();
 
 function DietStackScreen() {
 	return (
-		<DietStack.Navigator>
-			<DietStack.Screen name='Diet' component={DietScreenMain} />
-			<DietStack.Screen name='Edit Diet' component={EditDietScreen} />
-			<DietStack.Screen name='Log Diet' component={LogDietScreen} />
-			<DietStack.Screen name='Log Diet Details' component={LogDietDetailsScreen} />
+		<DietStack.Navigator
+			initialRouteName="Diet Main"
+			headerMode="screen"
+			screenOptions={{
+			header: ({ scene, previous, navigation }) => (
+				<Header scene={scene} previous={previous} navigation={navigation} />
+			),}}>
+			<DietStack.Screen 
+				name='Diet' 
+				component={DietScreenMain}
+				options={{ headerTitle: 'My Diet' }}
+			 />
+			<DietStack.Screen 
+				name='Edit Diet' 
+				component={EditDietScreen} 
+				options={{ headerTitle: 'Edit Diet' }}
+			/>
+			<DietStack.Screen 
+				name='Log Diet' 
+				component={LogDietScreen} 
+				options={{ headerTitle: 'Log Diet' }}
+			/>
+			<DietStack.Screen 
+				name='Log Diet Details'
+				component={LogDietDetailsScreen}
+				options={{ headerTitle: 'Log Diet Details' }}
+			/>
 		</DietStack.Navigator>
 	)
 }
@@ -57,12 +134,39 @@ const ExerciseStack = createStackNavigator();
 
 function ExerciseStackScreen() {
 	return (
-		<ExerciseStack.Navigator>
-			<ExerciseStack.Screen name='Exercise' component={ExerciseMainScreen} />
-			<ExerciseStack.Screen name='Plan Workout' component={PlanWorkoutScreen} />
-			<ExerciseStack.Screen name='View Workout' component={ViewWorkoutScreen} />
-			<ExerciseStack.Screen name='View Exercise' component={ViewExerciseScreen} />
-			<ExerciseStack.Screen name='Do Workout' component={DoWorkoutScreen} />
+		<ExerciseStack.Navigator
+			initialRouteName="Exercise Main"
+			headerMode="screen"
+			screenOptions={{
+			header: ({ scene, previous, navigation }) => (
+				<Header scene={scene} previous={previous} navigation={navigation} />
+			),}}
+		>
+			<ExerciseStack.Screen 
+				name='Exercise' 
+				component={ExerciseMainScreen}
+				options={{ headerTitle: 'Workouts' }}
+			/>
+			<ExerciseStack.Screen 
+				name='Plan Workout' 
+				component={PlanWorkoutScreen}
+				options={{ headerTitle: 'Plan Workout' }}
+			/>
+			<ExerciseStack.Screen 
+				name='View Workout'
+				component={ViewWorkoutScreen}
+				options={{ headerTitle: 'View Workout' }}
+			/>
+			<ExerciseStack.Screen
+				name='View Exercise'
+				component={ViewExerciseScreen}
+				options={{ headerTitle: 'View Exercise' }}
+			/>
+			<ExerciseStack.Screen
+				name='Do Workout'
+				component={DoWorkoutScreen}
+				options={{ headerTitle: 'Do Workout' }}
+			/>
 		</ExerciseStack.Navigator>
 	);
 }

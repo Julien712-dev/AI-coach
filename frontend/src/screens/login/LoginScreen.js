@@ -63,7 +63,7 @@ const LoginScreen = ({ navigation }) => {
       </View>
 
       <View style={{ marginTop: 200 }}>
-        <Card style={{ marginHorizontal: 10, width: 350, backgroundColor: 'transparent' }}>
+        <Card style={{ marginHorizontal: 10, width: 350, backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
           <View style={{ marginLeft: 15, marginTop: 10, alignSelf: "flex-start"  }}>
               <Title style={{ fontSize: 28 }}>Welcome, Athlete!</Title>
               <Text>Sign in to use Coach.ai.</Text>
