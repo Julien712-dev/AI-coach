@@ -7,6 +7,7 @@ import { Button, Text, Title, Card, Paragraph } from 'react-native-paper';
 import Carousel from 'react-native-snap-carousel';
 import DietLoggingFAB from './dietLoggingFAB';
 import { computeNutritionValues, getCoachAdvice } from '../../hooks/Nutrition';
+import { fetchFavListAsync } from '../../actions/profileActions'
 import searchRecipe from '../../hooks/searchRecipe';
 // location imports
 import * as Location from 'expo-location';
@@ -27,32 +28,32 @@ export default function DietScreenMain({ navigation }) {
 	const [time, setTime] = useState();
 	const [message, setMessage] = useState({});
 	const [coachAdvice, setCoachAdvice] = useState('');
-	const { searchByName, searchByNutrients, getRestaurantRecommendations, results, errorMessage } = searchRecipe();
+	const { searchByName, searchByNutrients, searchSimilarRecipes, getRestaurantRecommendations, results } = searchRecipe();
 	// Carousels
 	const [recommendedMealCarouselActiveIndex, setRecommendedMealCarouselActiveIndex] = useState(0);
 	const [restaurantMenuCarouselActiveIndex, setRestaurantMenuCarouselActiveIndex] = useState(0);
 	// Dummy Data
   const [restaurantMenuItems, setRestaurantMenuItems] = useState([]);
-  const { requestLocationPermissionAsync, updateLocationAsync, grant, location, district } = useLocation()
+
+  const { requestLocationPermissionAsync, updateLocationAsync, checkPermission, grant, location, district } = useLocation()
   const [showPopup, setShowPopup] = useState(false)
+  const [refreshing, setRefreshing] = React.useState(false)
+  const [favList, setFavList] = useState(null)
 
 	//const [location, setLocation] = useState(null);
   //const [district, setDistrict] = useState(null);
   
-  const [refreshing, setRefreshing] = React.useState(false);
+  
 
 	let profileRedux = useSelector(state => state.main.auth.profile) || {};
 
 	useEffect(() => {
-    console.log('in screen useeffect');
 		let currentTime = new Date();
 		let meal = config.messages.diet.find(message => (message.startAt <= moment(currentTime).hour() && message.endAt > moment(currentTime).hour()));
 		setTime(currentTime);
 		setMessage(meal);
     setCoachAdvice(getCoachAdvice(profileRedux));
 
-
-    
 		// get location async
 		(async () => {
 			let { status } = await Location.requestPermissionsAsync();
@@ -60,8 +61,10 @@ export default function DietScreenMain({ navigation }) {
 			  setErrorMsg('Permission to access location was denied');
 			  return;
       }
-      
-      console.log('in screen: ', grant);
+      console.log('check permission second time')
+      await checkPermission();
+      console.log('outside grant is ', grant);
+      (grant === false) ? setShowPopup(true) : setShowPopup(false)
       //await updateLocation()
 
 			if (!!profileRedux) {
@@ -75,7 +78,7 @@ export default function DietScreenMain({ navigation }) {
 					maxCarbs: nutritionValues.maximumDailyCarbsInGrams * meal.weight,
 					maxProtein: nutritionValues.maximumDailyProteinInGrams * meal.weight,
 					maxFat: nutritionValues.maximumDailyFatsInGrams * meal.weight
-				});
+        });
 			}
 
 			let restaurants = await getRestaurantRecommendations();
@@ -103,11 +106,14 @@ export default function DietScreenMain({ navigation }) {
   }
 
   const onRefresh = React.useCallback( async () => {
-    setRefreshing(true);
+    setRefreshing(true)
+    console.log('refresh pressed')
     
-    await requestLocationPermissionAsync()
+    const list = await fetchFavListAsync()
+    console.log(Object.keys(list));
+    searchSimilarRecipes({ idList: Object.keys(list), numberOfResults: 4 })
+
     
-    console.log('refresh pressed');
     wait(2000).then(() => setRefreshing(false));
   }, []);
 

@@ -17,12 +17,14 @@ const Popup = ({ title, message, yesCallback, noCallback}) => {
           <Dialog.Content>
             <Paragraph>{message}</Paragraph>
           </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={hideDialog}>Yes</Button>
-          </Dialog.Actions>
-          <Dialog.Actions>
-            <Button onPress={hideDialog}>No</Button>
-          </Dialog.Actions>
+          <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+            <Dialog.Actions>
+              <Button onPress={hideDialog}>Yes</Button>
+            </Dialog.Actions>
+            <Dialog.Actions>
+              <Button onPress={hideDialog}>No</Button>
+            </Dialog.Actions>
+          </View>
         </Dialog>
       </Portal>
     </View>

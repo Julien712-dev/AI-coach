@@ -7,7 +7,6 @@ export default () => {
   const apiKey = '24d701faa961453a88deb86494e8e39d'
 
   const [results, setResults] = useState(null)
-  const [errorMessage, setErrorMessage] = useState('')
 
   const cuisineTypeGenerator = () => {
     const cuisineTypesAvailable = ['Chinese', 'Japanese', 'Korean', 'French', 'American', 'Thai', 'Vietnamese', 'Italian']
@@ -30,7 +29,6 @@ export default () => {
       minFat,
       maxFat 
     }) => {
-    setErrorMessage('')
     try {
       console.log({
         type,
@@ -63,12 +61,10 @@ export default () => {
       //console.log(response.data.results);
     } catch(e) {
       console.log(e)
-      setErrorMessage('Problems in searchbyName')
     }
   }
 
   const searchByNutrients = async (keyword) => {
-    setErrorMessage('')
     try {
       const response = await spoonacular.get('/findByNutrients', {
         params: { 
@@ -81,33 +77,34 @@ export default () => {
       setResults(response.data.results)
     } catch(e) {
       console.log(e)
-      setErrorMessage('Problems in searchbyNutrients')
     }
   }
 
-  const searchSimilarRecipes = async (idList, numberOfResults) => {
-    setErrorMessage('')
+  const searchSimilarRecipes = async ({ idList, numberOfResults }) => {
     console.log('in similar');
+    console.log(idList.length, numberOfResults);
 
     const baseNumber = Math.ceil(idList.length / numberOfResults) * 2
-    const resultsArray = []
+    console.log('base number', baseNumber)
+    
+    const resultsList = []
   
-    for (let i = 0; i < favouriteList.length; i += baseNumber) {
-      const id = favouriteList[i + Math.floor(Math.random() * baseNumber)]
+    for (let i = 0; i < idList.length; i += baseNumber) {
+      const id = idList[i + Math.floor(Math.random() * baseNumber)]
+      console.log('id: ', id)
 
       try {
-        const response = await spoonacular.get(`${id}/similar`, {
-          params: { apiKey, id, number: 2 }
+        const response = await spoonacular.get(`/${id}/similar`, {
+          params: { apiKey, number: 2 }
         })
-        resultsArray.push(response.data.results)
+        resultsList.push(response.data[0])
+        resultsList.push(response.data[1])
       } catch(e) {
         console.log(e)
-        setErrorMessage('Problems in seachSimilarRecipes')
       }
     }
-
-    console.log(resultsArray);
-    return resultsArray
+    console.log(resultsList);
+    setResults(resultsList)
   }
 
   const getRestaurantRecommendations = async () => {
@@ -131,10 +128,10 @@ export default () => {
 
       return foodItems.slice(0,5);
 
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      console.log(e)
     }
   }
 
-  return {searchByName, searchByNutrients, searchSimilarRecipes, getRestaurantRecommendations, results, errorMessage}
+  return {searchByName, searchByNutrients, searchSimilarRecipes, getRestaurantRecommendations, results}
 }

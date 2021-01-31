@@ -9,19 +9,19 @@ export default  () => {
 
 
   useEffect(() => {
-    console.log('in uselocation useeffect');
-    const checkPermission = async () => {
-      let { status } = await getPermissionsAsync()
-      setGrant(status === "granted")
-      console.log(grant)
-    }
     checkPermission()
-    console.log('inuseloc: ', grant);
   }, [])
+
+  const checkPermission = async () => {
+    let { status } = await getPermissionsAsync()
+    console.log('check status is ', status === "granted");
+    (status === "granted") ? setGrant(true) : setGrant(false)
+    console.log('check grant is ', grant);
+  }
 
   const requestLocationPermissionAsync = async () => {
     let { status } = await requestPermissionsAsync()
-    setGrant(status === "granted")
+    (status === "granted") ? setGrant(true) : setGrant(false)
   }
 
   const updateLocationAsync = async () => {
@@ -36,5 +36,5 @@ export default  () => {
       })
   }
 
-  return { requestLocationPermissionAsync, updateLocationAsync, grant, location, district }
+  return { requestLocationPermissionAsync, updateLocationAsync, checkPermission, grant, location, district }
 }
