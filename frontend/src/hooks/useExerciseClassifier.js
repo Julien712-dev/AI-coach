@@ -20,13 +20,19 @@ const poseMapping = [
 ];
 
 function poseToArray(pose) {
+    const keypoints = poseMapping.map(part => pose.keypoints.find(keypoint => keypoint.part == part));
+    const array = keypoints.flatMap(keypoint => [keypoint.position.x, keypoint.position.y, keypoint.score]);
+    return array;
+}
+
+function standardizeTimeseries(timeseries) {
     const boxSize = 100;
 
-    const keypoints = poseMapping.map(part => pose.keypoints.find(keypoint => keypoint.part == part));
+    const getXs = frame => frame.filter((value, index) => index % 3 == 0);
+    const getYs = frame => frame.filter((value, index) => index % 3 == 1);
 
-    // Standardize to box with fixed size
-    const xs = keypoints.map(keypoint => keypoint.position.x);
-    const ys = keypoints.map(keypoint => keypoint.position.y);
+    const xs = timeseries.flatMap(getXs);
+    const ys = timeseries.flatMap(getYs);
     const maxX = Math.max(...xs);
     const minX = Math.min(...xs);
     const maxY = Math.max(...ys);
@@ -35,8 +41,14 @@ function poseToArray(pose) {
     const standardizeX = x => (x - minX) / maxDiff * boxSize;
     const standardizeY = y => (y - minY) / maxDiff * boxSize;
 
-    const array = keypoints.flatMap(keypoint => [standardizeX(keypoint.position.x), standardizeY(keypoint.position.y), keypoint.score]);
-    return array;
+    return timeseries.map(frame => frame.map((value, index) => {
+        if (index % 3 == 0)
+            return standardizeX(value);
+        else if (index % 3 == 1)
+            return standardizeY(value);
+        else 
+            return value
+    }));
 }
 
 function extractFrames(frames, idealTimes) {
@@ -141,8 +153,8 @@ export default function useExerciseClassifier(step, index) {
             idealTimes.reverse();
             let idealFrames = extractFrames(frames, idealTimes);
             const usedFramedLength = idealFrames.filter((value, index, array) => array.indexOf(value) == index).length;
-            const timeseries = [idealFrames.map(frame => frame.pose)];
-            const result = await exerciseClassifier.post('/classify', { fps, timeseries });
+            const timeseries = standardizeTimeseries(idealFrames.map(frame => frame.pose));
+            const result = await exerciseClassifier.post('/classify', { fps, timeseries: [timeseries] });
             const classLabel = result.data[0];
             setClassification({ timestamp: latestTime, usedFramedLength, fps, classLabel });
             setIsClassifying(false);
