@@ -78,11 +78,14 @@ export default function DietScreenMain({ navigation }) {
 					maxCarbs: nutritionValues.maximumDailyCarbsInGrams * meal.weight,
 					maxProtein: nutritionValues.maximumDailyProteinInGrams * meal.weight,
 					maxFat: nutritionValues.maximumDailyFatsInGrams * meal.weight
-        });
-			}
+				});
 
-			let restaurants = await getRestaurantRecommendations();
-			setRestaurantMenuItems(restaurants);
+				let restaurants = await getRestaurantRecommendations({ 
+					minCalories: (meal.meal == 'breakfast' || meal.meal == 'snack') ? undefined : nutritionValues.dailyRecommendedCalories * 0.55 * meal.weight,
+					maxCalories: nutritionValues.dailyRecommendedCalories * meal.weight,
+				});
+				setRestaurantMenuItems(restaurants);
+			}
 
 		  })();
 	}, [grant]);
@@ -134,7 +137,7 @@ export default function DietScreenMain({ navigation }) {
 			<ShowCard 
 				title={item.recommendedItem.itemName} 
 				id={item.address} 
-				description={`${item.name}\n\n${item.address}`} 
+				description={`${item.recommendedItem.nutritionValues.nf_calories}\n\n${item.name}\n\n${item.address}`} 
 				image={item.image} 
 			/>
     )

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { View, ScrollView } from 'react-native';
-import { Text, Searchbar, Button, Divider, TextInput, FAB, Portal, Provider } from 'react-native-paper';
+import { Text, Searchbar, Button, Divider, TextInput, FAB, Portal, Provider, Snackbar } from 'react-native-paper';
 import LoadingScreen from '../LoadingScreen';
 import Firebase from 'firebase';
 import DropDown from 'react-native-paper-dropdown';
+import moment from 'moment';
+import { setLogs } from '../../store/authSlice';
 
 export default function LogDietDetailsScreen({navigation}) {
 
@@ -13,49 +16,85 @@ export default function LogDietDetailsScreen({navigation}) {
         {label: 'Snack', value: 'snack'}, 
         {label: 'Dinner',value: 'dinner'}
     ];
-    const [user, setUser] = useState(null);
-    const [initialUser, setInitialUser] = useState(null);
+
+    let user = useSelector(state => state.main.auth.user);
+    const userFireBaseRef = Firebase.database();
+    const dispatch = useDispatch();
+
+    const [loading, setLoading] = useState(false);
     const [showDropDown, setShowDropDown] = useState(false);
-    const [mealSelected, setMealSelected] = useState();
-    const [itemName, setItemName] = useState('');
-    const [calorieAmount, setCalorieAmount] = useState(0);
-    const [proteinAmount, setProteinAmount] = useState(0);
-    const [fatAmount, setFatAmount] = useState(0);
-    const [carbAmount, setCarbAmount] = useState(0);
-    const [description, setDescription] = useState('');
+    const [mealSelected, setMealSelected] = useState(null);
+    const [itemName, setItemName] = useState(null);
+    const [calorieAmount, setCalorieAmount] = useState(null);
+    const [proteinAmount, setProteinAmount] = useState(null);
+    const [fatAmount, setFatAmount] = useState(null);
+    const [carbAmount, setCarbAmount] = useState(null);
+    const [description, setDescription] = useState(null);
     const [loggedItems, setLoggedItems] = useState([]);
+    //Snack Bar
+    const [visible, setVisible] = useState(false);
+    const [message, setMessage] = useState('');
+
+    const clearInputs = () => {
+        setItemName(null);
+        setDescription(null);
+        setFatAmount(null);
+        setProteinAmount(null);
+        setCalorieAmount(null);
+    }
+
+    const isValid = () => {
+        return (!!mealSelected && !!calorieAmount)
+    }
 
     const onSaveChanges = () => {
-        setDialogVisible(false);
-        userDatabaseRef.set(user);
-        navigation.dispatch(navigationAction);
+        setLoading(true);
+        setMessage('Meals logged.');
+        const today = moment().format('YYYYMMDD');
+        let updateObj = {};
+        for (let loggedItem of loggedItems) {
+            let userDatabaseLogRef = Firebase.database().ref(`/users/${user.uid}/logs/${today}/diet/${loggedItem.meal}`);
+            userDatabaseLogRef.once('value', snapshot => {
+                let value = snapshot.val();
+                if (!!value) {
+                    console.log(value);
+                    let newUserDatabaseLogRef = Firebase.database().ref(`/users/${user.uid}/logs/${today}/diet`);
+                    if (Array.isArray(value)) {
+                        newUserDatabaseLogRef.update({
+                            [mealSelected]: [...value, loggedItem]
+                        });
+                        updateObj[mealSelected] = [...value, loggedItem]
+                    }
+    
+                } else {
+                    let newUserDatabaseLogRef = Firebase.database().ref(`/users/${user.uid}/logs/${today}/diet`);
+                    newUserDatabaseLogRef.update({
+                        [loggedItem.meal]: [loggedItem]
+                    });
+                }
+                setVisible(true);
+            });
+        }
+        // fetch from realtime db again
+        let userDatabaseDietRef = Firebase.database().ref(`/users/${user.uid}/logs`);
+        userDatabaseDietRef.once('value', snapshot => { 
+            let value = snapshot.val();
+            if (!!value) {
+                console.log('value found');
+                console.log(value);
+                dispatch(setLogs({ logs: value }));
+            }
+            setLoading(false);
+        });
+        setTimeout(() => {
+            navigation.goBack();
+        }, 1000);
     };
-
-    // const userId = '1234567890';
-
-    // const userDatabaseRef = Firebase.database().ref(`/users/${userId}`);
-
-    // useEffect(() => {
-    //     userDatabaseRef.on('value', snapshot => { 
-    //         let value = snapshot.val();
-    //         setInitialUser(value);
-    //         setUser(value); 
-    //     });
-    // }, []);
-    // useEffect(() => {
-    //     const unsubscribe = navigation.addListener('beforeRemove', event => {
-    //         if (JSON.stringify(user) != JSON.stringify(initialUser)) {
-    //             event.preventDefault();
-    //             setNavigationAction(event.data.action);
-    //             setDialogVisible(true);
-    //         }
-    //     });
-    //     return unsubscribe;
-    // }, [navigation, user, initialUser]);
 
     return (
 		<View style={{flex:1}}>
 			<ScrollView contentContainerStyle={{padding: 20}}>
+                {loading && <LoadingScreen />}
                 <DropDown
                     label={'Select Meal'}
                     mode={'outlined'}
@@ -115,18 +154,43 @@ export default function LogDietDetailsScreen({navigation}) {
                         onChangeText={item => setFatAmount(item)}
                     />
                 </View>
-                <Button icon='check' mode='contained'>ADD</Button>
+                <Button icon='check' mode='contained' onPress={() => {
+                    if (isValid()) {
+                        let mealObj = {
+                            meal: mealSelected,
+                            itemName,
+                            ...(!!description && {description}),
+                            calorieAmount,
+                            ...(!!proteinAmount && {proteinAmount}),
+                            ...(!!fatAmount && {fatAmount}),
+                            ...(!!carbAmount && {carbAmount}),
+                        }
+                        console.log(mealObj);
+                        setLoggedItems([...loggedItems, mealObj]);
+                        clearInputs();
+                    } else {
+                        setMessage('Please select meal type and fill in calorie amount.');
+                        setVisible(true);
+                    }
+
+                }}>ADD</Button>
 			</ScrollView>
             <Provider>
                 <Portal>
+                    {/* <Button
+                        style={{position: "absolute", alignSelf: 'flex-start', margin: 16, left: 0, bottom: 0}} 
+                    >VIEW LOGS</Button> */}
                     <FAB 
                         small 
                         style={{position: "absolute", alignSelf: 'flex-end', margin: 16, right: 0, bottom: 0}} 
-                        icon={`plus`} 
-                        label={`Log ${!!loggedItems.length? `(1 added)` : ``}`} 
+                        icon={`plus`}
+                        disabled={!loggedItems.length}
+                        label={`Submit Log ${!!loggedItems.length? `(${loggedItems.length} logged)` : ``}`} 
+                        onPress={() => onSaveChanges()}
                     />
                 </Portal>
             </Provider>
+            <Snackbar visible={visible} onDismiss={() => setVisible(false)} duration={2000}>{message}</Snackbar>
             <View style={{ marginBottom: 50 }}></View>
 		</View>
     )

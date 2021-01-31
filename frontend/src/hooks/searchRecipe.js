@@ -58,7 +58,6 @@ export default () => {
         }
       })
       setResults(response.data.results)
-      //console.log(response.data.results);
     } catch(e) {
       console.log(e)
     }
@@ -107,7 +106,16 @@ export default () => {
     setResults(resultsList)
   }
 
-  const getRestaurantRecommendations = async () => {
+  const getRestaurantRecommendations = async ({
+    minCarbs, 
+    maxCarbs, 
+    minProtein, 
+    maxProtein,
+    minCalories = 350,
+    maxCalories,
+    minFat,
+    maxFat 
+  }) => {
 
     try {
       let foodItems = [];
@@ -118,9 +126,10 @@ export default () => {
         let properItemFound = false;
         for (var item of restaurantData.menuDataWithNutritionInfo) {
           if (item.nutritionValues == 'N.A.') continue; 
-          else {
+          else if (item.nutritionValues.nf_calories >= minCalories) {
             properItemFound = true;
             recommendedItem = item;
+            break;
           }
         }
         if (properItemFound) foodItems.push({...restaurantData, recommendedItem});

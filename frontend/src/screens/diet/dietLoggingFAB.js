@@ -20,12 +20,12 @@ const MyComponent = (props) => {
             {
                 icon: 'broom',
                 label: 'Edit Recommendations',
-                onPress: () => navigation.navigate('Edit Diet'),
+                onPress: () => navigation.push("Edit Diet"),
               },
             {
               icon: 'pencil',
               label: 'Log Manually',
-              onPress: () => navigation.navigate('Log Diet'),
+              onPress: () => navigation.push("Log Diet"),
             },
             {
               icon: 'camera',
