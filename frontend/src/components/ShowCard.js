@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Button, Title, Card, Paragraph } from 'react-native-paper';
-import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import { updateFavList, updateBlkList } from '../actions/profileActions'
 

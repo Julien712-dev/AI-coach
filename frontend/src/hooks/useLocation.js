@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { requestPermissionsAsync, getCurrentPositionAsync, Accuracy, reverseGeocodeAsync } from 'expo-location'
+import { requestPermissionsAsync, getCurrentPositionAsync, Accuracy, reverseGeocodeAsync, getPermissionsAsync } from 'expo-location'
 
 // run callback whenever receive a new position update
 export default  () => {
@@ -8,16 +8,23 @@ export default  () => {
   const [district, setDistrict] = useState(null)
 
 
-  useEffect( async () => {
-    let { status } = await requestPermissionsAsync()
-    setGrant(status)
-    return () => {
-      
+  useEffect(() => {
+    console.log('in uselocation useeffect');
+    const checkPermission = async () => {
+      let { status } = await getPermissionsAsync()
+      setGrant(status === "granted")
+      console.log(grant)
     }
+    checkPermission()
+    console.log('inuseloc: ', grant);
   }, [])
-  
 
-  const updateLocation = async () => {
+  const requestLocationPermissionAsync = async () => {
+    let { status } = await requestPermissionsAsync()
+    setGrant(status === "granted")
+  }
+
+  const updateLocationAsync = async () => {
     await getCurrentPositionAsync({accuracy: Accuracy.Balanced})
       .then( async (response) => {
         setLocation(response.coords)
@@ -29,5 +36,5 @@ export default  () => {
       })
   }
 
-  return { updateLocation, grant, location, district }
+  return { requestLocationPermissionAsync, updateLocationAsync, grant, location, district }
 }

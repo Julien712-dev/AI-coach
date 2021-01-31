@@ -20,6 +20,7 @@ import ShowCard from '../../components/ShowCard'
 import Popup from '../../components/Popup'
 
 import useLocation from '../../hooks/useLocation'
+import { requestPermissionsAsync } from 'expo-camera';
 
 export default function DietScreenMain({ navigation }) {
 
@@ -32,7 +33,9 @@ export default function DietScreenMain({ navigation }) {
 	const [restaurantMenuCarouselActiveIndex, setRestaurantMenuCarouselActiveIndex] = useState(0);
 	// Dummy Data
   const [restaurantMenuItems, setRestaurantMenuItems] = useState([]);
-  const { updateLocation, grant, location, district } = useLocation()
+  const { requestLocationPermissionAsync, updateLocationAsync, grant, location, district } = useLocation()
+  const [showPopup, setShowPopup] = useState(false)
+
 	//const [location, setLocation] = useState(null);
   //const [district, setDistrict] = useState(null);
   
@@ -41,6 +44,7 @@ export default function DietScreenMain({ navigation }) {
 	let profileRedux = useSelector(state => state.main.auth.profile) || {};
 
 	useEffect(() => {
+    console.log('in screen useeffect');
 		let currentTime = new Date();
 		let meal = config.messages.diet.find(message => (message.startAt <= moment(currentTime).hour() && message.endAt > moment(currentTime).hour()));
 		setTime(currentTime);
@@ -57,11 +61,12 @@ export default function DietScreenMain({ navigation }) {
 			  return;
       }
       
-      await updateLocation()
+      console.log('in screen: ', grant);
+      //await updateLocation()
 
 			if (!!profileRedux) {
 				let nutritionValues = computeNutritionValues(profileRedux);
-				console.log(nutritionValues);
+				//console.log(nutritionValues);
 	
 				await searchByName({
 					type: meal.meal,
@@ -77,7 +82,7 @@ export default function DietScreenMain({ navigation }) {
 			setRestaurantMenuItems(restaurants);
 
 		  })();
-	}, []);
+	}, [grant]);
 
 	// Fires when users click into the screen
 	useEffect(() => {
@@ -91,17 +96,22 @@ export default function DietScreenMain({ navigation }) {
     }, [navigation]);
   
   
-    const wait = (timeout) => {
-      return new Promise(resolve => {
-        setTimeout(resolve, timeout);
-      });
-    }
-  
-    const onRefresh = React.useCallback(() => {
-      setRefreshing(true);
-      console.log('refresh pressed');
-      wait(2000).then(() => setRefreshing(false));
-    }, []);
+  const wait = (timeout) => {
+    return new Promise(resolve => {
+      setTimeout(resolve, timeout);
+    });
+  }
+
+  const onRefresh = React.useCallback( async () => {
+    setRefreshing(true);
+    
+    await requestLocationPermissionAsync()
+    
+    console.log('refresh pressed');
+    wait(2000).then(() => setRefreshing(false));
+  }, []);
+
+
     
 
 	// Render function for recipe item recommendations.
@@ -110,7 +120,7 @@ export default function DietScreenMain({ navigation }) {
 		return (
 			<ShowCard title={item.title} id={item.id} description={`${Math.round(calorieObj.amount)} kcal`} image={item.image}/>
 		)
-	}
+  }
 
 	// Render function for restaurant menu item recommendations.
 	function _renderRestaurantMenuItems({item,index}){
@@ -128,7 +138,7 @@ export default function DietScreenMain({ navigation }) {
 
 	return (
 		<View style={{flex:1}}>
-
+      { showPopup ? <Popup title='Location' message='please turn on location' /> : null }
 			<ScrollView contentContainerStyle={{padding: 20}} refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>

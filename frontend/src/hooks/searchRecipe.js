@@ -60,7 +60,7 @@ export default () => {
         }
       })
       setResults(response.data.results)
-      console.log(response.data.results);
+      //console.log(response.data.results);
     } catch(e) {
       console.log(e)
       setErrorMessage('Problems in searchbyName')
