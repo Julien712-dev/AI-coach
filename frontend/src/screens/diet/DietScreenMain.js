@@ -7,7 +7,7 @@ import { Button, Text, Title, Card, Paragraph } from 'react-native-paper';
 import Carousel from 'react-native-snap-carousel';
 import DietLoggingFAB from './dietLoggingFAB';
 import { computeNutritionValues, getCoachAdvice } from '../../hooks/Nutrition';
-import { fetchFavListAsync } from '../../actions/profileActions'
+import { fetchFavListAsync } from '../../hooks/useProfileFirebase'
 import searchRecipe from '../../hooks/searchRecipe';
 // location imports
 import * as Location from 'expo-location';
@@ -28,7 +28,7 @@ export default function DietScreenMain({ navigation }) {
 	const [time, setTime] = useState();
 	const [message, setMessage] = useState({});
 	const [coachAdvice, setCoachAdvice] = useState('');
-	const { searchByName, searchByNutrients, searchSimilarRecipes, getRestaurantRecommendations, results } = searchRecipe();
+	const { searchByName, searchByNutrients, smartSearch, getRestaurantRecommendations, results } = searchRecipe();
 	// Carousels
 	const [recommendedMealCarouselActiveIndex, setRecommendedMealCarouselActiveIndex] = useState(0);
 	const [restaurantMenuCarouselActiveIndex, setRestaurantMenuCarouselActiveIndex] = useState(0);
@@ -56,11 +56,6 @@ export default function DietScreenMain({ navigation }) {
 
 		// get location async
 		(async () => {
-			let { status } = await Location.requestPermissionsAsync();
-			if (status !== 'granted') {
-			  setErrorMsg('Permission to access location was denied');
-			  return;
-      }
       console.log('check permission second time')
       await checkPermission();
       console.log('outside grant is ', grant);
@@ -113,6 +108,7 @@ export default function DietScreenMain({ navigation }) {
     console.log('refresh pressed')
     
     const list = await fetchFavListAsync()
+    // retrieve the keys from the list
     console.log(Object.keys(list));
     searchSimilarRecipes({ idList: Object.keys(list), numberOfResults: 4 })
 
@@ -127,7 +123,14 @@ export default function DietScreenMain({ navigation }) {
 	function _renderRecipeRecommendations({item,index}){
     let calorieObj = (item.nutrition.nutrients || []).find(nutrient => nutrient.title=="Calories")
 		return (
-			<ShowCard title={item.title} id={item.id} description={`${Math.round(calorieObj.amount)} kcal`} image={item.image}/>
+      <ShowCard 
+        title={item.title} 
+        id={item.id} 
+        cuisineType={item.cuisineType}
+        description={`${Math.round(calorieObj.amount)} kcal`} 
+        image={item.image}
+        enableLike={true}
+      />
 		)
   }
 
@@ -138,7 +141,8 @@ export default function DietScreenMain({ navigation }) {
 				title={item.recommendedItem.itemName} 
 				id={item.address} 
 				description={`${item.recommendedItem.nutritionValues.nf_calories}\n\n${item.name}\n\n${item.address}`} 
-				image={item.image} 
+        image={item.image}
+        enableLike={false}
 			/>
     )
     }

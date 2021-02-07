@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import spoonacular from '../api/spoonacular'
-import Firebase from 'firebase';
-import '@firebase/firestore'
+
+//import { fetchFavListAsync, fetchBlklistAsync } from '../../actions/profileActions'
+import { fetchCuisineListAsync, cuisineList} from './useProfileFirebase';
+
 
 export default () => {
   const apiKey = '24d701faa961453a88deb86494e8e39d'
-
   const [results, setResults] = useState(null)
 
   const cuisineTypeGenerator = () => {
@@ -58,6 +59,7 @@ export default () => {
         }
       })
       setResults(response.data.results)
+      //console.log(response.data.results);
     } catch(e) {
       console.log(e)
     }
@@ -79,31 +81,12 @@ export default () => {
     }
   }
 
-  const searchSimilarRecipes = async ({ idList, numberOfResults }) => {
-    console.log('in similar');
-    console.log(idList.length, numberOfResults);
+  // number is number of results
+  const smartSearch = async ({ type, nutritionValues }) => {
+    await fetchCuisineListAsync()
+    cuisineList
+    console.log(Object.keys(list));
 
-    const baseNumber = Math.ceil(idList.length / numberOfResults) * 2
-    console.log('base number', baseNumber)
-    
-    const resultsList = []
-  
-    for (let i = 0; i < idList.length; i += baseNumber) {
-      const id = idList[i + Math.floor(Math.random() * baseNumber)]
-      console.log('id: ', id)
-
-      try {
-        const response = await spoonacular.get(`/${id}/similar`, {
-          params: { apiKey, number: 2 }
-        })
-        resultsList.push(response.data[0])
-        resultsList.push(response.data[1])
-      } catch(e) {
-        console.log(e)
-      }
-    }
-    console.log(resultsList);
-    setResults(resultsList)
   }
 
   const getRestaurantRecommendations = async ({
@@ -142,5 +125,5 @@ export default () => {
     }
   }
 
-  return {searchByName, searchByNutrients, searchSimilarRecipes, getRestaurantRecommendations, results}
+  return {searchByName, searchByNutrients, smartSearch, getRestaurantRecommendations, results}
 }

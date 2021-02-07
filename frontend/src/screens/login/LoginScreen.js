@@ -24,7 +24,6 @@ const LoginScreen = ({ navigation }) => {
     firebase.auth().signInWithEmailAndPassword(email, password)
       .then(() => {
         dispatch(login());
-        loginSuccess();
       })
       .catch(() => {
         setLoading(false);
@@ -38,7 +37,6 @@ const LoginScreen = ({ navigation }) => {
     firebase.auth().signInWithEmailAndPassword(`trial@gmail.com`, `123456`)
       .then(() => {
         dispatch(login());
-        loginSuccess();
       })
       .catch(() => {
         setLoading(false)

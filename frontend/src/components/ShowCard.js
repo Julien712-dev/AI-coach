@@ -2,9 +2,10 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Button, Title, Card, Paragraph } from 'react-native-paper';
 
-import { updateFavList, updateBlkList } from '../actions/profileActions'
+import { updateCuisineList } from '../hooks/useProfileFirebase'
 
-export default ShowCard = ({title, id, description, image, enableLike}) => {
+export default ShowCard = ({title, id, cuisineType, description, image, enableLike}) => {
+
   return (
     <Card>
       <Card.Cover style={{ height: 140 }}source={{ uri: image }} />
@@ -12,12 +13,14 @@ export default ShowCard = ({title, id, description, image, enableLike}) => {
         <Title>{title}</Title>
         <Paragraph>{description}</Paragraph>
       </Card.Content>
-      <Card.Actions style={styles.iconContainer}>
-          <Button icon='close' onPress={() => {updateBlkList(id)}}>
+      { enableLike ? 
+        <Card.Actions style={styles.iconContainer}>
+          <Button icon='close' onPress={() => {updateBlkList({ cuisineType, change: -1 })}}>
           </Button>
-          <Button icon='heart-outline' onPress={() => {updateFavList(id)}}>
+          <Button icon='heart-outline' onPress={() => {updateFavList({ cuisineType, change: 1 })}}>
           </Button>
-      </Card.Actions>
+        </Card.Actions>
+        : null }
     </Card>
   )
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import {Camera} from 'expo-camera'
+import { Camera } from 'expo-camera'
 import * as ImageManipulator from 'expo-image-manipulator';
 
 // this hook is used by FoodClassifyScreen.js
