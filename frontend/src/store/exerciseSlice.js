@@ -1,9 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
+import PushUpVideo from '~/assets/video/push-up.mp4';
 import DreamFeetVideo from '~/assets/video/dream-feet.mp4';
 
 const exerciseLibrary = {
     'Push up': {
-        video: DreamFeetVideo,
+        video: PushUpVideo,
         lengthUnit: 'reps',
         labels: ['Arm', 'Chest'],
         instructions: [
