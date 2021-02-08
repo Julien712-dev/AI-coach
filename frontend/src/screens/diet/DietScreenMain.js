@@ -17,50 +17,22 @@ import ShowCard from '../../components/ShowCard'
 
 export default function DietScreenMain({ navigation }) {
 
-	const [time, setTime] = useState();
 	const [message, setMessage] = useState({});
 	const [coachAdvice, setCoachAdvice] = useState('');
 	const { searchByName, searchByNutrients, getRestaurantRecommendations, results, errorMessage } = searchRecipe();
-	// Carousels
-	const [recommendedMealCarouselActiveIndex, setRecommendedMealCarouselActiveIndex] = useState(0);
-	const [restaurantMenuCarouselActiveIndex, setRestaurantMenuCarouselActiveIndex] = useState(0);
-	// Dummy Data
 	const [restaurantMenuItems, setRestaurantMenuItems] = useState([]);
-	const [location, setLocation] = useState(null);
-	const [district, setDistrict] = useState(null);
 	let profileRedux = useSelector(state => state.main.auth.profile) || {};
 
 	useEffect(() => {
 		let currentTime = new Date();
 		let meal = config.messages.diet.find(message => (message.startAt <= moment(currentTime).hour() && message.endAt > moment(currentTime).hour()));
-		setTime(currentTime);
 		setMessage(meal);
 		setCoachAdvice(getCoachAdvice(profileRedux));
 		// get location async
 		(async () => {
-			let { status } = await Location.requestPermissionsAsync();
-			if (status !== 'granted') {
-			  setErrorMsg('Permission to access location was denied');
-			  return;
-			}
-	  
-			let location = await Location.getCurrentPositionAsync({}).then(
-				async (response) => {
-					console.log(response);
-					let postalAddress = await Location.reverseGeocodeAsync(response.coords);
-					console.log(postalAddress);
-					setLocation(location);
-					setDistrict(postalAddress[0].district);
-				}
-			);
-
-			if (!!location) {
-				let postalAddress = await Location.reverseGeocodeAsync(location.coords);
-			}
 
 			if (!!profileRedux) {
 				let nutritionValues = computeNutritionValues(profileRedux);
-				console.log(nutritionValues);
 	
 				await searchByName({
 					type: meal.meal,
@@ -75,25 +47,15 @@ export default function DietScreenMain({ navigation }) {
 					minCalories: (meal.meal == 'breakfast' || meal.meal == 'snack') ? undefined : nutritionValues.dailyRecommendedCalories * 0.55 * meal.weight,
 					maxCalories: nutritionValues.dailyRecommendedCalories * meal.weight,
 				});
+
 				setRestaurantMenuItems(restaurants);
 			}
 
 		  })();
 	}, []);
 
-	// Fires when users click into the screen
-	useEffect(() => {
-		const unsubscribe = navigation.addListener('focus', () => {
-			// The screen is focused
-			// Call any action
-		});
-	
-		// Return the function to unsubscribe from the event so it gets removed on unmount
-		return unsubscribe;
-		}, [navigation]);
-
 	// Render function for recipe item recommendations.
-	function _renderRecipeRecommendations({item,index}){
+	function _renderRecipeRecommendations({ item, index }) {
     let calorieObj = (item.nutrition.nutrients || []).find(nutrient => nutrient.title=="Calories")
 		return (
 			<ShowCard title={item.title} id={item.id} description={`${Math.round(calorieObj.amount)} kcal`} image={item.image}/>
@@ -115,7 +77,7 @@ export default function DietScreenMain({ navigation }) {
 	if (!results) return (<LoadingScreen />)
 
 	return (
-		<View style={{flex:1}}>
+		<View style={{ flex:1 }}>
 			<ScrollView contentContainerStyle={{padding: 20}}>
 				<Title style={{fontSize: 25}}>
 					{message.title}
@@ -128,13 +90,11 @@ export default function DietScreenMain({ navigation }) {
 						layout={"default"}
 						layoutCardOffset={5}
 						activeSlideOffset={5}
-						// ref={ref => this.carousel = ref}
 						data={results}
 						containerCustomStyle={{overflow: "visible"}}
 						sliderWidth={300}
 						itemWidth={300}
 						renderItem={_renderRecipeRecommendations}
-						onSnapToItem = { index => setRecommendedMealCarouselActiveIndex(index) }
 					/>
 				</View>
 				<Card style={{ width: '100%', marginTop: 10, marginBottom: 15 }}>
@@ -158,7 +118,6 @@ export default function DietScreenMain({ navigation }) {
 						sliderWidth={300}
 						itemWidth={300}
 						renderItem={_renderRestaurantMenuItems}
-						onSnapToItem = { index => setRestaurantMenuCarouselActiveIndex(index) }
 					/>
 				</View>
 				<View style={{ marginBottom: 80 }}></View>

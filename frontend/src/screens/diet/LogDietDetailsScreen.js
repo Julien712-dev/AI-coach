@@ -76,16 +76,18 @@ export default function LogDietDetailsScreen({navigation}) {
             });
         }
         // fetch from realtime db again
-        let userDatabaseDietRef = Firebase.database().ref(`/users/${user.uid}/logs`);
-        userDatabaseDietRef.once('value', snapshot => { 
-            let value = snapshot.val();
-            if (!!value) {
-                console.log('value found');
-                console.log(value);
-                dispatch(setLogs({ logs: value }));
-            }
-            setLoading(false);
-        });
+        setTimeout(() => {
+            let userDatabaseDietRef = Firebase.database().ref(`/users/${user.uid}/logs`);
+            userDatabaseDietRef.once('value', snapshot => { 
+                let value = snapshot.val();
+                if (!!value) {
+                    console.log('value found');
+                    console.log(value);
+                    dispatch(setLogs({ logs: value }));
+                }
+                setLoading(false);
+            });
+        }, 1000)
         setTimeout(() => {
             navigation.goBack();
         }, 1000);
@@ -93,8 +95,8 @@ export default function LogDietDetailsScreen({navigation}) {
 
     return (
 		<View style={{flex:1}}>
+            {loading && <LoadingScreen />}
 			<ScrollView contentContainerStyle={{padding: 20}}>
-                {loading && <LoadingScreen />}
                 <DropDown
                     label={'Select Meal'}
                     mode={'outlined'}
