@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import spoonacular from '../api/spoonacular'
+import firebase from 'firebase/app'
 
 //import { fetchFavListAsync, fetchBlklistAsync } from '../../actions/profileActions'
-import { fetchCuisineListAsync, cuisineList} from './useProfileFirebase';
+import { fetchCuisineListAsync } from '../actions/firebaseActions';
 
 
 export default () => {
@@ -80,11 +81,11 @@ export default () => {
       console.log(e)
     }
   }
-
+  
   // number is number of results
-  const smartSearch = async ({ type, nutritionValues }) => {
-    await fetchCuisineListAsync()
-    cuisineList
+  const smartSearch = async ({ nutritionValues }) => {
+    const cuisineList = await fetchCuisineListAsync()
+
     console.log(Object.keys(list));
 
   }
@@ -102,7 +103,7 @@ export default () => {
 
     try {
       let foodItems = [];
-      const snapshot = await Firebase.firestore().collection('restaurants').where('menuDataWithNutritionInfo', '>', []).get();
+      const snapshot = await firebase.firestore().collection('restaurants').where('menuDataWithNutritionInfo', '>', []).get();
       snapshot.forEach(doc => {
         let restaurantData = doc.data();
         let recommendedItem = restaurantData.menuDataWithNutritionInfo[0];

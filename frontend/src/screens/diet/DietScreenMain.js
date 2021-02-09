@@ -7,7 +7,6 @@ import { Button, Text, Title, Card, Paragraph } from 'react-native-paper';
 import Carousel from 'react-native-snap-carousel';
 import DietLoggingFAB from './dietLoggingFAB';
 import { computeNutritionValues, getCoachAdvice } from '../../hooks/Nutrition';
-import { fetchFavListAsync } from '../../hooks/useProfileFirebase'
 import searchRecipe from '../../hooks/searchRecipe';
 // location imports
 import * as Location from 'expo-location';
@@ -38,13 +37,12 @@ export default function DietScreenMain({ navigation }) {
   const { requestLocationPermissionAsync, updateLocationAsync, checkPermission, grant, location, district } = useLocation()
   const [showPopup, setShowPopup] = useState(false)
   const [refreshing, setRefreshing] = React.useState(false)
-  const [favList, setFavList] = useState(null)
+	const [favList, setFavList] = useState(null)
 
 	//const [location, setLocation] = useState(null);
   //const [district, setDistrict] = useState(null);
   
   
-
 	let profileRedux = useSelector(state => state.main.auth.profile) || {};
 
 	useEffect(() => {
@@ -105,28 +103,18 @@ export default function DietScreenMain({ navigation }) {
 
   const onRefresh = React.useCallback( async () => {
     setRefreshing(true)
-    console.log('refresh pressed')
-    
-    const list = await fetchFavListAsync()
-    // retrieve the keys from the list
-    console.log(Object.keys(list));
-    searchSimilarRecipes({ idList: Object.keys(list), numberOfResults: 4 })
-
+		console.log('refresh pressed')
     
     wait(2000).then(() => setRefreshing(false));
   }, []);
-
-
-    
 
 	// Render function for recipe item recommendations.
 	function _renderRecipeRecommendations({item,index}){
     let calorieObj = (item.nutrition.nutrients || []).find(nutrient => nutrient.title=="Calories")
 		return (
       <ShowCard 
-        title={item.title} 
-        id={item.id} 
-        cuisineType={item.cuisineType}
+        title={item.title}
+        cuisineType='temp1'
         description={`${Math.round(calorieObj.amount)} kcal`} 
         image={item.image}
         enableLike={true}
