@@ -136,7 +136,7 @@ module.exports = {
                 endAt: 18,
                 title: `Tea time!`,
                 message: `Grab a snack if you feel like having one.`,
-                weight: 0.15
+                weight: 0.1
             },
             {
                 time: `night`,
@@ -145,7 +145,7 @@ module.exports = {
                 endAt: 24,
                 title: `Dinner's ready!`,
                 message: `Feel like a feast? Or planning to go clean?`,
-                weight: 0.3
+                weight: 0.35
             }
         ]
     },
