@@ -17,7 +17,6 @@ import { computeNutritionValues, getCoachAdvice } from "../../hooks/Nutrition";
 import { fetchFavListAsync } from "../../hooks/useProfileFirebase";
 import searchRecipe from "../../hooks/searchRecipe";
 // location imports
-import * as Location from "expo-location";
 import * as TaskManager from "expo-task-manager";
 
 // import Constants from 'expo-constants';
@@ -25,7 +24,6 @@ import * as TaskManager from "expo-task-manager";
 import LoadingScreen from "../LoadingScreen";
 import ShowCard from "../../components/ShowCard";
 import Popup from "../../components/Popup";
-
 import useLocation from "../../hooks/useLocation";
 
 export default function DietScreenMain({ navigation }) {
@@ -94,7 +92,7 @@ export default function DietScreenMain({ navigation }) {
           maxProtein: nutritionValues.maximumDailyProteinInGrams * meal.weight,
           maxFat: nutritionValues.maximumDailyFatsInGrams * meal.weight,
         });*/
-
+        // can add more params afterwards
         await smartSearch(10, {
           type: meal.meal,
           minCalories:
@@ -134,7 +132,7 @@ export default function DietScreenMain({ navigation }) {
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     console.log("refresh pressed");
-
+    // This triggers the food and restaurant search again
     setRefreshTimes(refreshTimes + 1);
 
     wait(2000).then(() => setRefreshing(false));
