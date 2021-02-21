@@ -63,7 +63,7 @@ function App() {
 			require('../assets/image/exercise-survey-bg.jpg'),
 			require('../assets/image/rest-day.jpg'),
 			require('../assets/image/survey-background.jpg')
-		  ]);
+		]);
 	  
 		//   const fontAssets = cacheFonts([FontAwesome.font]);
 	  
