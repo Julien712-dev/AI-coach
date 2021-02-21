@@ -41,19 +41,42 @@ module.exports = {
             label: 'Female',
             value: 'F',
         }],
-        exerciseHabitOptions: [
+        physicalFitnessOptions: [
             {
-                label: 'Sedentary (Little to none).',
-                value: 'sedentary',
+                label: 'Poor (I almost never exercise)',
+                value: 'poor'
             },
             {
-                label: 'Medium (Daily walk/basic workout).',
-                value: 'medium',
+                label: 'Below average (I seldom exercise, around once or twice a month)',
+                value: 'below'
             },
             {
-                label: 'Extensive (Regular exercise habits).',
-                value: 'extensive',
+                label: 'Average (I exercise somewhat regularly, around once a week)',
+                value: 'average'
             },
+            {
+                label: 'Above average (I exercise regularly, more than once a week)',
+                value: 'above'
+            },
+            {
+                label: 'Excellent (I have intense exercise regularly, more than once a week)',
+                value: 'excellent'
+            }
+        ],
+        exerciseDayPerWeek: [
+            { label: '1', value: 1 },
+            { label: '2', value: 2 },
+            { label: '3', value: 3 },
+            { label: '4', value: 4 },
+            { label: '5', value: 5 },
+            { label: '6', value: 6 },
+            { label: '7', value: 7 },
+        ],
+        exerciseMinutePerDay: [
+            { label: '15', value: 15 },
+            { label: '30', value: 30 },
+            { label: '45', value: 45 },
+            { label: '60', value: 60 },
         ],
         dietHabitOptions: [
             {
