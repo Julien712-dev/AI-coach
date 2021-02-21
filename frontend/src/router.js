@@ -16,6 +16,7 @@ import DietScreenMain from './screens/diet/DietScreenMain';
 import EditDietScreen from './screens/diet/EditDietScreen';
 import LogDietScreen from './screens/diet/LogDietScreen';
 import LogDietDetailsScreen from './screens/diet/LogDietDetailsScreen';
+import FoodClassifyScreen from './screens/diet/FoodClassifyScreen';
 
 // Exercise Screens
 import ExerciseMainScreen from './screens/exercise/ExerciseMainScreen';
@@ -126,6 +127,13 @@ function DietStackScreen() {
 				component={LogDietDetailsScreen}
 				options={{ headerTitle: 'Log Diet Details' }}
 			/>
+      <DietStack.Screen 
+        name='Classify Food' 
+        component={FoodClassifyScreen}
+        options={{ headerTitle: 'Food Classify'}}
+      />
+
+      
 		</DietStack.Navigator>
 	)
 }
