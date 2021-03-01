@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from "react";
-import firebase from "firebase";
+import Firebase from "firebase";
 
 // There are some console.log() in this file which can be removed in the future.
 
 export default () => {
+  // In case we can't retrieve the cuisine list from firebase, use this.
+  const defaultCuisineList = {
+    American: 10,
+    French: 10,
+    Chinese: 10,
+    Japanese: 10,
+    Korean: 10,
+    Thai: 10,
+    Italian: 10,
+  };
   const [cuisineList, setCuisineList] = useState(null);
 
   useEffect(() => {
@@ -12,26 +22,31 @@ export default () => {
 
   const fetchCuisineListAsync = async () => {
     let data = await fetchData({ path: "/profile/cuisineList" });
+    if (data === null) data = defaultCuisineList;
     setCuisineList(data);
     return data;
   };
 
   const updateCuisineList = ({ cuisineType, change }) => {
-    let orginalValue =
-      cuisineList[cuisineType] === undefined ? 0 : cuisineList[cuisineType];
+    let newValue =
+      cuisineList[cuisineType] === undefined
+        ? 10 + change
+        : cuisineList[cuisineType] + change;
+    if (newValue > 18) newValue = 18;
+    else if (newValue < 2) newValue = 2;
     updateData({
       path: "/profile/cuisineList",
-      data: { [cuisineType]: orginalValue + change },
+      data: { [cuisineType]: newValue },
     });
+    fetchCuisineListAsync();
   };
 
   // General functions
 
   const fetchData = async ({ path }) => {
-    const { currentUser } = firebase.auth();
+    const { currentUser } = Firebase.auth();
     let data;
-    await firebase
-      .database()
+    await Firebase.database()
       .ref(`/users/${currentUser.uid}${path}`)
       .once("value", (snapshot) => {
         data = snapshot.val();
@@ -40,10 +55,9 @@ export default () => {
   };
 
   const updateData = async ({ path, data }) => {
-    const { currentUser } = firebase.auth();
+    const { currentUser } = Firebase.auth();
     console.log("in updateData, append: ", data, " to path: ", path);
-    await firebase
-      .database()
+    await Firebase.database()
       .ref(`/users/${currentUser.uid}${path}`)
       .update(data)
       .catch((err) => {
@@ -52,9 +66,8 @@ export default () => {
   };
 
   const setData = async ({ path, data }) => {
-    const { currentUser } = firebase.auth();
-    await firebase
-      .database()
+    const { currentUser } = Firebase.auth();
+    await Firebase.database()
       .ref(`/users/${currentUser.uid}${path}`)
       .set(data)
       .catch((err) => {

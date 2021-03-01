@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import spoonacular from "../api/spoonacular";
 
-//import { fetchFavListAsync, fetchBlklistAsync } from '../../actions/profileActions'
+import Firebase from "firebase";
+
 import useProfileFirebase from "./useProfileFirebase";
 
 export default () => {
@@ -22,8 +23,8 @@ export default () => {
       "Vietnamese",
       "Italian",
     ];
-    var n = 2;
-    randomItems = cuisineTypesAvailable
+    let n = 2;
+    let randomItems = cuisineTypesAvailable
       .sort(() => 0.5 - Math.random())
       .slice(0, n);
 
@@ -47,7 +48,8 @@ export default () => {
   };
 
   const searchByName = async ({
-    keyword,
+    query,
+    cuisine,
     type = "lunch",
     excludeIngredients,
     minCarbs,
@@ -70,25 +72,18 @@ export default () => {
         maxFat,
       });
 
-      let cuisineTypes = cuisineTypeGenerator();
-      console.log(cuisineTypes);
       const response = await spoonacular.get("/complexSearch", {
         params: {
           apiKey,
-          cuisine: cuisineTypes,
+          query,
           minCalories,
           maxCalories,
-          // maxCarbs,
-          // maxProtein,
-          minProtein: 0,
-          minCarbs: 0,
-          minFat: 0,
           type,
-          number: 4,
+          number: 6,
         },
       });
       setRecipeResults(response.data.results);
-      //console.log(response.data.results);
+      console.log(response.data.results);
     } catch (e) {
       console.log(e);
     }
@@ -117,7 +112,8 @@ export default () => {
   ) => {
     const list = await fetchCuisineListAsync();
     const searchList = weightedRandom(list, number);
-    console.log("wr list", searchList);
+    console.log("weighted random list", searchList);
+    console.log("calories: ", minCalories, maxCalories);
     let tempResults = [];
     try {
       for (cuisine in searchList) {
@@ -144,6 +140,74 @@ export default () => {
     } catch (e) {
       console.log(e);
     }
+  };
+
+  const fakeSearch = () => {
+    console.log("in fake search");
+    let recipeResults = [
+      {
+        id: 716429,
+        calories: 584,
+        carbs: "84g",
+        fat: "20g",
+        image: "https://spoonacular.com/recipeImages/716429-312x231.jpg",
+        imageType: "jpg",
+        protein: "19g",
+        title: "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs",
+      },
+      {
+        id: 715538,
+        calories: 521,
+        carbs: "69g",
+        fat: "10g",
+        image: "https://spoonacular.com/recipeImages/715538-312x231.jpg",
+        imageType: "jpg",
+        protein: "35g",
+        title: "Bruschetta Style Pork & Pasta",
+      },
+      {
+        id: 715539,
+        calories: 521,
+        carbs: "69g",
+        fat: "10g",
+        image: "https://spoonacular.com/recipeImages/715538-312x231.jpg",
+        imageType: "jpg",
+        protein: "35g",
+        title: "Bruschetta Style Pork & Pasta",
+      },
+      {
+        id: 715578,
+        calories: 521,
+        carbs: "69g",
+        fat: "10g",
+        image: "https://spoonacular.com/recipeImages/715538-312x231.jpg",
+        imageType: "jpg",
+        protein: "35g",
+        title: "Bruschetta Style Pork & Pasta",
+      },
+      {
+        id: 715544,
+        calories: 521,
+        carbs: "69g",
+        fat: "10g",
+        image: "https://spoonacular.com/recipeImages/715538-312x231.jpg",
+        imageType: "jpg",
+        protein: "35g",
+        title: "Bruschetta Style Pork & Pasta",
+      },
+      {
+        id: 715533,
+        calories: 521,
+        carbs: "69g",
+        fat: "10g",
+        image: "https://spoonacular.com/recipeImages/715538-312x231.jpg",
+        imageType: "jpg",
+        protein: "35g",
+        title: "Bruschetta Style Pork & Pasta",
+      },
+    ];
+    setRecipeResults(recipeResults);
+    return recipeResults;
   };
 
   const getRestaurantRecommendations = async ({
@@ -191,6 +255,7 @@ export default () => {
     searchByName,
     searchByNutrients,
     smartSearch,
+    fakeSearch,
     getRestaurantRecommendations,
     recipeResults,
     restaurantResults,
