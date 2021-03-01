@@ -47,6 +47,23 @@ export default () => {
     return randomChoices;
   };
 
+  // To process the nutrient information in results.
+  const processResults = (dataList) => {
+    dataList.forEach((recipe) => {
+      const nutrients = recipe.nutrition.nutrients;
+      if (nutrients === null) return dataList;
+      recipe.nutrients = {};
+      for (var i = 0; i < nutrients.length; i++) {
+        recipe.nutrients[nutrients[i].title.toLowerCase()] = {
+          amount: Math.round(nutrients[i].amount),
+          unit: nutrients[i].unit,
+        };
+      }
+      delete recipe.nutrition;
+    });
+    return dataList;
+  };
+
   const searchByName = async ({
     query,
     cuisine,
@@ -54,11 +71,11 @@ export default () => {
     excludeIngredients,
     minCarbs,
     maxCarbs,
-    minProtein,
+    minProtein = 0,
     maxProtein,
-    minCalories,
+    minCalories = 0,
     maxCalories,
-    minFat,
+    minFat = 0,
     maxFat,
   }) => {
     try {
@@ -76,14 +93,17 @@ export default () => {
         params: {
           apiKey,
           query,
+          minProtein,
+          minFat,
           minCalories,
-          maxCalories,
           type,
           number: 6,
         },
       });
-      setRecipeResults(response.data.results);
       console.log(response.data.results);
+      const results = processResults(response.data.results);
+      setRecipeResults(results);
+      console.log(results);
     } catch (e) {
       console.log(e);
     }

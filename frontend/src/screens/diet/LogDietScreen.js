@@ -52,7 +52,7 @@ export default function DetailsScreen({ navigation }) {
         </Button>
       </View>
       <SafeAreaView style={{ flex: 1, paddingHorizontal: 20 }}>
-        <VerticalList data={recipeResults} />
+        <VerticalList data={recipeResults} screenName="Log Diet Details" />
       </SafeAreaView>
     </SafeAreaView>
   );
