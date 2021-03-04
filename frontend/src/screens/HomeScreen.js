@@ -13,6 +13,8 @@ const REST_DAY_IMAGE = require('../../assets/image/rest-day.jpg');
 const ARM_WORKOUT_IMAGE = require('../../assets/image/exercise-survey-bg.jpg');
 
 import { Pedometer } from 'expo-sensors';
+import { VictoryBar, VictoryChart, VictoryTheme, VictoryLine } from "victory-native";
+import { computeNutritionValues } from "../hooks/Nutrition";
 
 export default function HomeScreen({ navigation }) {
 	let user = useSelector(state => state.main.auth.user) || {};
@@ -74,36 +76,28 @@ export default function HomeScreen({ navigation }) {
 	}
 
 	function InsightsDiet(props) {
-
+		const data = [];
+		const nutritionValues = computeNutritionValues(profile)
+		for (let d=0; d<7; d++) {
+			let l = moment().add(-7+d, 'days').format('YYYYMMDD')
+			console.log(l)
+			if (!!logs[l]) {
+				let totalCalories = 0;
+				for (let diet in logs[l]['diet']) {
+					let result = logs[l]['diet'][diet].reduce(function (acc, obj) { return acc + parseInt(obj.calorieAmount); }, 0); // 7
+					totalCalories += result
+				}
+				data.push({ day: moment(l).format('DD/MM'), calories: totalCalories })
+			} else data.push({ day: moment(l).format('DD/MM'), calories: 0 })
+		}
+		console.log(data);
 		return (		
 			<View style={{ flex: 1, flexDirection: "column", alignItems: 'center', justifyContent: 'center'}}>
-			<Title style={{ fontSize: 26, marginTop: 15 }}>Diet</Title>
-			<View style={{ flex: 1, flexDirection: "row" }}>
-				<View style={{ width: 80, marginLeft: 5, justifyContent: 'center' }}>
-					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
-						<Text style={{ fontSize: 32 }}>{caloriesConsumedThisWeek}</Text>
-					</View>
-					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
-						<Text style={{ fontSize: 10, textAlign: 'center' }}>average calories intake</Text>
-					</View>
-				</View>
-				<View style={{ width: 110, marginHorizontal: 5, justifyContent: 'center', marginBottom: 10 }}>
-					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
-						<Text style={{ fontSize: 72, fontWeight: '600' }}>3</Text>
-					</View>
-					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
-						<Text style={{ fontSize: 12, textAlign: 'center'}}>workouts completed</Text>
-					</View>
-				</View>
-				<View style={{ width: 80, marginRight: 5, justifyContent: 'center' }}>
-					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
-						<Text style={{ fontSize: 32 }}>{caloriesConsumedThisWeek}</Text>
-					</View>
-					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
-						<Text style={{ fontSize: 10, textAlign: 'center' }}>average calories consumption</Text>
-					</View>
-				</View>
-			</View>
+			<Title style={{ fontSize: 22, marginTop: 15 }}>Weekly Diet</Title>
+			<VictoryChart width={310} height={200} theme={VictoryTheme.material} padding={{ left: 50, right: 50, top: 10, bottom: 40}}>
+				<VictoryLine y={() => nutritionValues.dailyRecommendedCalories} />
+				<VictoryBar data={data} x="day" y="calories" />
+			</VictoryChart>
 		</View>)
 	}
 
