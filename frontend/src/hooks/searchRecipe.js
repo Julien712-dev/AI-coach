@@ -172,7 +172,7 @@ export default () => {
     maxCarbs,
     minProtein,
     maxProtein,
-    minCalories = 350,
+    minCalories = 0,
     maxCalories,
     minFat,
     maxFat,
@@ -183,7 +183,6 @@ export default () => {
     console.log("wr list", searchList);
     try {
       let foodItems = [];
-      console.log(maxCalories);
 
       const snapshot = await Firebase.firestore()
         .collection("restaurants")
