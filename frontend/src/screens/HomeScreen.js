@@ -215,7 +215,7 @@ export default function HomeScreen({ navigation }) {
 							layout={"default"}
 							layoutCardOffset={3}
 							activeSlideOffset={5}
-							data={['summary', 'diet', 'c']}
+							data={['summary', 'diet']}
 							containerCustomStyle={{overflow: "visible"}}
 							sliderWidth={350}
 							itemWidth={310}
