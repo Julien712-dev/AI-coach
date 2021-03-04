@@ -10,9 +10,9 @@ export function computeNutritionValues(profile) {
         let {
             age,
             sex,
-            exerciseHabit,
             dietHabit
         } = profile;
+        let exerciseHabit = 'sedentary'; // DEBUG
 
         if ( !age || !sex || !dietHabit ) throw 'invalid_profile';
 
