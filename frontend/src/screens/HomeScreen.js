@@ -12,6 +12,8 @@ import Carousel, { Pagination } from 'react-native-snap-carousel';
 const REST_DAY_IMAGE = require('../../assets/image/rest-day.jpg');
 const ARM_WORKOUT_IMAGE = require('../../assets/image/exercise-survey-bg.jpg');
 
+import { Pedometer } from 'expo-sensors';
+
 export default function HomeScreen({ navigation }) {
 	let user = useSelector(state => state.main.auth.user) || {};
 	let currentProfile = useSelector(state => state.main.auth.profile) || {};
@@ -38,8 +40,76 @@ export default function HomeScreen({ navigation }) {
 	}
 
 	// Render function for recipe item recommendations.
+	function InsightsSummary(props) {
+		return (				
+		<View style={{ flex: 1, flexDirection: "column", alignItems: 'center', justifyContent: 'center'}}>
+			<Title style={{ fontSize: 26, marginTop: 15 }}>This Week</Title>
+			<View style={{ flex: 1, flexDirection: "row" }}>
+				<View style={{ width: 80, marginLeft: 5, justifyContent: 'center' }}>
+					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
+						<Text style={{ fontSize: 32 }}>{caloriesConsumedThisWeek}</Text>
+					</View>
+					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
+						<Text style={{ fontSize: 10, textAlign: 'center' }}>average calories intake</Text>
+					</View>
+				</View>
+				<View style={{ width: 110, marginHorizontal: 5, justifyContent: 'center', marginBottom: 10 }}>
+					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
+						<Text style={{ fontSize: 72, fontWeight: '600' }}>3</Text>
+					</View>
+					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
+						<Text style={{ fontSize: 12, textAlign: 'center'}}>workouts completed</Text>
+					</View>
+				</View>
+				<View style={{ width: 80, marginRight: 5, justifyContent: 'center' }}>
+					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
+						<Text style={{ fontSize: 32 }}>{caloriesConsumedThisWeek}</Text>
+					</View>
+					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
+						<Text style={{ fontSize: 10, textAlign: 'center' }}>average calories consumption</Text>
+					</View>
+				</View>
+			</View>
+		</View>)
+	}
+
+	function InsightsDiet(props) {
+
+		return (		
+			<View style={{ flex: 1, flexDirection: "column", alignItems: 'center', justifyContent: 'center'}}>
+			<Title style={{ fontSize: 26, marginTop: 15 }}>Diet</Title>
+			<View style={{ flex: 1, flexDirection: "row" }}>
+				<View style={{ width: 80, marginLeft: 5, justifyContent: 'center' }}>
+					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
+						<Text style={{ fontSize: 32 }}>{caloriesConsumedThisWeek}</Text>
+					</View>
+					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
+						<Text style={{ fontSize: 10, textAlign: 'center' }}>average calories intake</Text>
+					</View>
+				</View>
+				<View style={{ width: 110, marginHorizontal: 5, justifyContent: 'center', marginBottom: 10 }}>
+					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
+						<Text style={{ fontSize: 72, fontWeight: '600' }}>3</Text>
+					</View>
+					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
+						<Text style={{ fontSize: 12, textAlign: 'center'}}>workouts completed</Text>
+					</View>
+				</View>
+				<View style={{ width: 80, marginRight: 5, justifyContent: 'center' }}>
+					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
+						<Text style={{ fontSize: 32 }}>{caloriesConsumedThisWeek}</Text>
+					</View>
+					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
+						<Text style={{ fontSize: 10, textAlign: 'center' }}>average calories consumption</Text>
+					</View>
+				</View>
+			</View>
+		</View>)
+	}
+
 	function _renderInsights( { item, index } ){
 
+		console.log('rendering insights:', item)
 		return (
 			<View style={{
 				borderRadius: 8,
@@ -47,25 +117,8 @@ export default function HomeScreen({ navigation }) {
 				width: null,
 				backgroundColor: 'white',
 			}}>
-				<View style={{ flex: 1, flexDirection: "column", alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
-					<Title style={{ fontSize: 26 }}>This Week</Title>
-					<View style={{ width: 200, marginHorizontal: 20, justifyContent: 'center', marginBottom: 15 }}>
-						<View style={{ justifyContent: 'center', alignItems: 'center'}}>
-							<Text style={{ fontSize: 36, fontWeight: '600' }}>3</Text>
-						</View>
-						<View style={{ justifyContent: 'center', alignItems: 'center'}}>
-							<Text style={{ fontSize: 18 }}>workouts completed</Text>
-						</View>
-					</View>
-					<View style={{ width: 150, marginHorizontal: 20, justifyContent: 'center' }}>
-						<View style={{ justifyContent: 'center', alignItems: 'center'}}>
-							<Text style={{ fontSize: 28 }}>{caloriesConsumedThisWeek}</Text>
-						</View>
-						<View style={{ justifyContent: 'center', alignItems: 'center'}}>
-							<Text style={{ fontSize: 12 }}>average calories intake</Text>
-						</View>
-					</View>
-				</View>
+				{item == 'summary' && <InsightsSummary />}
+				{item == 'diet' && <InsightsDiet />}
 			</View>
 		)
 	}
@@ -168,7 +221,7 @@ export default function HomeScreen({ navigation }) {
 							layout={"default"}
 							layoutCardOffset={3}
 							activeSlideOffset={5}
-							data={['a', 'b', 'c']}
+							data={['summary', 'diet', 'c']}
 							containerCustomStyle={{overflow: "visible"}}
 							sliderWidth={350}
 							itemWidth={310}
