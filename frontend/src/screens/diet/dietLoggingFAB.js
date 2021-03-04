@@ -30,7 +30,7 @@ const MyComponent = (props) => {
             {
               icon: 'camera',
               label: 'Log by Food Snap',
-              onPress: () => console.log('Pressed email'),
+              onPress: () => navigation.navigate('Classify Food'),
             },
           ]}
           onStateChange={onStateChange}
