@@ -2,11 +2,13 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { TouchableOpacity, View } from 'react-native';
 import { useTheme, Headline, Text, Snackbar } from 'react-native-paper';
-import { CAMERA, AUDIO_RECORDING } from 'expo-permissions';
+import { CAMERA } from 'expo-permissions';
 import { Camera } from 'expo-camera';
+import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
 import ProgressCircle from 'react-native-progress-circle';
 import usePermissions from '~/src/hooks/usePermissions';
 import useCameraRatio from '~/src/hooks/useCameraRatio';
+import useExerciseClassifier from '~/src/hooks/useExerciseClassifier';
 import useTimer from '~/src/hooks/useTimer';
 import LoadingScreen from '~/src/screens/LoadingScreen';
 import MultiDivider from '~/src/components/MultiDivider';
@@ -16,6 +18,8 @@ function calculateAspectRatio(ratio) {
     const [height, width] = ratio.split(':');
     return width / height;
 }
+
+const TensorCamera = cameraWithTensors(Camera);
 
 function CustomProgressCircle({ children, percent }) {
     const { colors } = useTheme();
@@ -33,31 +37,34 @@ function CustomProgressCircle({ children, percent }) {
         </ProgressCircle>);
 }
 
-function DoExerciseScreen({ index, exercise, onComplete }) {
+function DoExerciseScreen({ index, exercise, onComplete, classification, setImageIterator }) {
+    const imageWidth = 300;
+
     const description = useSelector(state => state.main.exercise.library[exercise.type]);
     const { colors } = useTheme();
 
     const timeElapsed = useTimer([index], 100);
     const secondsElapsed = Math.floor(timeElapsed / 1000);
 
-    const [cameraRef, adjustCameraRatio, cameraRatio] = useCameraRatio('4:3');
+    const [cameraRef, adjustCameraRatio, cameraRatio] = useCameraRatio('4:3', { tensor: true });
     const cameraAspectRatio = calculateAspectRatio(cameraRatio);
-    const complete = () => cameraRef.current.stopRecording();
+
+    useEffect(() => console.log(classification), [classification]);
 
     // Check if countdown is finished
     useEffect(() => {
         if ((description.lengthUnit == 'seconds' && secondsElapsed >= exercise.length))
-            complete();
-    }, [exercise, description, secondsElapsed, complete]);
+            onComplete();
+    }, [exercise, description, secondsElapsed, onComplete]);
 
-    const onCameraReady = async () => {
+    const onCameraReady = async imageIterator => {
         adjustCameraRatio();
-        cameraRef.current.recordAsync({ mute: true }).then(video => onComplete(video));
+        setImageIterator(imageIterator);
     };
 
     if (description.lengthUnit == 'reps')
         var progressContent = (
-            <TouchableOpacity onLongPress={complete}>
+            <TouchableOpacity onLongPress={onComplete}>
                 <CustomProgressCircle percent={0}>
                     <Text style={{ fontSize: 50 }}>{exercise.length}</Text>
                     <Text>reps</Text>
@@ -78,11 +85,14 @@ function DoExerciseScreen({ index, exercise, onComplete }) {
     return (
         <View style={{ padding: 20, alignItems: 'center' }}>
             <Headline style={{ textAlign: 'center', color: colors.primary }}>{exercise.type}</Headline>
-            <Camera
+            <TensorCamera
                 ref={cameraRef}
                 type={Camera.Constants.Type.front}
                 style={{ height: '60%', aspectRatio: cameraAspectRatio, marginBottom: 10 }}
-                onCameraReady={onCameraReady}
+                resizeWidth={imageWidth}
+                resizeHeight={imageWidth / cameraAspectRatio}
+                resizeDepth={3}
+                onReady={onCameraReady}
             />
             <MultiDivider thickness={5} />
             {progressContent}
@@ -133,7 +143,9 @@ export default function DoWorkoutScreen({ navigation, route }) {
     const exercise = plan != null ? plan.sequence[progress.index] : undefined;
     const dispatch = useDispatch();
 
-    const permissions = usePermissions([CAMERA, AUDIO_RECORDING]);
+    const permissions = usePermissions([CAMERA]);
+
+    const [isClassifierReady, classification, setImageIterator] = useExerciseClassifier(3, progress?.index);
 
     useEffect(() => { dispatch(startWorkout({ day })); }, [day]);
 
@@ -141,17 +153,17 @@ export default function DoWorkoutScreen({ navigation, route }) {
     useEffect(() => {
         if (plan != null && ((progress.index == plan.sequence.length - 1 && progress.stage == 'rest') || progress.index >= plan.sequence.length))
             navigation.goBack();
-            // Todo
+        // Todo
     }, [plan, progress, navigation]);
 
-    if (plan == null || permissions == null || permissions.status == 'undecided')
+    if (plan == null || permissions == null || permissions.status == 'undecided' || !isClassifierReady)
         return <LoadingScreen />;
     else if (permissions.status == 'denied')
         navigation.goBack();
     else {
         if (progress.stage == 'exercise') {
             const onCompleteExercise = video => dispatch(completeExercise({ video }));
-            return <DoExerciseScreen index={progress.index} exercise={exercise} onComplete={onCompleteExercise} />
+            return <DoExerciseScreen index={progress.index} exercise={exercise} onComplete={onCompleteExercise} classification={classification} setImageIterator={setImageIterator} />
         }
         else if (progress.stage == 'rest') {
             const onCompleteRest = () => dispatch(completeRest());

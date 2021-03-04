@@ -1,20 +1,18 @@
-import React, { useState, useEffect, useRef, useReducer } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Firebase from 'firebase';
 import config from '../../config';
 import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
-import { Button, Text, Title, Card, Paragraph, TextInput, Chip, Snackbar } from 'react-native-paper';
+import { Button, Text, Title, TextInput, Chip, Snackbar } from 'react-native-paper';
 import DropDown from 'react-native-paper-dropdown';
-import Carousel from 'react-native-snap-carousel';
 import LoadingScreen from "../LoadingScreen";
-import { updateTempStorage, saveProfileToFirebase, clearTempStorage } from "../../store/profileSlice.js";
+import { updateTempStorage, clearTempStorage } from "../../store/profileSlice.js";
 import Swiper from 'react-native-swiper';
+import BackgroundImage from '../../../assets/image/survey-background.jpg';
 import { saveProfileToReducer } from '../../store/authSlice';
 import { setPlan } from '../../store/exerciseSlice';
 
-const EXERCISE_SURVEY_BACKGROUND_IMAGE = require('../../../assets/image/survey-background.jpg');
-
-const renderSurveyOptions = (props) => {
+function SurveyOptions(props) {
     let {
         index,
         setValueFunction,
@@ -30,7 +28,7 @@ const renderSurveyOptions = (props) => {
     )
 }
 
-function EntranceSurveyStepOneScreen({ navigation, swiperRef }) {
+function StepOneScreen({ swiperRef }) {
 
     let currentProfile = useSelector(state => state.main.auth.profile) || {} ;
     const [firstName, setFirstName] = useState(currentProfile.firstName || null);
@@ -71,12 +69,6 @@ function EntranceSurveyStepOneScreen({ navigation, swiperRef }) {
                     width: 165, marginHorizontal: 10, 
                     backgroundColor: 'transparent' }} 
                     label='First Name' 
-                    // theme={{ colors: { 
-                    //   text: 'white',
-                    //   placeholder: 'white',
-                    //   primary: 'white',
-                    //   underlineColor: 'white'
-                    // } }}
                     value={firstName} 
                     onChangeText={text => setFirstName(text)} 
                     autoCorrect={false}></TextInput>
@@ -154,10 +146,6 @@ function EntranceSurveyStepOneScreen({ navigation, swiperRef }) {
                 <Button style={{width: 130}} 
                     mode='contained' 
                     disabled={!isValid} 
-                    // theme={{ colors: { 
-                    //     text: 'black',
-                    //     primary: 'black',
-                    // } }}
                     onPress={() => {
                     let setObj = {
                         firstName: !!firstName ? firstName: undefined,
@@ -170,8 +158,6 @@ function EntranceSurveyStepOneScreen({ navigation, swiperRef }) {
                         sex: !!sex? sex: undefined
                     }
                     dispatch(updateTempStorage({...setObj}));
-                    // const userFireBaseProfileRef = Firebase.database().ref(`/users/${user.uid}/profile`);
-                    // dispatch(saveProfileToFirebase(userFireBaseProfileRef));
                     swiperRef.current.scrollBy(1)
                     }}>NEXT</Button>
             </View>
@@ -179,22 +165,14 @@ function EntranceSurveyStepOneScreen({ navigation, swiperRef }) {
     )
 }
 
-function renderChipOfSingleChoice() {
-    return (<Chip></Chip>)
-}
-
-
-function EntranceSurveyStepTwoScreen({ navigation, swiperRef }) {
-
+function StepTwoScreen({ swiperRef }) {
     let currentProfile = useSelector(state => state.main.auth.profile) || {} ;
-    const [value, setValue] = useState();
-    const [isSelected, setIsSelected] = useState(false);
-    const [exerciseHabit, setExerciseHabit] = useState(currentProfile.exerciseHabit || null);
+    const [physicalFitness, setPhysicalFitness] = useState(currentProfile.physicalFitness || null);
     const [isValid, setIsValid] = useState(false);
 
     const dispatch = useDispatch();
 
-    const surveyFields = [exerciseHabit]
+    const surveyFields = [physicalFitness]
     const validateSurvey = () => {
         for (var surveyField of surveyFields) {
             if (!surveyField) return;
@@ -208,24 +186,22 @@ function EntranceSurveyStepTwoScreen({ navigation, swiperRef }) {
 
     return (
         <View style={{ flex: 1 }}>
-            <View style={{ height: 400}}>
+            <View style={{ height: 450}}>
                 <View style={{ marginHorizontal: 10 }}>
-                    <Title>Step 2: Exercise Habits</Title>
+                    <Title>Step 2: Physical Fitness</Title>
                 </View>
                 <View style={{ marginHorizontal: 10 }}>
-                    <Text>How often do you exercise weekly?</Text> 
+                    <Text>Which physical fitness level best describe you currently?</Text> 
                 </View>
                 <View style={{ marginHorizontal: 10 }}>
-                    {config.constants.exerciseHabitOptions.map((option, index) => (renderSurveyOptions({index: index, setValueFunction: setExerciseHabit, displayText: option.label, value: option.value, currentValue: exerciseHabit})))}
+                    {config.constants.physicalFitnessOptions.map((option, index) => <SurveyOptions index={index} setValueFunction={setPhysicalFitness} displayText={option.label} value={option.value} currentValue={physicalFitness}/>)}
                 </View>
             </View>
-
             <View style={{ marginHorizontal: 10, flexDirection: "row", alignContent: "center", justifyContent: "center" }}>
                 <Button 
                     style={{marginHorizontal: 5, width: 130}} 
                     mode="contained"
                     onPress={() => swiperRef.current.scrollBy(-1)}
-                
                 >PREVIOUS</Button>
                 <Button 
                     disabled={!isValid} 
@@ -233,7 +209,7 @@ function EntranceSurveyStepTwoScreen({ navigation, swiperRef }) {
                     mode="contained"
                     onPress={() => {
                         let setObj = {
-                            exerciseHabit: !!exerciseHabit ? exerciseHabit : undefined
+                            physicalFitness: !!physicalFitness ? physicalFitness : undefined
                         }
                         dispatch(updateTempStorage({...setObj}));
                         swiperRef.current.scrollBy(1);
@@ -282,7 +258,97 @@ function MultipleChoiceChip({ index, option, selectedElements, setValueFunction 
     )
 }
 
-function EntranceSurveyStepThreeScreen({ navigation, swiperRef }) {
+function StepThreeScreen({ swiperRef }) {
+    let currentProfile = useSelector(state => state.main.auth.profile) || {} ;
+    const [dayPerWeek, setDayPerWeek] = useState(currentProfile.dayPerWeek || null);
+    const [minutePerDay, setMinutePerDay] = useState(currentProfile.minutePerDay || null);
+    const [isValid, setIsValid] = useState(false);
+    const [showDayDropdown, setShowDayDropdown] = useState(false);
+    const [showMinuteDropdown, setShowMinuteDropdown] = useState(false);
+
+    const dispatch = useDispatch();
+
+    const surveyFields = [dayPerWeek, minutePerDay];
+    const validateSurvey = () => {
+        for (var surveyField of surveyFields) {
+            if (!surveyField) return;
+        }
+        setIsValid(true);
+    }
+
+    useEffect(() => {
+        validateSurvey();
+    }, surveyFields)
+
+    return (
+        <View style={{ flex: 1 }}>
+            <View style={{ height: 450}}>
+                <View style={{ marginHorizontal: 10 }}>
+                    <Title>Step 3: Exercise Schedule</Title>
+                </View>
+                <View style={{ marginHorizontal: 10 }}>
+                    <Text>We can help you create a customized exercise plan, but for that we need to know how often you are planning to exercise.</Text> 
+                </View>
+                <View style={{ marginHorizontal: 10 }}>
+                    <DropDown
+                        label={'Days per week'}
+                        mode={'flat'}
+                        theme={{ colors: { 
+                            background: 'transparent'
+                        } }}
+                        value={dayPerWeek}
+                        setValue={setDayPerWeek}
+                        list={config.constants.exerciseDayPerWeek}
+                        visible={showDayDropdown}
+                        showDropDown={() => setShowDayDropdown(true)}
+                        onDismiss={() => setShowDayDropdown(false)}
+                        inputProps={{
+                            right: <TextInput.Icon name={'menu-down'} />,
+                        }}
+                    />
+                    <DropDown
+                        label={'Minutes per day'}
+                        mode={'flat'}
+                        theme={{ colors: { 
+                            background: 'transparent'
+                        } }}
+                        value={minutePerDay}
+                        setValue={setMinutePerDay}
+                        list={config.constants.exerciseMinutePerDay}
+                        visible={showMinuteDropdown}
+                        showDropDown={() => setShowMinuteDropdown(true)}
+                        onDismiss={() => setShowMinuteDropdown(false)}
+                        inputProps={{
+                            right: <TextInput.Icon name={'menu-down'} />,
+                        }}
+                    />
+                </View>
+            </View>
+            <View style={{ marginHorizontal: 10, flexDirection: "row", alignContent: "center", justifyContent: "center" }}>
+                <Button 
+                    style={{marginHorizontal: 5, width: 130}} 
+                    mode="contained"
+                    onPress={() => swiperRef.current.scrollBy(-1)}
+                >PREVIOUS</Button>
+                <Button 
+                    disabled={!isValid} 
+                    style={{ marginHorizontal: 5, width: 130 }} 
+                    mode="contained"
+                    onPress={() => {
+                        let setObj = {
+                            dayPerWeek: !!dayPerWeek ? dayPerWeek : undefined,
+                            minutePerDay: !!minutePerDay ? minutePerDay : undefined,
+                        }
+                        dispatch(updateTempStorage({...setObj}));
+                        swiperRef.current.scrollBy(1);
+                    }}
+                >NEXT</Button>
+            </View>
+        </View>
+    )
+}
+
+function StepFourScreen({ navigation, swiperRef }) {
 
     let currentProfile = useSelector(state => state.main.auth.profile) || {} ;
 
@@ -319,7 +385,7 @@ function EntranceSurveyStepThreeScreen({ navigation, swiperRef }) {
                     <Text>Body goal</Text> 
                 </View>
                 <View style={{ marginHorizontal: 10, marginBottom: 10 }}>
-                    {config.constants.dietHabitOptions.map((option, index) => (renderSurveyOptions({index: index, setValueFunction: setDietHabit, displayText: option.label, value: option.value, currentValue: dietHabit})))}
+                    {config.constants.dietHabitOptions.map((option, index) => <SurveyOptions index={index} setValueFunction={setDietHabit} displayText={option.label} value={option.value} currentValue={dietHabit} />)}
                 </View>
                 <View style={{ marginHorizontal: 10 }}>
                     <Text>Diet Restrictions</Text>
@@ -381,11 +447,7 @@ function EntranceSurveyStepThreeScreen({ navigation, swiperRef }) {
 
 // MAIN
 export default function EntranceSurveyScreen({ navigation }) {
-
-    const [profile, setProfile] = useState(null);
-    const [isFetched, setIsFetched] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
-    const dispatch = useDispatch();
 
     const swiperRef = useRef(null);
 
@@ -393,44 +455,11 @@ export default function EntranceSurveyScreen({ navigation }) {
     let tempProfile = useSelector(state => state.main.auth.profile);
 
     const PAGES = [
-        <EntranceSurveyStepOneScreen key={`PAGE-0`} navigation={navigation} swiperRef={swiperRef} />, 
-        <EntranceSurveyStepTwoScreen key={`PAGE-1`} navigation={navigation} swiperRef={swiperRef} />, 
-        <EntranceSurveyStepThreeScreen key={`PAGE-2`} navigation={navigation} swiperRef={swiperRef} />
+        <StepOneScreen key={`PAGE-0`} navigation={navigation} swiperRef={swiperRef} />, 
+        <StepTwoScreen key={`PAGE-1`} navigation={navigation} swiperRef={swiperRef} />, 
+        <StepThreeScreen key={`PAGE-2`} navigation={navigation} swiperRef={swiperRef} />, 
+        <StepFourScreen key={`PAGE-3`} navigation={navigation} swiperRef={swiperRef} />
     ];
-
-    // useEffect(() => {
-    //     (async () => {
-	// 	  setIsFetched(false);
-	// 	  const userDatabaseRef = Firebase.database().ref(`/users/${user.uid}`);
-	// 	    userDatabaseRef.once('value', snapshot => { 
-	// 		  let value = snapshot.val();
-	// 		  if (!!value) {
-	// 			setProfile(value);
-	// 		  }
-	// 		  setIsFetched(true);
-	// 	  });
-    //     })();
-    // }, [])
-
-    // When the user first login, force the user to complete his profile.
-	// useEffect(() => {
-	// 	const unsubscribe = navigation.addListener('focus', () => {
-	// 	  // The screen is focused
-	// 	  // Call any action
-	// 	  setIsFetched(false);
-	// 	  const userDatabaseRef = Firebase.database().ref(`/users/${user.uid}`);
-	// 	    userDatabaseRef.once('value', snapshot => { 
-	// 		  let value = snapshot.val();
-	// 		  if (!!value) {
-	// 			setProfile(value);
-	// 		  }
-	// 		  setIsFetched(true);
-	// 	  });
-	// 	});
-	
-	// 	// Return the function to unsubscribe from the event so it gets removed on unmount
-	// 	return unsubscribe;
-	//   }, [navigation]);
 
     if (!user) {
         return (<LoadingScreen />)
@@ -440,7 +469,7 @@ export default function EntranceSurveyScreen({ navigation }) {
             {/* <View style={{flex: 1}}> */}
             <View style={styles.backgroundContainer}>
                 <ImageBackground 
-                source={EXERCISE_SURVEY_BACKGROUND_IMAGE} 
+                source={BackgroundImage} 
                 style={styles.bakcgroundImage}
                 blurRadius={10}
                 >
@@ -450,10 +479,6 @@ export default function EntranceSurveyScreen({ navigation }) {
             <Button 
                 icon="close" 
                 style={{ position: 'absolute', top:20, right:0, color: 'white' }}
-                // theme={{ colors: { 
-                //   text: 'black',
-                //   primary: 'black',
-                // } }}
                 onPress={() => navigation.goBack()}>CLOSE
             </Button>}
             <View style={{ padding: 20, marginTop: 50, justifyContent: 'center', flex: 1 }}>
@@ -462,7 +487,6 @@ export default function EntranceSurveyScreen({ navigation }) {
             <Swiper
                 ref={swiperRef}
                 style={{ height: 530 }}
-                // activeDotColor={'black'}
                 loop={false}
                 index={currentPage}
                 autoplay={false}
