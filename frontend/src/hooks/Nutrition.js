@@ -14,9 +14,9 @@ export function computeNutritionValues(profile) {
             dietHabit
         } = profile;
 
-        if ( !age || !sex || !exerciseHabit || !dietHabit ) throw 'invalid_profile';
+        if ( !age || !sex || !dietHabit ) throw 'invalid_profile';
 
-        let palValue = config.palValueMap[exerciseHabit];
+        let palValue = config.palValueMap[exerciseHabit] || 1.4;
         
         // get daily recommended calorie intake
         switch(true) {
