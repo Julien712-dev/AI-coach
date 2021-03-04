@@ -173,9 +173,11 @@ module.exports = {
         ]
     },
     palValueMap: {
-        'sedentary': 1.4,
-        'medium': 1.6,
-        'extensive': 1.8
+        'poor': 1.4,
+        'below': 1.4,
+        'average': 1.6,
+        'above': 1.6,
+        'excellent': 1.8
     },
     nutritionPerGramToKcal: {
         'protein': 4,
