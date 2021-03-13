@@ -48,10 +48,11 @@ export default function LogDietDetailsScreen({ route, navigation }) {
 
   useEffect(() => {
     if (recipe != null) {
-      console.log("recipe is not null");
+      console.log("loading recipe data from previous page");
       setItemName(recipe.title);
       setFatAmount(recipe.nutrients.fat.amount.toString());
       setProteinAmount(recipe.nutrients.protein.amount.toString());
+      setCarbAmount(recipe.nutrients.carbohydrates.amount.toString());
       setCalorieAmount(recipe.nutrients.calories.amount.toString());
     }
   }, []);
@@ -61,6 +62,7 @@ export default function LogDietDetailsScreen({ route, navigation }) {
     setDescription(null);
     setFatAmount(null);
     setProteinAmount(null);
+    setCarbAmount(null);
     setCalorieAmount(null);
   };
 

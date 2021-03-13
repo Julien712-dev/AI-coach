@@ -69,7 +69,7 @@ export default () => {
     cuisine,
     type = "lunch",
     excludeIngredients,
-    minCarbs,
+    minCarbs = 0,
     maxCarbs,
     minProtein = 0,
     maxProtein,
@@ -93,6 +93,7 @@ export default () => {
         params: {
           apiKey,
           query,
+          minCarbs,
           minProtein,
           minFat,
           minCalories,

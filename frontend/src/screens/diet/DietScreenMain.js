@@ -154,7 +154,7 @@ export default function DietScreenMain({ navigation }) {
     );
   }
 
-  if (!recipeResults) return <LoadingScreen />;
+  //if (!recipeResults) return <LoadingScreen />;
 
   return (
     <View style={{ flex: 1 }}>

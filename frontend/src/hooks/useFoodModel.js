@@ -16,23 +16,34 @@ export default function TFModel() {
   const [model, setModel] = useState(null);
 
   useEffect(() => {
-    const loadModel = async () => {
-      console.log("inside model loading");
-      const tfReady = await tf.ready();
-      const modelJson = await require("../../assets/model/food/model.json");
-      const modelWeight = await require("../../assets/model/food/model_weights.bin");
-      const m = await tf.loadGraphModel(
-        bundleResourceIO(modelJson, modelWeight)
-      );
-      console.log("m is ", m);
-      setModel(m);
-    };
-
-    loadModel();
+    loadTestModel();
     return () => {
       model?.dispose();
     };
   }, []);
+
+  const loadModel = async () => {
+    console.log("inside model loading");
+    const tfReady = await tf.ready();
+    const modelJson = await require("../../assets/model/food/model.json");
+    const modelWeight = await require("../../assets/model/food/model_weights.bin");
+    const m = await tf.loadGraphModel(bundleResourceIO(modelJson, modelWeight));
+    console.log("m is ", m);
+    setModel(m);
+  };
+
+  const loadTestModel = async () => {
+    console.log("inside test model loading");
+    await tf.ready();
+    const modelJson = await require("../../assets/model/test/model.json");
+    const modelWeight = await require("../../assets/model/test/model_weights.bin");
+    const m = await tf.loadLayersModel(
+      bundleResourceIO(modelJson, modelWeight)
+    );
+    setModel(m);
+    const zeros = tf.zeros([1, 224, 224, 3]);
+    m.predict(zeros).print();
+  };
 
   const testMobilenetModel = async () => {
     console.log("inside mbnet");
@@ -56,12 +67,10 @@ export default function TFModel() {
       buffer[i + 2] = data[offset + 2];
       offset += 4;
     }
-    return tf.tensor3d(buffer, [height, width, 3]);
+    return tf.tensor4d(buffer, [1, height, width, 3]);
   };
 
   const classifyImage = async (uri) => {
-    console.log(model);
-    return;
     if (model === undefined || model === null) {
       console.log("model is undefined or null");
       return;
@@ -78,8 +87,9 @@ export default function TFModel() {
 
       const imageTensor = imageToTensor(rawImageData);
       const pred = await model.predict(imageTensor).data();
-      console.log(pred);
-      setPredictions(pred);
+      const predIndex = tf.argMax(pred).toFloat();
+      console.log(predIndex);
+      setPredictions(predIndex);
     } catch (error) {
       console.log(error);
     }
