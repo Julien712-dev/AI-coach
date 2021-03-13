@@ -27,6 +27,7 @@ export default function DietScreenMain({ navigation }) {
   const [time, setTime] = useState();
   const [message, setMessage] = useState({});
   const [coachAdvice, setCoachAdvice] = useState("");
+  const [loading, setLoading] = useState(false);
   const {
     searchByName,
     searchByNutrients,
@@ -76,6 +77,7 @@ export default function DietScreenMain({ navigation }) {
     // get location async
     (async () => {
       if (!!profileRedux) {
+        setLoading(true);
         let nutritionValues = computeNutritionValues(profileRedux);
 
         // can add more params afterwards
@@ -95,6 +97,8 @@ export default function DietScreenMain({ navigation }) {
               : nutritionValues.dailyRecommendedCalories * 0.55 * meal.weight,
           maxCalories: nutritionValues.dailyRecommendedCalories * meal.weight,
         });
+
+        setLoading(false);
       }
     })();
   }, [refreshTimes]);
@@ -147,14 +151,14 @@ export default function DietScreenMain({ navigation }) {
       <ShowCard
         title={item.recommendedItem.itemName}
         id={item.address}
-        description={`${item.recommendedItem.nutritionValues.nf_calories}\n\n${item.name}\n\n${item.address}`}
+        description={`${item.recommendedItem.nutritionValues.nf_calories} kcal\n\n${item.name}\n\n${item.address}`}
         image={item.image}
         enableLike={false}
       />
     );
   }
 
-  //if (!recipeResults) return <LoadingScreen />;
+  if (!recipeResults) return <LoadingScreen />;
 
   return (
     <View style={{ flex: 1 }}>

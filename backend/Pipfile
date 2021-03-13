@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[scripts]
+start = "python main.py"
+test = "cd test && test.bat"
+deploy = "set PYTHONIOENCODING=UTF-8 && pipenv lock -r > requirements.txt && gcloud app deploy"
+
+[packages]
+flask = "*"
+tensorflow = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.7"
