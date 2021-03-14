@@ -1,5 +1,6 @@
 module.exports = {
     constants: {
+        days: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
         midnight: {
             startAt: 0,
             endAt: 6
@@ -68,9 +69,7 @@ module.exports = {
             { label: '2', value: 2 },
             { label: '3', value: 3 },
             { label: '4', value: 4 },
-            { label: '5', value: 5 },
-            { label: '6', value: 6 },
-            { label: '7', value: 7 },
+            { label: '5', value: 5 }
         ],
         exerciseMinutePerDay: [
             { label: '15', value: 15 },

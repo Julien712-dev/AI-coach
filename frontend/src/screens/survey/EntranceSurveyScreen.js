@@ -261,14 +261,14 @@ function MultipleChoiceChip({ index, option, selectedElements, setValueFunction 
 function StepThreeScreen({ swiperRef }) {
     let currentProfile = useSelector(state => state.main.auth.profile) || {} ;
     const [dayPerWeek, setDayPerWeek] = useState(currentProfile.dayPerWeek || null);
-    const [minutePerDay, setMinutePerDay] = useState(currentProfile.minutePerDay || null);
+    const [minutePerSession, setMinutePerDay] = useState(currentProfile.minutePerSession || null);
     const [isValid, setIsValid] = useState(false);
     const [showDayDropdown, setShowDayDropdown] = useState(false);
     const [showMinuteDropdown, setShowMinuteDropdown] = useState(false);
 
     const dispatch = useDispatch();
 
-    const surveyFields = [dayPerWeek, minutePerDay];
+    const surveyFields = [dayPerWeek, minutePerSession];
     const validateSurvey = () => {
         for (var surveyField of surveyFields) {
             if (!surveyField) return;
@@ -312,7 +312,7 @@ function StepThreeScreen({ swiperRef }) {
                         theme={{ colors: { 
                             background: 'transparent'
                         } }}
-                        value={minutePerDay}
+                        value={minutePerSession}
                         setValue={setMinutePerDay}
                         list={config.constants.exerciseMinutePerDay}
                         visible={showMinuteDropdown}
@@ -337,7 +337,7 @@ function StepThreeScreen({ swiperRef }) {
                     onPress={() => {
                         let setObj = {
                             dayPerWeek: !!dayPerWeek ? dayPerWeek : undefined,
-                            minutePerDay: !!minutePerDay ? minutePerDay : undefined,
+                            minutePerSession: !!minutePerSession ? minutePerSession : undefined,
                         }
                         dispatch(updateTempStorage({...setObj}));
                         swiperRef.current.scrollBy(1);
@@ -427,12 +427,7 @@ function StepFourScreen({ navigation, swiperRef }) {
                             ...tempProfile,
                             ...setObj
                         });
-                        const userFireBaseExercisePlanRef = Firebase.database().ref(`/users/${user.uid}/exercisePlan`);
-                        userFireBaseExercisePlanRef.set({
-                            ...config.defaultExercisePlan
-                        });
                         dispatch(saveProfileToReducer({ profile: { ...tempProfile, ...setObj }}));
-                        dispatch(setPlan({ plan: {...config.defaultExercisePlan} }));
                         dispatch(clearTempStorage());
                         setTimeout(() => {
                             navigation.goBack();

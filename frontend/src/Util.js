@@ -1,4 +1,4 @@
-export function getDayOfWeek() {
-    const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-    return days[(new Date()).getDay()]
+export function capitalize(string) {
+    if (typeof string !== 'string') return ''
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }

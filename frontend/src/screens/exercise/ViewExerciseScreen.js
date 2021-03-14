@@ -18,7 +18,7 @@ export default function ViewExerciseScreen({ route }) {
     const dispatch = useDispatch();
     const { colors } = useTheme();
 
-    const labels = exerciseDescription.labels.map((label, index) => <Chip key={index.toString()} style={{ marginRight: 3 }} mode="contained">{label}</Chip>);
+    const focuses = exerciseDescription.focuses.map((label, index) => <Chip key={index.toString()} style={{ marginRight: 3 }} mode="contained">{label}</Chip>);
     const instructions = exerciseDescription.instructions.map((instruction, index) => `${index + 1}. ${instruction}`).join('\n');
 
     const onPressLength = () => { setDialogVisible(true); }
@@ -36,7 +36,7 @@ export default function ViewExerciseScreen({ route }) {
             />
             <MultiDivider thickness={5} />
             <View style={{ width: '100%', marginTop: 5, flexDirection: 'row' }}>
-                {labels}
+                {focuses}
             </View>
             <View style={{ width: '100%', marginTop: 20 }}>
                 <Subheading>Instructions</Subheading>
