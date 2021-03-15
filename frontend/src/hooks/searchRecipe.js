@@ -3,8 +3,6 @@ import spoonacular from "../api/spoonacular";
 import Firebase from "firebase/app";
 import "firebase/firestore";
 
-import Firebase from "firebase";
-
 import useProfileFirebase from "./useProfileFirebase";
 
 function shuffle(array) {
