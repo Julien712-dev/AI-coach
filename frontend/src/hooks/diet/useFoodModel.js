@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import * as tf from "@tensorflow/tfjs";
-import * as mobilenet from "@tensorflow-models/mobilenet";
-import { fetch, bundleResourceIO } from "@tensorflow/tfjs-react-native";
-
-import Constants from "expo-constants";
+import { bundleResourceIO } from "@tensorflow/tfjs-react-native";
 
 import * as jpeg from "jpeg-js";
 import * as FileSystem from "expo-file-system";
@@ -25,8 +22,8 @@ export default function TFModel() {
   const loadModel = async () => {
     console.log("inside model loading");
     const tfReady = await tf.ready();
-    const modelJson = await require("../../assets/model/food/model.json");
-    const modelWeight = await require("../../assets/model/food/model_weights.bin");
+    const modelJson = await require("~/assets/model/food/model.json");
+    const modelWeight = await require("~/assets/model/food/model_weights.bin");
     const m = await tf.loadGraphModel(bundleResourceIO(modelJson, modelWeight));
     console.log("m is ", m);
     setModel(m);
@@ -35,8 +32,8 @@ export default function TFModel() {
   const loadTestModel = async () => {
     console.log("inside test model loading");
     await tf.ready();
-    const modelJson = await require("../../assets/model/test/model.json");
-    const modelWeight = await require("../../assets/model/test/model_weights.bin");
+    const modelJson = await require("~/assets/model/test/model.json");
+    const modelWeight = await require("~/assets/model/test/model_weights.bin");
     const m = await tf.loadLayersModel(
       bundleResourceIO(modelJson, modelWeight)
     );

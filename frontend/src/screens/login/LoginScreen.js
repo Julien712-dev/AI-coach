@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import firebase from 'firebase';
-import { View, ScrollView, StyleSheet, Keyboard, TouchableWithoutFeedback, ImageBackground, StatusBar } from 'react-native';
-import { FAB, Portal, Provider, Card, TextInput, Button, ActivityIndicator, Snackbar, Text, Title } from 'react-native-paper';
-import { login } from '../../store/authSlice';
+import { View, StyleSheet, Keyboard, TouchableWithoutFeedback, ImageBackground } from 'react-native';
+import { Card, TextInput, Button, Snackbar, Text, Title } from 'react-native-paper';
+import { login } from '~/src/store/authSlice';
 import LoadingScreen from '../LoadingScreen';
 
 const LoginScreen = ({ navigation }) => {
@@ -53,7 +53,7 @@ const LoginScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.backgroundContainer}>
             <ImageBackground 
-              source={require('../../../assets/image/male-athlete.jpg')} 
+              source={require('~/assets/image/male-athlete.jpg')} 
               style={styles.bakcgroundImage}
               blurRadius={20}
             >

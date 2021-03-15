@@ -6,8 +6,7 @@ import { useTheme, FAB, Headline, Text, IconButton, Surface, Title, Portal, Dial
 import StarRating from 'react-native-star-rating';
 
 import { resetDraftPlan, saveDraftPlan, swapWorkout, removeWorkout } from '~/src/store/exerciseSlice';
-
-const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+import { constants } from '~/src/config';
 
 const styles = StyleSheet.create({
     cell: {
@@ -101,6 +100,7 @@ export default function PlanWorkoutScreen({ navigation }) {
     const [dialogVisible, setDialogVisible] = useState(false);
     const [navigationAction, setNavigationAction] = useState(false);    // The navigation action interrupted by the 'Save?' dialog
     const { colors } = useTheme();
+
     useEffect(() => {
         const unsubscribe = navigation.addListener('beforeRemove', event => {
             if (planModified) {
@@ -118,16 +118,16 @@ export default function PlanWorkoutScreen({ navigation }) {
             navigation.navigate('View Workout', { day });
     };
     const onActivityMoveUp = day => {
-        const index = days.indexOf(day);
+        const index = constants.days.indexOf(day);
         if (index > 0) {
-            let prevDay = days[index - 1];
+            let prevDay = constants.days[index - 1];
             dispatch(swapWorkout({ fromDay: prevDay, toDay: day }));
         }
     };
     const onActivityMoveDown = day => {
-        const index = days.indexOf(day);
-        if (index < days.length - 1) {
-            let nextDay = days[index + 1];
+        const index = constants.days.indexOf(day);
+        if (index < constants.days.length - 1) {
+            let nextDay = constants.days[index + 1];
             dispatch(swapWorkout({ fromDay: nextDay, toDay: day }));
         }
     };
@@ -151,7 +151,7 @@ export default function PlanWorkoutScreen({ navigation }) {
     const onCancelChanges = () => {
         setDialogVisible(false);
     }
-    const rows = days.map(day => {
+    const rows = constants.days.map(day => {
         const header = day[0].toUpperCase() + day.slice(1);
         const activity = draftPlan[day];
         const component = activity == undefined ?

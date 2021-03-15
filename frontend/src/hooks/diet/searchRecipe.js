@@ -1,11 +1,9 @@
-import { useState, useEffect } from "react";
-import spoonacular from "../api/spoonacular";
-import Firebase from "firebase/app";
+import { useState } from "react";
+import spoonacular from "~/src/api/spoonacular";
+import Firebase from "firebase";
 import "firebase/firestore";
 
-import Firebase from "firebase";
-
-import useProfileFirebase from "./useProfileFirebase";
+import useProfileFirebase from "../useProfileFirebase";
 
 function shuffle(array) {
   var currentIndex = array.length,

@@ -1,27 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import config from "../../config";
-import moment, { updateLocale } from "moment";
+import { useSelector } from "react-redux";
+import config from "~/src/config";
+import moment from "moment";
 import {
   View,
-  StyleSheet,
   ScrollView,
-  SafeAreaView,
-  ImageBackground,
   RefreshControl,
 } from "react-native";
-import { Button, Text, Title, Card, Paragraph } from "react-native-paper";
+import { Text, Title, Card, Paragraph } from "react-native-paper";
 import Carousel from "react-native-snap-carousel";
 import DietLoggingFAB from "./dietLoggingFAB";
-import { computeNutritionValues, getCoachAdvice } from "../../hooks/Nutrition";
-import searchRecipe from "../../hooks/searchRecipe";
-// location imports
-import * as TaskManager from "expo-task-manager";
+import { computeNutritionValues, getCoachAdvice } from "~/src/hooks/diet/Nutrition";
+import searchRecipe from "~/src/hooks/diet/searchRecipe";
 
 import LoadingScreen from "../LoadingScreen";
-import ShowCard from "../../components/ShowCard";
-import Popup from "../../components/Popup";
-import useLocation from "../../hooks/useLocation";
+import ShowCard from "~/src/components/ShowCard";
+import Popup from "~/src/components/Popup";
+import useLocation from "~/src/hooks/useLocation";
 
 export default function DietScreenMain({ navigation }) {
   const [time, setTime] = useState();

@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import firebase from 'firebase'
 
 /*const fetchProfile = createAsyncThunk("users/fetchProfile", async () => {
   let data

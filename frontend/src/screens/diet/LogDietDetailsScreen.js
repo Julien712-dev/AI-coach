@@ -3,9 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { View, ScrollView } from "react-native";
 import {
   Text,
-  Searchbar,
   Button,
-  Divider,
   TextInput,
   FAB,
   Portal,
@@ -16,7 +14,7 @@ import LoadingScreen from "../LoadingScreen";
 import Firebase from "firebase";
 import DropDown from "react-native-paper-dropdown";
 import moment from "moment";
-import { setLogs } from "../../store/authSlice";
+import { setLogs } from "~/src/store/authSlice";
 
 export default function LogDietDetailsScreen({ route, navigation }) {
   let meals = [

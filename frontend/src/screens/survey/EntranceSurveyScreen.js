@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Firebase from 'firebase';
-import config from '../../config';
+import config from '~/src/config';
 import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
 import { Button, Text, Title, TextInput, Chip, Snackbar } from 'react-native-paper';
 import DropDown from 'react-native-paper-dropdown';
 import LoadingScreen from "../LoadingScreen";
-import { updateTempStorage, clearTempStorage } from "../../store/profileSlice.js";
+import { updateTempStorage, clearTempStorage } from "~/src/store/profileSlice.js";
 import Swiper from 'react-native-swiper';
-import BackgroundImage from '../../../assets/image/survey-background.jpg';
-import { saveProfileToReducer } from '../../store/authSlice';
-import { setPlan } from '../../store/exerciseSlice';
+import BackgroundImage from '~/assets/image/survey-background.jpg';
+import { saveProfileToReducer } from '~/src/store/authSlice';
 
 function SurveyOptions(props) {
     let {
@@ -261,14 +260,14 @@ function MultipleChoiceChip({ index, option, selectedElements, setValueFunction 
 function StepThreeScreen({ swiperRef }) {
     let currentProfile = useSelector(state => state.main.auth.profile) || {} ;
     const [dayPerWeek, setDayPerWeek] = useState(currentProfile.dayPerWeek || null);
-    const [minutePerDay, setMinutePerDay] = useState(currentProfile.minutePerDay || null);
+    const [minutePerSession, setMinutePerDay] = useState(currentProfile.minutePerSession || null);
     const [isValid, setIsValid] = useState(false);
     const [showDayDropdown, setShowDayDropdown] = useState(false);
     const [showMinuteDropdown, setShowMinuteDropdown] = useState(false);
 
     const dispatch = useDispatch();
 
-    const surveyFields = [dayPerWeek, minutePerDay];
+    const surveyFields = [dayPerWeek, minutePerSession];
     const validateSurvey = () => {
         for (var surveyField of surveyFields) {
             if (!surveyField) return;
@@ -312,7 +311,7 @@ function StepThreeScreen({ swiperRef }) {
                         theme={{ colors: { 
                             background: 'transparent'
                         } }}
-                        value={minutePerDay}
+                        value={minutePerSession}
                         setValue={setMinutePerDay}
                         list={config.constants.exerciseMinutePerDay}
                         visible={showMinuteDropdown}
@@ -337,7 +336,7 @@ function StepThreeScreen({ swiperRef }) {
                     onPress={() => {
                         let setObj = {
                             dayPerWeek: !!dayPerWeek ? dayPerWeek : undefined,
-                            minutePerDay: !!minutePerDay ? minutePerDay : undefined,
+                            minutePerSession: !!minutePerSession ? minutePerSession : undefined,
                         }
                         dispatch(updateTempStorage({...setObj}));
                         swiperRef.current.scrollBy(1);
@@ -427,12 +426,7 @@ function StepFourScreen({ navigation, swiperRef }) {
                             ...tempProfile,
                             ...setObj
                         });
-                        const userFireBaseExercisePlanRef = Firebase.database().ref(`/users/${user.uid}/exercisePlan`);
-                        userFireBaseExercisePlanRef.set({
-                            ...config.defaultExercisePlan
-                        });
                         dispatch(saveProfileToReducer({ profile: { ...tempProfile, ...setObj }}));
-                        dispatch(setPlan({ plan: {...config.defaultExercisePlan} }));
                         dispatch(clearTempStorage());
                         setTimeout(() => {
                             navigation.goBack();
