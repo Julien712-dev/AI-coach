@@ -1,11 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import firebase from 'firebase'
 
-export const fetchNotes = createAsyncThunk("users/fetchNotes", async () => {
-  // Returns data after resolve
-  const data = await firebasePromise();
+/*const fetchProfile = createAsyncThunk("users/fetchProfile", async () => {
+  let data
+  console.log('accessing');
+  await firebase.database().ref('/users/123/profile')
+    .once("value", (snapshot) => {
+      data = snapshot.val()
+    });
   return data;
-});
+});*/
 
 const nullProfile = {
   firstName: null,
@@ -44,8 +48,6 @@ const profileSlice = createSlice({
     }
   }
 });
-
-
 
 
 const { reducer, actions } = profileSlice;
