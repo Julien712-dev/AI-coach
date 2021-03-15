@@ -1,17 +1,19 @@
 import { useState, useEffect } from "react";
 import spoonacular from "../api/spoonacular";
-import Firebase from 'firebase/app';
-import 'firebase/firestore';
+import Firebase from "firebase/app";
+import "firebase/firestore";
 
-//import { fetchFavListAsync, fetchBlklistAsync } from '../../actions/profileActions'
+import Firebase from "firebase";
+
 import useProfileFirebase from "./useProfileFirebase";
 
 function shuffle(array) {
-  var currentIndex = array.length, temporaryValue, randomIndex;
+  var currentIndex = array.length,
+    temporaryValue,
+    randomIndex;
 
   // While there remain elements to shuffle...
   while (0 !== currentIndex) {
-
     // Pick a remaining element...
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex -= 1;
@@ -27,7 +29,14 @@ function shuffle(array) {
 
 export default () => {
   const apiKey = "24d701faa961453a88deb86494e8e39d";
-  const defaultRecipeList = { American: 10, Chinese: 10, Japanese: 10, French: 10, Korean: 10, Thai: 10 }
+  const defaultRecipeList = {
+    American: 10,
+    Chinese: 10,
+    Japanese: 10,
+    French: 10,
+    Korean: 10,
+    Thai: 10,
+  };
   const [recipeResults, setRecipeResults] = useState(null);
   const [restaurantResults, setRestaurantResults] = useState(null);
 
@@ -44,8 +53,8 @@ export default () => {
       "Vietnamese",
       "Italian",
     ];
-    var n = 2;
-    randomItems = cuisineTypesAvailable
+    let n = 2;
+    let randomItems = cuisineTypesAvailable
       .sort(() => 0.5 - Math.random())
       .slice(0, n);
 
@@ -68,17 +77,35 @@ export default () => {
     return randomChoices;
   };
 
+  // To process the nutrient information in results.
+  const processResults = (dataList) => {
+    dataList.forEach((recipe) => {
+      const nutrients = recipe.nutrition.nutrients;
+      if (nutrients === null) return dataList;
+      recipe.nutrients = {};
+      for (var i = 0; i < nutrients.length; i++) {
+        recipe.nutrients[nutrients[i].title.toLowerCase()] = {
+          amount: Math.round(nutrients[i].amount),
+          unit: nutrients[i].unit,
+        };
+      }
+      delete recipe.nutrition;
+    });
+    return dataList;
+  };
+
   const searchByName = async ({
-    keyword,
+    query,
+    cuisine,
     type = "lunch",
     excludeIngredients,
-    minCarbs,
+    minCarbs = 0,
     maxCarbs,
-    minProtein,
+    minProtein = 0,
     maxProtein,
-    minCalories,
+    minCalories = 0,
     maxCalories,
-    minFat,
+    minFat = 0,
     maxFat,
   }) => {
     try {
@@ -92,24 +119,20 @@ export default () => {
         maxFat,
       });
 
-      let cuisineTypes = cuisineTypeGenerator();
-      console.log(cuisineTypes);
       const response = await spoonacular.get("/complexSearch", {
         params: {
           apiKey,
-          cuisine: cuisineTypes,
+          query,
+          minCarbs,
+          minProtein,
+          minFat,
           minCalories,
-          maxCalories,
-          // maxCarbs,
-          // maxProtein,
-          minProtein: 0,
-          minCarbs: 0,
-          minFat: 0,
           type,
-          number: 4,
+          number: 6,
         },
       });
-      setRecipeResults(response.data.results);
+      const results = processResults(response.data.results);
+      setRecipeResults(results);
     } catch (e) {
       console.log(e);
     }
@@ -136,9 +159,8 @@ export default () => {
     number,
     { type = "lunch", minCalories, maxCalories }
   ) => {
-    //const list = await fetchCuisineListAsync();
-    const searchList = weightedRandom(defaultRecipeList, number);
-    console.log("wr list", searchList);
+    const list = await fetchCuisineListAsync();
+    const searchList = weightedRandom(list, number);
     let tempResults = [];
     try {
       for (cuisine in searchList) {
@@ -165,6 +187,74 @@ export default () => {
     } catch (e) {
       console.log(e);
     }
+  };
+
+  const fakeSearch = () => {
+    console.log("in fake search");
+    let recipeResults = [
+      {
+        id: 716429,
+        calories: 584,
+        carbs: "84g",
+        fat: "20g",
+        image: "https://spoonacular.com/recipeImages/716429-312x231.jpg",
+        imageType: "jpg",
+        protein: "19g",
+        title: "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs",
+      },
+      {
+        id: 715538,
+        calories: 521,
+        carbs: "69g",
+        fat: "10g",
+        image: "https://spoonacular.com/recipeImages/715538-312x231.jpg",
+        imageType: "jpg",
+        protein: "35g",
+        title: "Bruschetta Style Pork & Pasta",
+      },
+      {
+        id: 715539,
+        calories: 521,
+        carbs: "69g",
+        fat: "10g",
+        image: "https://spoonacular.com/recipeImages/715538-312x231.jpg",
+        imageType: "jpg",
+        protein: "35g",
+        title: "Bruschetta Style Pork & Pasta",
+      },
+      {
+        id: 715578,
+        calories: 521,
+        carbs: "69g",
+        fat: "10g",
+        image: "https://spoonacular.com/recipeImages/715538-312x231.jpg",
+        imageType: "jpg",
+        protein: "35g",
+        title: "Bruschetta Style Pork & Pasta",
+      },
+      {
+        id: 715544,
+        calories: 521,
+        carbs: "69g",
+        fat: "10g",
+        image: "https://spoonacular.com/recipeImages/715538-312x231.jpg",
+        imageType: "jpg",
+        protein: "35g",
+        title: "Bruschetta Style Pork & Pasta",
+      },
+      {
+        id: 715533,
+        calories: 521,
+        carbs: "69g",
+        fat: "10g",
+        image: "https://spoonacular.com/recipeImages/715538-312x231.jpg",
+        imageType: "jpg",
+        protein: "35g",
+        title: "Bruschetta Style Pork & Pasta",
+      },
+    ];
+    setRecipeResults(recipeResults);
+    return recipeResults;
   };
 
   const getRestaurantRecommendations = async ({
@@ -194,7 +284,10 @@ export default () => {
         let properItemFound = false;
         for (var item of restaurantData.menuDataWithNutritionInfo) {
           if (item.nutritionValues == "N.A.") continue;
-          else if (item.nutritionValues.nf_calories >= minCalories && item.nutritionValues.nf_calories <= maxCalories) {
+          else if (
+            item.nutritionValues.nf_calories >= minCalories &&
+            item.nutritionValues.nf_calories <= maxCalories
+          ) {
             recommendedItem = item;
             // break;
             foodItems.push({ ...restaurantData, recommendedItem });
@@ -210,7 +303,10 @@ export default () => {
       for (let cuisineType in searchList) {
         for (let i of foodItems) {
           if ((i.cuisineType || []).includes(cuisineType)) {
-            if (foodItemsAccordingToWishList[cuisineType] < searchList[cuisineType]) {
+            if (
+              foodItemsAccordingToWishList[cuisineType] <
+              searchList[cuisineType]
+            ) {
               foodItemsAccordingToWishList[cuisineType]++;
               finalResults.push(i);
             } else break;
@@ -229,6 +325,7 @@ export default () => {
     searchByName,
     searchByNutrients,
     smartSearch,
+    fakeSearch,
     getRestaurantRecommendations,
     recipeResults,
     restaurantResults,

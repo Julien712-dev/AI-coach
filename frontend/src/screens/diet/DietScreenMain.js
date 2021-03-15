@@ -14,12 +14,9 @@ import { Button, Text, Title, Card, Paragraph } from "react-native-paper";
 import Carousel from "react-native-snap-carousel";
 import DietLoggingFAB from "./dietLoggingFAB";
 import { computeNutritionValues, getCoachAdvice } from "../../hooks/Nutrition";
-import { fetchFavListAsync } from "../../hooks/useProfileFirebase";
 import searchRecipe from "../../hooks/searchRecipe";
 // location imports
 import * as TaskManager from "expo-task-manager";
-
-// import Constants from 'expo-constants';
 
 import LoadingScreen from "../LoadingScreen";
 import ShowCard from "../../components/ShowCard";
@@ -80,22 +77,11 @@ export default function DietScreenMain({ navigation }) {
     // get location async
     (async () => {
       if (!!profileRedux) {
-		setLoading(true);
+        setLoading(true);
         let nutritionValues = computeNutritionValues(profileRedux);
 
-        /*await searchByName({
-          type: meal.meal,
-          minCalories:
-            meal.meal == "breakfast" || meal.meal == "snack"
-              ? undefined
-              : nutritionValues.dailyRecommendedCalories * 0.55 * meal.weight,
-          maxCalories: nutritionValues.dailyRecommendedCalories * meal.weight,
-          maxCarbs: nutritionValues.maximumDailyCarbsInGrams * meal.weight,
-          maxProtein: nutritionValues.maximumDailyProteinInGrams * meal.weight,
-          maxFat: nutritionValues.maximumDailyFatsInGrams * meal.weight,
-        });*/
         // can add more params afterwards
-        await smartSearch(10, {
+        await smartSearch(3, {
           type: meal.meal,
           minCalories:
             meal.meal == "breakfast" || meal.meal == "snack"
@@ -112,7 +98,7 @@ export default function DietScreenMain({ navigation }) {
           maxCalories: nutritionValues.dailyRecommendedCalories * meal.weight,
         });
 
-		setLoading(false);
+        setLoading(false);
       }
     })();
   }, [refreshTimes]);
@@ -172,7 +158,7 @@ export default function DietScreenMain({ navigation }) {
     );
   }
 
-  if (loading) return <LoadingScreen />;
+  if (!recipeResults) return <LoadingScreen />;
 
   return (
     <View style={{ flex: 1 }}>
