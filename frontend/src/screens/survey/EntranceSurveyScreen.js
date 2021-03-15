@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Firebase from 'firebase';
-import config from '../../config';
+import config from '~/src/config';
 import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
 import { Button, Text, Title, TextInput, Chip, Snackbar } from 'react-native-paper';
 import DropDown from 'react-native-paper-dropdown';
 import LoadingScreen from "../LoadingScreen";
-import { updateTempStorage, clearTempStorage } from "../../store/profileSlice.js";
+import { updateTempStorage, clearTempStorage } from "~/src/store/profileSlice.js";
 import Swiper from 'react-native-swiper';
-import BackgroundImage from '../../../assets/image/survey-background.jpg';
-import { saveProfileToReducer } from '../../store/authSlice';
-import { setPlan } from '../../store/exerciseSlice';
+import BackgroundImage from '~/assets/image/survey-background.jpg';
+import { saveProfileToReducer } from '~/src/store/authSlice';
 
 function SurveyOptions(props) {
     let {

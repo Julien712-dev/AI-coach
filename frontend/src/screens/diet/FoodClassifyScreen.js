@@ -1,13 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useRef } from 'react'
 import {Camera} from 'expo-camera'
-import * as ImageManipulator from 'expo-image-manipulator';
-//import ImageEditor from "@react-native-community/image-editor";
-import {StyleSheet, Text, View, TouchableOpacity, Platform, ImageBackground} from 'react-native'
+import {StyleSheet, Text, View, TouchableOpacity, ImageBackground} from 'react-native'
 
-import { Button } from 'react-native-paper';
-
-import useFoodModel from '../../hooks/diet/useFoodModel'
-import useCamera from '../../hooks/useCamera'
+import useFoodModel from '~/src/hooks/diet/useFoodModel'
+import useCamera from '~/src/hooks/useCamera'
 
 export default function RecognitionScreen() {
   ratio = '1:1';

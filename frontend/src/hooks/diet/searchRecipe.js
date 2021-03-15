@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
-import spoonacular from "~src/api/spoonacular";
+import { useState } from "react";
+import spoonacular from "~/src/api/spoonacular";
 import Firebase from 'firebase/app';
 import 'firebase/firestore';
 
-//import { fetchFavListAsync, fetchBlklistAsync } from '../../actions/profileActions'
 import useProfileFirebase from "../useProfileFirebase";
 
 function shuffle(array) {

@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import firebase from 'firebase'
 
 export const fetchNotes = createAsyncThunk("users/fetchNotes", async () => {
   // Returns data after resolve

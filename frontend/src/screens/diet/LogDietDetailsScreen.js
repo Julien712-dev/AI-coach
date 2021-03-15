@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { View, ScrollView } from 'react-native';
-import { Text, Searchbar, Button, Divider, TextInput, FAB, Portal, Provider, Snackbar } from 'react-native-paper';
+import { Text, Button, TextInput, FAB, Portal, Provider, Snackbar } from 'react-native-paper';
 import LoadingScreen from '../LoadingScreen';
 import Firebase from 'firebase';
 import DropDown from 'react-native-paper-dropdown';
 import moment from 'moment';
-import { setLogs } from '../../store/authSlice';
+import { setLogs } from '~/src/store/authSlice';
 
 export default function LogDietDetailsScreen({navigation}) {
 

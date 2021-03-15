@@ -1,11 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 import * as tf from '@tensorflow/tfjs'
-import * as mobilenet from '@tensorflow-models/mobilenet'
-import { fetch, bundleResourceIO } from '@tensorflow/tfjs-react-native'
-
-import Constants from 'expo-constants'
-import * as Permissions from 'expo-permissions'
+import { bundleResourceIO } from '@tensorflow/tfjs-react-native'
 
 import * as jpeg from 'jpeg-js'
 import * as FileSystem from 'expo-file-system'

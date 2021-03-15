@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import firebase from 'firebase';
-import { View, ScrollView, StyleSheet, TouchableWithoutFeedback, Keyboard, ImageBackground } from 'react-native';
+import { View, StyleSheet, TouchableWithoutFeedback, Keyboard, ImageBackground } from 'react-native';
 import { Title, Card, TextInput, Button, ActivityIndicator, Snackbar, Text } from 'react-native-paper';
-import { login } from '../../store/authSlice';
-
 
 export default function SignUpScreen({ navigation }) {
 
@@ -46,7 +44,7 @@ export default function SignUpScreen({ navigation }) {
         <View style={styles.container}>
         <View style={styles.backgroundContainer}>
             <ImageBackground 
-              source={require('../../../assets/image/female-athlete.jpg')} 
+              source={require('~/assets/image/female-athlete.jpg')} 
               style={styles.bakcgroundImage}
               blurRadius={70}
             >
