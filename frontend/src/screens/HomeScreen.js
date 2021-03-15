@@ -27,6 +27,8 @@ export default function HomeScreen({ navigation }) {
 	const [workoutOfTheDay, setWorkoutOfTheDay] = useState(null);
 	const [insightCarouselActiveIndex, setInsightCarouselActiveIndex] = useState(0);
 	const [caloriesConsumedThisWeek, setCaloriesBurntThisWeek] = useState(0);
+
+	const [todaySteps, setTodaySteps] = useState(0);
 	const today = moment();
 	const dispatch = useDispatch();
 
@@ -79,7 +81,7 @@ export default function HomeScreen({ navigation }) {
 		const data = [];
 		const nutritionValues = computeNutritionValues(profile)
 		for (let d=0; d<7; d++) {
-			let l = moment().add(-7+d, 'days').format('YYYYMMDD')
+			let l = moment().add(-6+d, 'days').format('YYYYMMDD')
 			console.log(l)
 			if (!!logs[l]) {
 				let totalCalories = 0;
@@ -101,6 +103,14 @@ export default function HomeScreen({ navigation }) {
 		</View>)
 	}
 
+	function InsightsExercise(props) {
+		return (		
+			<View style={{ flex: 1, flexDirection: "column", alignItems: 'center', justifyContent: 'center'}}>
+			<Title style={{ fontSize: 22, marginTop: 15 }}>Steps and Workouts</Title>
+				<Text style={{ fontSize: 44 }}>{todaySteps}</Text>
+		</View>)
+	}
+
 	function _renderInsights( { item, index } ){
 
 		console.log('rendering insights:', item)
@@ -113,6 +123,7 @@ export default function HomeScreen({ navigation }) {
 			}}>
 				{item == 'summary' && <InsightsSummary />}
 				{item == 'diet' && <InsightsDiet />}
+				{item == 'exercise' && <InsightsExercise />}
 			</View>
 		)
 	}
@@ -135,7 +146,6 @@ export default function HomeScreen({ navigation }) {
 			for (var prop in currentPlan) {
 				if (moment().day(prop).day() == today.day()) {
 					setWorkoutOfTheDay(currentPlan[prop]);
-					// console.log(currentPlan[prop]);
 				}
 			}
 		}
@@ -185,6 +195,32 @@ export default function HomeScreen({ navigation }) {
 				  }
 				}
 				setIsFetched(true);
+
+				// pedometer
+				let subscription = Pedometer.watchStepCount(result => {
+					console.log(result.steps)
+				})
+
+				Pedometer.isAvailableAsync().then(result => {
+					console.log('pedometer enabled: ', result)
+				},
+				error => {
+					console.log(error)
+				})
+
+				const end = new Date();
+				const start = new Date();
+
+				start.setDate(end.getDate() - 1);
+				Pedometer.getStepCountAsync(start, end).then(
+					result => {
+						console.log('past step count: ', result.steps)
+						setTodaySteps(result.steps);
+					},
+					error => {
+						console.log(error);
+					}
+				)
 			});
         })();
 	}, []);
@@ -215,7 +251,7 @@ export default function HomeScreen({ navigation }) {
 							layout={"default"}
 							layoutCardOffset={3}
 							activeSlideOffset={5}
-							data={['summary', 'diet']}
+							data={['summary', 'diet', 'exercise']}
 							containerCustomStyle={{overflow: "visible"}}
 							sliderWidth={350}
 							itemWidth={310}
@@ -266,7 +302,7 @@ export default function HomeScreen({ navigation }) {
 										<Title>Breakfast</Title>
 										{logs[today.format('YYYYMMDD')]['diet']['breakfast'].map((item, index) =>
 											<View key={index} style={{ width: '100%', flexDirection: 'row' }}>
-												<View>
+												<View style={{ width: '80%' }}>
 													<Text style={{ alignSelf: 'flex-start' }}>{item.itemName}</Text>
 												</View>
 												<View style={{ flex: 1, alignItems: 'flex-end' }}>
