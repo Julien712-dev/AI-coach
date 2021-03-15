@@ -1,11 +1,33 @@
 import { useState, useEffect } from "react";
 import spoonacular from "../api/spoonacular";
+import Firebase from 'firebase/app';
+import 'firebase/firestore';
 
 //import { fetchFavListAsync, fetchBlklistAsync } from '../../actions/profileActions'
 import useProfileFirebase from "./useProfileFirebase";
 
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
 export default () => {
   const apiKey = "24d701faa961453a88deb86494e8e39d";
+  const defaultRecipeList = { American: 10, Chinese: 10, Japanese: 10, French: 10, Korean: 10, Thai: 10 }
   const [recipeResults, setRecipeResults] = useState(null);
   const [restaurantResults, setRestaurantResults] = useState(null);
 
@@ -31,7 +53,7 @@ export default () => {
   };
 
   // dataList format === { 'a': 1, 'b': 2, 'c': 3}
-  const weightedRandom = (dataList, number) => {
+  const weightedRandom = (dataList = defaultRecipeList, number) => {
     let items = Object.keys(dataList);
     let weights = Object.values(dataList);
     let randomChoices = {};
@@ -88,7 +110,6 @@ export default () => {
         },
       });
       setRecipeResults(response.data.results);
-      //console.log(response.data.results);
     } catch (e) {
       console.log(e);
     }
@@ -115,8 +136,8 @@ export default () => {
     number,
     { type = "lunch", minCalories, maxCalories }
   ) => {
-    const list = await fetchCuisineListAsync();
-    const searchList = weightedRandom(list, number);
+    //const list = await fetchCuisineListAsync();
+    const searchList = weightedRandom(defaultRecipeList, number);
     console.log("wr list", searchList);
     let tempResults = [];
     try {
@@ -151,14 +172,18 @@ export default () => {
     maxCarbs,
     minProtein,
     maxProtein,
-    minCalories = 350,
+    minCalories = 0,
     maxCalories,
     minFat,
     maxFat,
   }) => {
     console.log("searching restaurants");
+    const list = await fetchCuisineListAsync();
+    const searchList = weightedRandom(defaultRecipeList, 5);
+    console.log("wr list", searchList);
     try {
       let foodItems = [];
+
       const snapshot = await Firebase.firestore()
         .collection("restaurants")
         .where("menuDataWithNutritionInfo", ">", [])
@@ -169,19 +194,32 @@ export default () => {
         let properItemFound = false;
         for (var item of restaurantData.menuDataWithNutritionInfo) {
           if (item.nutritionValues == "N.A.") continue;
-          else if (item.nutritionValues.nf_calories >= minCalories) {
-            properItemFound = true;
+          else if (item.nutritionValues.nf_calories >= minCalories && item.nutritionValues.nf_calories <= maxCalories) {
             recommendedItem = item;
-            break;
+            // break;
+            foodItems.push({ ...restaurantData, recommendedItem });
           }
         }
-        if (properItemFound)
-          foodItems.push({ ...restaurantData, recommendedItem });
       });
+      foodItems = shuffle(foodItems);
+      let foodItemsAccordingToWishList = {};
+      for (let cuisineType in searchList) {
+        foodItemsAccordingToWishList[cuisineType] = 0;
+      }
+      let finalResults = [];
+      for (let cuisineType in searchList) {
+        for (let i of foodItems) {
+          if ((i.cuisineType || []).includes(cuisineType)) {
+            if (foodItemsAccordingToWishList[cuisineType] < searchList[cuisineType]) {
+              foodItemsAccordingToWishList[cuisineType]++;
+              finalResults.push(i);
+            } else break;
+          } else continue;
+        }
+      }
       let results = foodItems.slice(0, 5);
-      console.log("results is ", results);
-      setRestaurantResults(results);
-      return results;
+      setRestaurantResults(finalResults);
+      return finalResults;
     } catch (e) {
       console.log(e);
     }

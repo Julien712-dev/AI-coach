@@ -158,7 +158,7 @@ module.exports = {
                 endAt: 18,
                 title: `Tea time!`,
                 message: `Grab a snack if you feel like having one.`,
-                weight: 0.15
+                weight: 0.1
             },
             {
                 time: `night`,
@@ -167,14 +167,16 @@ module.exports = {
                 endAt: 24,
                 title: `Dinner's ready!`,
                 message: `Feel like a feast? Or planning to go clean?`,
-                weight: 0.3
+                weight: 0.35
             }
         ]
     },
     palValueMap: {
-        'sedentary': 1.4,
-        'medium': 1.6,
-        'extensive': 1.8
+        'poor': 1.4,
+        'below': 1.4,
+        'average': 1.6,
+        'above': 1.6,
+        'excellent': 1.8
     },
     nutritionPerGramToKcal: {
         'protein': 4,

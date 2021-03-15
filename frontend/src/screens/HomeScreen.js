@@ -12,37 +12,9 @@ import Carousel, { Pagination } from 'react-native-snap-carousel';
 const REST_DAY_IMAGE = require('../../assets/image/rest-day.jpg');
 const ARM_WORKOUT_IMAGE = require('../../assets/image/exercise-survey-bg.jpg');
 
-// Render function for recipe item recommendations.
-function _renderInsights( { item, index } ){
-
-	return (
-		<View style={{
-			borderRadius: 8,
-			height: 220,
-			width: null,
-			backgroundColor: 'white',
-		}}>
-			<View style={{ flex: 1, flexDirection: "column", alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
-				<View style={{ width: 200, marginHorizontal: 20, justifyContent: 'center', marginBottom: 15 }}>
-					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
-						<Text style={{ fontSize: 54, fontWeight: '600' }}>3</Text>
-					</View>
-					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
-						<Text style={{ fontSize: 18 }}>workouts completed</Text>
-					</View>
-				</View>
-				<View style={{ width: 150, marginHorizontal: 20, justifyContent: 'center' }}>
-					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
-						<Text style={{ fontSize: 28 }}>123</Text>
-					</View>
-					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
-						<Text style={{ fontSize: 12 }}>average calories burnt</Text>
-					</View>
-				</View>
-			</View>
-		</View>
-	)
-}
+import { Pedometer } from 'expo-sensors';
+import { VictoryBar, VictoryChart, VictoryTheme, VictoryLine } from "victory-native";
+import { computeNutritionValues } from "../hooks/Nutrition";
 
 export default function HomeScreen({ navigation }) {
 	let user = useSelector(state => state.main.auth.user) || {};
@@ -52,9 +24,9 @@ export default function HomeScreen({ navigation }) {
 	var plan = {};
 	const [isFetched, setIsFetched] = useState(false);
 	const [profile, setProfile] = useState(null);
-	const [logsOfTheDay, setLogsOfTheDay] = useState(null);
 	const [workoutOfTheDay, setWorkoutOfTheDay] = useState(null);
 	const [insightCarouselActiveIndex, setInsightCarouselActiveIndex] = useState(0);
+	const [caloriesConsumedThisWeek, setCaloriesBurntThisWeek] = useState(0);
 	const today = moment();
 	const dispatch = useDispatch();
 
@@ -67,6 +39,82 @@ export default function HomeScreen({ navigation }) {
 		  	.catch(() => {
 				// An error happened.
 			});
+	}
+
+	// Render function for recipe item recommendations.
+	function InsightsSummary(props) {
+		return (				
+		<View style={{ flex: 1, flexDirection: "column", alignItems: 'center', justifyContent: 'center'}}>
+			<Title style={{ fontSize: 26, marginTop: 15 }}>This Week</Title>
+			<View style={{ flex: 1, flexDirection: "row" }}>
+				<View style={{ width: 80, marginLeft: 5, justifyContent: 'center' }}>
+					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
+						<Text style={{ fontSize: 32 }}>{caloriesConsumedThisWeek}</Text>
+					</View>
+					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
+						<Text style={{ fontSize: 10, textAlign: 'center' }}>average calories intake</Text>
+					</View>
+				</View>
+				<View style={{ width: 110, marginHorizontal: 5, justifyContent: 'center', marginBottom: 10 }}>
+					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
+						<Text style={{ fontSize: 72, fontWeight: '600' }}>3</Text>
+					</View>
+					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
+						<Text style={{ fontSize: 12, textAlign: 'center'}}>workouts completed</Text>
+					</View>
+				</View>
+				<View style={{ width: 80, marginRight: 5, justifyContent: 'center' }}>
+					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
+						<Text style={{ fontSize: 32 }}>{caloriesConsumedThisWeek}</Text>
+					</View>
+					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
+						<Text style={{ fontSize: 10, textAlign: 'center' }}>average calories consumption</Text>
+					</View>
+				</View>
+			</View>
+		</View>)
+	}
+
+	function InsightsDiet(props) {
+		const data = [];
+		const nutritionValues = computeNutritionValues(profile)
+		for (let d=0; d<7; d++) {
+			let l = moment().add(-7+d, 'days').format('YYYYMMDD')
+			console.log(l)
+			if (!!logs[l]) {
+				let totalCalories = 0;
+				for (let diet in logs[l]['diet']) {
+					let result = logs[l]['diet'][diet].reduce(function (acc, obj) { return acc + parseInt(obj.calorieAmount); }, 0); // 7
+					totalCalories += result
+				}
+				data.push({ day: moment(l).format('DD/MM'), calories: totalCalories })
+			} else data.push({ day: moment(l).format('DD/MM'), calories: 0 })
+		}
+		console.log(data);
+		return (		
+			<View style={{ flex: 1, flexDirection: "column", alignItems: 'center', justifyContent: 'center'}}>
+			<Title style={{ fontSize: 22, marginTop: 15 }}>Weekly Diet</Title>
+			<VictoryChart width={310} height={200} theme={VictoryTheme.material} padding={{ left: 50, right: 50, top: 10, bottom: 40}}>
+				<VictoryLine y={() => nutritionValues.dailyRecommendedCalories} />
+				<VictoryBar data={data} x="day" y="calories" />
+			</VictoryChart>
+		</View>)
+	}
+
+	function _renderInsights( { item, index } ){
+
+		console.log('rendering insights:', item)
+		return (
+			<View style={{
+				borderRadius: 8,
+				height: 230,
+				width: null,
+				backgroundColor: 'white',
+			}}>
+				{item == 'summary' && <InsightsSummary />}
+				{item == 'diet' && <InsightsDiet />}
+			</View>
+		)
 	}
 
 	// This functions fires every time when the user clicks into home screen
@@ -82,11 +130,12 @@ export default function HomeScreen({ navigation }) {
 
 	useEffect(() => {
 		// Listen to profile update and update workout of the day.
+		console.log('plan update triggered.')
 		if (!!currentPlan) {
 			for (var prop in currentPlan) {
 				if (moment().day(prop).day() == today.day()) {
 					setWorkoutOfTheDay(currentPlan[prop]);
-					console.log(currentPlan[prop]);
+					// console.log(currentPlan[prop]);
 				}
 			}
 		}
@@ -95,7 +144,18 @@ export default function HomeScreen({ navigation }) {
 	// Listen to log update and update the logs for diet and exercise
 	useEffect(() => {
 		if (!!logs) {
-			console.log('logs are updated.')
+			let totalAmountOfCalories = 0, daysLogged = 0;
+			for (var l in logs) {
+				if (l >= moment().add(-7, 'days').format('YYYYMMDD') && l <= today.format('YYYYMMDD')) {
+					daysLogged++;
+					for (var d in logs[l].diet) {
+						console.log(d, logs[l]['diet'][d]);
+						let result = logs[l]['diet'][d].reduce(function (acc, obj) { return acc + parseInt(obj.calorieAmount); }, 0); // 7
+						totalAmountOfCalories += result;
+					}
+				}
+			};
+			setCaloriesBurntThisWeek(totalAmountOfCalories/daysLogged);
 		}
 	}, [logs])
 
@@ -155,7 +215,7 @@ export default function HomeScreen({ navigation }) {
 							layout={"default"}
 							layoutCardOffset={3}
 							activeSlideOffset={5}
-							data={['a', 'b', 'c']}
+							data={['summary', 'diet']}
 							containerCustomStyle={{overflow: "visible"}}
 							sliderWidth={350}
 							itemWidth={310}
