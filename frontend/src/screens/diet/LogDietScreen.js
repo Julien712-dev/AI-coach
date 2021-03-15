@@ -3,7 +3,7 @@ import { View, ScrollView } from 'react-native';
 import { Text, Searchbar, Button, Divider } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import searchRecipe from '~/src/hooks/searchRecipe'
+import searchRecipe from '~/src/hooks/diet/searchRecipe';
 
 // Overriding the header
 DetailsScreen['navigationOptions'] = screenProps => ({

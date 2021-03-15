@@ -8,7 +8,7 @@ import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
 import ProgressCircle from 'react-native-progress-circle';
 import usePermissions from '~/src/hooks/usePermissions';
 import useCameraRatio from '~/src/hooks/useCameraRatio';
-import useExerciseClassifier from '~/src/hooks/useExerciseClassifier';
+import useExerciseClassifier from '~/src/hooks/exercise/useExerciseClassifier';
 import useTimer from '~/src/hooks/useTimer';
 import LoadingScreen from '~/src/screens/LoadingScreen';
 import MultiDivider from '~/src/components/MultiDivider';

@@ -14,7 +14,7 @@ const ARM_WORKOUT_IMAGE = require('../../assets/image/exercise-survey-bg.jpg');
 
 import { Pedometer } from 'expo-sensors';
 import { VictoryBar, VictoryChart, VictoryTheme, VictoryLine } from "victory-native";
-import { computeNutritionValues } from "../hooks/Nutrition";
+import { computeNutritionValues } from "../hooks/diet/Nutrition";
 
 export default function HomeScreen({ navigation }) {
 	let user = useSelector(state => state.main.auth.user) || {};

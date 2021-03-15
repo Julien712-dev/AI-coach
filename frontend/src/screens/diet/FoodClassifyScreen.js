@@ -6,7 +6,7 @@ import {StyleSheet, Text, View, TouchableOpacity, Platform, ImageBackground} fro
 
 import { Button } from 'react-native-paper';
 
-import useFoodModel from '../../hooks/useFoodModel'
+import useFoodModel from '../../hooks/diet/useFoodModel'
 import useCamera from '../../hooks/useCamera'
 
 export default function RecognitionScreen() {

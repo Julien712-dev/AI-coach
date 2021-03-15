@@ -13,9 +13,9 @@ import {
 import { Button, Text, Title, Card, Paragraph } from "react-native-paper";
 import Carousel from "react-native-snap-carousel";
 import DietLoggingFAB from "./dietLoggingFAB";
-import { computeNutritionValues, getCoachAdvice } from "../../hooks/Nutrition";
+import { computeNutritionValues, getCoachAdvice } from "../../hooks/diet/Nutrition";
 import { fetchFavListAsync } from "../../hooks/useProfileFirebase";
-import searchRecipe from "../../hooks/searchRecipe";
+import searchRecipe from "../../hooks/diet/searchRecipe";
 // location imports
 import * as TaskManager from "expo-task-manager";
 

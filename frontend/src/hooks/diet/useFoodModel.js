@@ -29,7 +29,7 @@ export default function TFModel() {
     await tf.ready()
     if (!model) {
       // For custom model, have some layer bug
-      const modelJson = require('../../assets/model/food/model.json');
+      const modelJson = require('~/assets/model/food/model.json');
       //const modelWeights = require('../path/to/model_weights.bin');
       const m = await tf
         .loadGraphModel(bundleResourceIO(modelJson, 3))
