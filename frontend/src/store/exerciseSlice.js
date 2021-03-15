@@ -433,10 +433,11 @@ function assignSequence(plan) {
 }
 
 function assignInfo(plan) {
-    for (const day of Object.values(plan)) {
-        day.name = `${capitalize(day.focus)} Workout`;
-        day.level = 4;
-    }
+    for (const day of Object.values(plan))
+        if (day.type == 'workout') {
+            day.name = `${capitalize(day.focus)} Workout`;
+            day.level = 4;
+        }
 }
 
 const exerciseSlice = createSlice({
