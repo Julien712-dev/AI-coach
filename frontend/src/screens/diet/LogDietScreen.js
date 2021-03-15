@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { View, ScrollView, SafeAreaView } from "react-native";
+import React from "react";
+import { View, SafeAreaView } from "react-native";
 import { Text, Searchbar, Button, Divider } from "react-native-paper";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 // edit
-import searchRecipe from "~/src/hooks/searchRecipe";
+import searchRecipe from "~/src/hooks/diet/searchRecipe";
 import VerticalList from "~/src/components/VerticalList";
 
 // Overriding the header

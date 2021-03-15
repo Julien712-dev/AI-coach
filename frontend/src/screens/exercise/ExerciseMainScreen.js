@@ -3,7 +3,11 @@ import { useSelector } from 'react-redux';
 import { View, ScrollView } from 'react-native';
 import { useTheme, Button, FAB, Text, Headline, Paragraph, Card } from 'react-native-paper';
 import ProgressCircle from 'react-native-progress-circle';
-import { getDayOfWeek } from '~/src/Util';
+import { constants } from '~/src/config';
+
+function getDayOfWeek() {
+	return constants.days[(new Date()).getDay()];
+}
 
 function AnalysisCard() {
 	return (

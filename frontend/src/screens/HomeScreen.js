@@ -9,12 +9,12 @@ import { logout as logoutAction, saveProfileToReducer, setLogs } from '../store/
 import { setPlan } from '../store/exerciseSlice';
 import LoadingScreen from './LoadingScreen';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
-const REST_DAY_IMAGE = require('../../assets/image/rest-day.jpg');
-const ARM_WORKOUT_IMAGE = require('../../assets/image/exercise-survey-bg.jpg');
+import REST_DAY_IMAGE from '~/assets/image/rest-day.jpg';
+import ARM_WORKOUT_IMAGE from '~/assets/image/exercise-survey-bg.jpg';
 
 import { Pedometer } from 'expo-sensors';
 import { VictoryBar, VictoryChart, VictoryTheme, VictoryLine } from "victory-native";
-import { computeNutritionValues } from "../hooks/Nutrition";
+import { computeNutritionValues } from "../hooks/diet/Nutrition";
 
 export default function HomeScreen({ navigation }) {
 	let user = useSelector(state => state.main.auth.user) || {};
