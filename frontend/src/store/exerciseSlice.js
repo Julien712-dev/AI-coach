@@ -461,7 +461,6 @@ const exerciseSlice = createSlice({
             assignFocus(state.plan);
             assignSequence(state.plan);
             assignInfo(state.plan);
-            console.log(JSON.stringify(state.plan));
         },
         resetDraftPlan: state => {
             state.draftPlan = state.plan;
