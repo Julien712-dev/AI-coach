@@ -11,10 +11,33 @@ import LoadingScreen from './LoadingScreen';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import REST_DAY_IMAGE from '~/assets/image/rest-day.jpg';
 import ARM_WORKOUT_IMAGE from '~/assets/image/exercise-survey-bg.jpg';
+import GLUTE_WORKOUT_IMAGE from '~/assets/image/glute-workout.jpeg';
+import CORE_WORKOUT_IMAGE from '~/assets/image/core-workout.jpeg';
+import LEG_WORKOUT_IMAGE from '~/assets/image/leg-workout.jpeg';
 
 import { Pedometer } from 'expo-sensors';
 import { VictoryBar, VictoryChart, VictoryTheme, VictoryLine } from "victory-native";
 import { computeNutritionValues } from "../hooks/diet/Nutrition";
+
+function getWorkoutImage(workout) {
+	switch(workout.focus) {
+		case 'arm': return ARM_WORKOUT_IMAGE;
+		case 'glute': return GLUTE_WORKOUT_IMAGE;
+		case 'core': return CORE_WORKOUT_IMAGE;
+		case 'leg': return LEG_WORKOUT_IMAGE;
+		default: return ARM_WORKOUT_IMAGE;
+	}
+}
+
+function getWorkoutDescription(workout) {
+	switch(workout.focus) {
+		case 'arm': return 'This workout is designed to train your arm strength.';
+		case 'glute': return 'This is a glute workout routine to strengthen your buttocks.';
+		case 'core': return 'Engage your core in this workout.';
+		case 'leg': return 'We will workout your legs with this one.';
+		default: return 'Enjoy the designed routine!';
+	}
+}
 
 export default function HomeScreen({ navigation }) {
 	let user = useSelector(state => state.main.auth.user) || {};
@@ -27,6 +50,8 @@ export default function HomeScreen({ navigation }) {
 	const [workoutOfTheDay, setWorkoutOfTheDay] = useState(null);
 	const [insightCarouselActiveIndex, setInsightCarouselActiveIndex] = useState(0);
 	const [caloriesConsumedThisWeek, setCaloriesBurntThisWeek] = useState(0);
+
+	const [todaySteps, setTodaySteps] = useState(0);
 	const today = moment();
 	const dispatch = useDispatch();
 
@@ -79,7 +104,7 @@ export default function HomeScreen({ navigation }) {
 		const data = [];
 		const nutritionValues = computeNutritionValues(profile)
 		for (let d=0; d<7; d++) {
-			let l = moment().add(-7+d, 'days').format('YYYYMMDD')
+			let l = moment().add(-6+d, 'days').format('YYYYMMDD')
 			console.log(l)
 			if (!!logs[l]) {
 				let totalCalories = 0;
@@ -101,9 +126,15 @@ export default function HomeScreen({ navigation }) {
 		</View>)
 	}
 
-	function _renderInsights( { item, index } ){
+	function InsightsExercise(props) {
+		return (		
+			<View style={{ flex: 1, flexDirection: "column", alignItems: 'center', justifyContent: 'center'}}>
+			<Title style={{ fontSize: 22, marginTop: 15 }}>Steps and Workouts</Title>
+				<Text style={{ fontSize: 44 }}>{todaySteps}</Text>
+		</View>)
+	}
 
-		console.log('rendering insights:', item)
+	function _renderInsights( { item, index } ){
 		return (
 			<View style={{
 				borderRadius: 8,
@@ -113,6 +144,7 @@ export default function HomeScreen({ navigation }) {
 			}}>
 				{item == 'summary' && <InsightsSummary />}
 				{item == 'diet' && <InsightsDiet />}
+				{item == 'exercise' && <InsightsExercise />}
 			</View>
 		)
 	}
@@ -135,7 +167,6 @@ export default function HomeScreen({ navigation }) {
 			for (var prop in currentPlan) {
 				if (moment().day(prop).day() == today.day()) {
 					setWorkoutOfTheDay(currentPlan[prop]);
-					// console.log(currentPlan[prop]);
 				}
 			}
 		}
@@ -146,7 +177,7 @@ export default function HomeScreen({ navigation }) {
 		if (!!logs) {
 			let totalAmountOfCalories = 0, daysLogged = 0;
 			for (var l in logs) {
-				if (l >= moment().add(-7, 'days').format('YYYYMMDD') && l <= today.format('YYYYMMDD')) {
+				if (l >= moment().add(-6, 'days').format('YYYYMMDD') && l <= today.format('YYYYMMDD')) {
 					daysLogged++;
 					for (var d in logs[l].diet) {
 						console.log(d, logs[l]['diet'][d]);
@@ -185,6 +216,32 @@ export default function HomeScreen({ navigation }) {
 				  }
 				}
 				setIsFetched(true);
+
+				// pedometer
+				let subscription = Pedometer.watchStepCount(result => {
+					console.log(result.steps)
+				})
+
+				Pedometer.isAvailableAsync().then(result => {
+					console.log('pedometer enabled: ', result)
+				},
+				error => {
+					console.log(error)
+				})
+
+				const end = new Date();
+				const start = new Date();
+
+				start.setDate(end.getDate() - 1);
+				Pedometer.getStepCountAsync(start, end).then(
+					result => {
+						console.log('past step count: ', result.steps)
+						setTodaySteps(result.steps);
+					},
+					error => {
+						console.log(error);
+					}
+				)
 			});
         })();
 	}, []);
@@ -215,7 +272,7 @@ export default function HomeScreen({ navigation }) {
 							layout={"default"}
 							layoutCardOffset={3}
 							activeSlideOffset={5}
-							data={['summary', 'diet']}
+							data={['summary', 'diet', 'exercise']}
 							containerCustomStyle={{overflow: "visible"}}
 							sliderWidth={350}
 							itemWidth={310}
@@ -266,7 +323,7 @@ export default function HomeScreen({ navigation }) {
 										<Title>Breakfast</Title>
 										{logs[today.format('YYYYMMDD')]['diet']['breakfast'].map((item, index) =>
 											<View key={index} style={{ width: '100%', flexDirection: 'row' }}>
-												<View>
+												<View style={{ width: '80%' }}>
 													<Text style={{ alignSelf: 'flex-start' }}>{item.itemName}</Text>
 												</View>
 												<View style={{ flex: 1, alignItems: 'flex-end' }}>
@@ -316,7 +373,6 @@ export default function HomeScreen({ navigation }) {
 												</View>
 											</View>)}
 									</View>}
-									{/* <Text>{JSON.stringify(logs[today.format('YYYYMMDD')]['diet'])}</Text> */}
 								</View>
  								:
 								<Text>You have not logged your diet yet. Logged food will be shown here.</Text>}
@@ -351,10 +407,10 @@ export default function HomeScreen({ navigation }) {
 									</ImageBackground>
 								</View>
 							: <View style={{ height: 170, width: '100%', borderRadius: 20, }}>
-								<ImageBackground source={ARM_WORKOUT_IMAGE} style={styles.bakcgroundImage}>
+								<ImageBackground source={getWorkoutImage(workoutOfTheDay)} style={styles.bakcgroundImage}>
 									<View style={styles.textOverImageWrapper}>
 										<Title style={styles.titleOverImage}>{workoutOfTheDay.name}</Title>
-										<Text style={{ fontWeight: "600", color: "white" }}>{workoutOfTheDay.description || `This workout is intended for building your arm strength.`}</Text>
+										<Text style={{ fontWeight: "600", color: "white" }}>{getWorkoutDescription(workoutOfTheDay)}</Text>
 									</View>
 								</ImageBackground>
 							</View>}
