@@ -11,10 +11,33 @@ import LoadingScreen from './LoadingScreen';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import REST_DAY_IMAGE from '~/assets/image/rest-day.jpg';
 import ARM_WORKOUT_IMAGE from '~/assets/image/exercise-survey-bg.jpg';
+import GLUTE_WORKOUT_IMAGE from '~/assets/image/glute-workout.jpeg';
+import CORE_WORKOUT_IMAGE from '~/assets/image/core-workout.jpeg';
+import LEG_WORKOUT_IMAGE from '~/assets/image/leg-workout.jpeg';
 
 import { Pedometer } from 'expo-sensors';
 import { VictoryBar, VictoryChart, VictoryTheme, VictoryLine } from "victory-native";
 import { computeNutritionValues } from "../hooks/diet/Nutrition";
+
+function getWorkoutImage(workout) {
+	switch(workout.focus) {
+		case 'arm': return ARM_WORKOUT_IMAGE;
+		case 'glute': return GLUTE_WORKOUT_IMAGE;
+		case 'core': return CORE_WORKOUT_IMAGE;
+		case 'leg': return LEG_WORKOUT_IMAGE;
+		default: return ARM_WORKOUT_IMAGE;
+	}
+}
+
+function getWorkoutDescription(workout) {
+	switch(workout.focus) {
+		case 'arm': return 'This workout is designed to train your arm strength.';
+		case 'glute': return 'This is a glute workout routine to strengthen your buttocks.';
+		case 'core': return 'Engage your core in this workout.';
+		case 'leg': return 'We will workout your legs with this one.';
+		default: return 'Enjoy the designed routine!';
+	}
+}
 
 export default function HomeScreen({ navigation }) {
 	let user = useSelector(state => state.main.auth.user) || {};
@@ -112,8 +135,6 @@ export default function HomeScreen({ navigation }) {
 	}
 
 	function _renderInsights( { item, index } ){
-
-		console.log('rendering insights:', item)
 		return (
 			<View style={{
 				borderRadius: 8,
@@ -156,7 +177,7 @@ export default function HomeScreen({ navigation }) {
 		if (!!logs) {
 			let totalAmountOfCalories = 0, daysLogged = 0;
 			for (var l in logs) {
-				if (l >= moment().add(-7, 'days').format('YYYYMMDD') && l <= today.format('YYYYMMDD')) {
+				if (l >= moment().add(-6, 'days').format('YYYYMMDD') && l <= today.format('YYYYMMDD')) {
 					daysLogged++;
 					for (var d in logs[l].diet) {
 						console.log(d, logs[l]['diet'][d]);
@@ -352,7 +373,6 @@ export default function HomeScreen({ navigation }) {
 												</View>
 											</View>)}
 									</View>}
-									{/* <Text>{JSON.stringify(logs[today.format('YYYYMMDD')]['diet'])}</Text> */}
 								</View>
  								:
 								<Text>You have not logged your diet yet. Logged food will be shown here.</Text>}
@@ -387,10 +407,10 @@ export default function HomeScreen({ navigation }) {
 									</ImageBackground>
 								</View>
 							: <View style={{ height: 170, width: '100%', borderRadius: 20, }}>
-								<ImageBackground source={ARM_WORKOUT_IMAGE} style={styles.bakcgroundImage}>
+								<ImageBackground source={getWorkoutImage(workoutOfTheDay)} style={styles.bakcgroundImage}>
 									<View style={styles.textOverImageWrapper}>
 										<Title style={styles.titleOverImage}>{workoutOfTheDay.name}</Title>
-										<Text style={{ fontWeight: "600", color: "white" }}>{workoutOfTheDay.description || `This workout is intended for building your arm strength.`}</Text>
+										<Text style={{ fontWeight: "600", color: "white" }}>{getWorkoutDescription(workoutOfTheDay)}</Text>
 									</View>
 								</ImageBackground>
 							</View>}
