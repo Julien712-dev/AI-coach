@@ -14,14 +14,15 @@ export default VerticalList = ({ data, screenName }) => {
       data={data}
       renderItem={({ item }) => (
         <Card>
-        <View style={{ flexDirection: "row" }}>
+        <View style={{ flexDirection: "row", marginVertical: 10, paddingHorizontal: 5 }}>
           <Card.Cover
             style={{ height: 100, width: 140 }}
             source={{ uri: item.image }}
           />
           <View style={{ flex: 1 }}>
             <Card.Content>
-              <Paragraph>{item.title}</Paragraph>
+              <Title>{item.title}</Title>
+              <Paragraph>{item.nutrients.calories.amount} {item.nutrients.calories.unit} ({item.nutrients.protein.amount}P {item.nutrients.carbohydrates.amount}C {item.nutrients.fat.amount}F)</Paragraph>
             </Card.Content>
             <Card.Actions style={{ alignSelf: "flex-end" }}>
               <Button onPress={() => navigation.navigate(screenName, { recipe: item })}>ADD</Button>
