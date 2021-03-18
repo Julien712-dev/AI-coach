@@ -55,31 +55,42 @@ function Table({ children }) {
 
 function ActivityCard({ activity, onPress, onMoveUp, onMoveDown, onDelete }) {
     const { colors } = useTheme();
-    const title = <Title>{activity.type == 'rest' ? 'Rest' : activity.name}</Title>;
-    const content = activity.type == 'rest' ? null : (
-        <View>
-            <StarRating
-                disabled={true}
-                maxStars={5}
-                rating={activity.level}
-                iconSet='Entypo'
-                fullStar='star'
-                emptyStar='star-outlined'
-                fullStarColor={colors.accent}
-                starSize={20}
-                containerStyle={{ justifyContent: 'flex-start', marginLeft: 7 }}
-            />
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <IconButton icon='clock-outline' style={styles.iconButton} />
-                <Text>{activity.time} mins</Text>
-            </View>
-        </View>
-    );
+    let title, content;
+    switch (activity.type) {
+        case 'workout':
+            title = activity.name;
+            content = (
+                <View>
+                    <StarRating
+                        disabled={true}
+                        maxStars={5}
+                        rating={activity.level}
+                        iconSet='Entypo'
+                        fullStar='star'
+                        emptyStar='star-outlined'
+                        fullStarColor={colors.accent}
+                        starSize={20}
+                        containerStyle={{ justifyContent: 'flex-start', marginLeft: 7 }}
+                    />
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <IconButton icon='clock-outline' style={styles.iconButton} />
+                        <Text>{activity.time} mins</Text>
+                    </View>
+                </View>
+            );
+            break;
+        case 'rest':
+            title = 'Rest';
+            break;
+        case 'recovery':
+            title = 'Recovery';
+            break;
+    }
     return (
         <TouchableOpacity onPress={onPress}>
             <Surface style={{ minHeight: 100, paddingHorizontal: 10, paddingVertical: 2, flexDirection: 'row', justifyContent: 'space-between', elevation: 5, borderRadius: 7 }}>
                 <View>
-                    {title}
+                    <Title>{title}</Title>
                     {content}
                 </View>
                 <View>
@@ -114,7 +125,7 @@ export default function PlanWorkoutScreen({ navigation }) {
 
     const onActivityPress = day => {
         const activity = draftPlan[day];
-        if (activity.type != 'rest')
+        if (activity.type == 'workout')
             navigation.navigate('View Workout', { day });
     };
     const onActivityMoveUp = day => {
