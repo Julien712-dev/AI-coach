@@ -45,6 +45,7 @@ export default function HomeScreen({ navigation }) {
 	let currentPlan = useSelector(state => state.main.exercise.plan);
 	let logs = useSelector(state => state.main.auth.logs) || {};
 	var plan = {};
+	const [loading, setLoading] = useState(false);
 	const [isFetched, setIsFetched] = useState(false);
 	const [profile, setProfile] = useState(null);
 	const [workoutOfTheDay, setWorkoutOfTheDay] = useState(null);
@@ -62,7 +63,7 @@ export default function HomeScreen({ navigation }) {
 
 	function onLogWorkout(workout) {
 		let workoutDbRef = Firebase.database().ref(`/users/${user.uid}/logs/${today.format('YYYYMMDD')}/workout`);
-		workoutDbRef.update(workout)
+		workoutDbRef.set([workout])
 
 		// fetch from realtime db again
 		setTimeout(() => {
@@ -72,7 +73,7 @@ export default function HomeScreen({ navigation }) {
 			userDatabaseDietRef.once("value", (snapshot) => {
 				let value = snapshot.val();
 				if (!!value) {
-				console.log(value);
+				// console.log(value);
 				dispatch(setLogs({ logs: value }));
 				}
 				setLoading(false);
@@ -130,7 +131,7 @@ export default function HomeScreen({ navigation }) {
 		const nutritionValues = computeNutritionValues(profile)
 		for (let d=0; d<7; d++) {
 			let l = moment().add(-6+d, 'days').format('YYYYMMDD')
-			console.log(l)
+			// console.log(l)
 			if (!!logs[l]) {
 				let totalCalories = 0;
 				for (let diet in logs[l]['diet']) {
@@ -140,18 +141,32 @@ export default function HomeScreen({ navigation }) {
 				data.push({ day: moment(l).format('DD/MM'), calories: totalCalories })
 			} else data.push({ day: moment(l).format('DD/MM'), calories: 0 })
 		}
-		console.log(data);
+		console.log(nutritionValues);
 		return (		
 			<View style={{ flex: 1, flexDirection: "column", alignItems: 'center', justifyContent: 'center'}}>
 			<Title style={{ fontSize: 22, marginTop: 15 }}>Weekly Diet</Title>
 			<VictoryChart width={310} height={200} theme={VictoryTheme.material} padding={{ left: 50, right: 50, top: 10, bottom: 40}}>
-				<VictoryLine y={() => nutritionValues.dailyRecommendedCalories} />
+				<VictoryLine
+					y={() => nutritionValues.dailyRecommendedCalories} 
+					style={{ data: { stroke: "#c43a31", strokeWidth: 3 } }}/>
 				<VictoryBar data={data} x="day" y="calories" />
 			</VictoryChart>
 		</View>)
 	}
 
 	function InsightsExercise(props) {
+		const data = [];
+		for (let d=0; d<7; d++) {
+			let l = moment().add(-6+d, 'days').format('YYYYMMDD')
+			if (!!logs[l]) {
+				let totalCalories = 0;
+				for (let diet in logs[l]['exercise']) {
+					let result = logs[l]['exercise'][diet].reduce(function (acc, obj) { return acc + parseInt(obj.calorieAmount); }, 0); // 7
+					totalCalories += result
+				}
+				data.push({ day: moment(l).format('DD/MM'), calories: totalCalories })
+			} else data.push({ day: moment(l).format('DD/MM'), calories: 0 })
+		}
 		return (		
 			<View style={{ flex: 1, flexDirection: "column", alignItems: 'center', justifyContent: 'center'}}>
 			<Title style={{ fontSize: 22, marginTop: 15 }}>Steps and Workouts</Title>
@@ -251,24 +266,24 @@ export default function HomeScreen({ navigation }) {
 
 				Pedometer.isAvailableAsync().then(result => {
 					console.log('pedometer enabled: ', result)
+					const end = new Date();
+					const start = new Date();
+					if (result) {
+						start.setDate(end.getDate() - 1);
+						Pedometer.getStepCountAsync(start, end).then(
+							result => {
+								console.log('past step count: ', result.steps)
+								setTodaySteps(result.steps);
+							},
+							error => {
+								console.log(error);
+							}
+						)
+					}
 				},
 				error => {
 					console.log(error)
 				})
-
-				const end = new Date();
-				const start = new Date();
-
-				start.setDate(end.getDate() - 1);
-				Pedometer.getStepCountAsync(start, end).then(
-					result => {
-						console.log('past step count: ', result.steps)
-						setTodaySteps(result.steps);
-					},
-					error => {
-						console.log(error);
-					}
-				)
 			});
         })();
 	}, []);
@@ -278,6 +293,7 @@ export default function HomeScreen({ navigation }) {
 	} else {
 		return (
 			<SafeAreaView>
+			{loading && <LoadingScreen />}
 			<ScrollView contentContainerStyle={{ padding: 10 }}>
 				<StatusBar barStyle="dark-content" style="auto" />
 				<View style={{ flex: 1 }}>
@@ -432,7 +448,7 @@ export default function HomeScreen({ navigation }) {
 						<Divider />
 						{!!workoutOfTheDay && 
 							<Card.Content style={{ marginTop: 5 }}>
-							{workoutOfTheDay.type == 'rest' ? 
+							{workoutOfTheDay.type == 'rest' || workoutOfTheDay.type == 'recovery' ? 
 								<View style={{ height: 170, width: '100%', borderRadius: 20 }}>
 									<ImageBackground source={REST_DAY_IMAGE} style={styles.bakcgroundImage}>
 										<View style={styles.textOverImageWrapper}>
