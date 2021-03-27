@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "coach-ai-test",
-    "slug": "coach-ai-test",
+    "name": "Coach.ai",
+    "slug": "coach-ai",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/image/icon.png",
