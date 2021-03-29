@@ -5,7 +5,7 @@ import { StyleSheet, View, ScrollView, TouchableOpacity, TouchableWithoutFeedbac
 import { useTheme, FAB, Headline, Text, IconButton, Surface, Title, Portal, Dialog, Paragraph, Button } from 'react-native-paper';
 import StarRating from 'react-native-star-rating';
 
-import { resetDraftPlan, saveDraftPlan, swapWorkout, removeWorkout } from '~/src/store/exerciseSlice';
+import { generatePlan, resetDraftPlan, saveDraftPlan, swapWorkout, removeWorkout } from '~/src/store/exerciseSlice';
 import { constants } from '~/src/config';
 
 const styles = StyleSheet.create({
@@ -107,6 +107,7 @@ export default function PlanWorkoutScreen({ navigation }) {
     const uid = useSelector(state => state.main.auth.user.uid);
     const draftPlan = useSelector(state => state.main.exercise.draftPlan);
     const planModified = useSelector(state => state.main.exercise.planModified);
+    const {dayPerWeek, minutePerSession, physicalFitness} = useSelector(state => state.main.auth.profile);
     const dispatch = useDispatch();
     const [dialogVisible, setDialogVisible] = useState(false);
     const [navigationAction, setNavigationAction] = useState(false);    // The navigation action interrupted by the 'Save?' dialog

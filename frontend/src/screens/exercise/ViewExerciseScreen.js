@@ -7,6 +7,16 @@ import NumericInput from 'react-native-numeric-input';
 
 import { changeExerciseLength } from '~/src/store/exerciseSlice';
 import MultiDivider from '~/src/components/MultiDivider';
+import PushUpVideo from '~/assets/video/push-up.mp4';
+
+function MuscleChipList(props) {
+    const { muscles } = props;
+    return muscles.map((muscle, index) => (
+        <Chip key={index.toString()} style={{ marginRight: 3 }} mode='contained'>
+            {muscle}
+        </Chip>
+    ));
+}
 
 export default function ViewExerciseScreen({ route }) {
     const { day, index } = route.params;
@@ -18,7 +28,7 @@ export default function ViewExerciseScreen({ route }) {
     const dispatch = useDispatch();
     const { colors } = useTheme();
 
-    const focuses = exerciseDescription.focuses.map((label, index) => <Chip key={index.toString()} style={{ marginRight: 3 }} mode="contained">{label}</Chip>);
+    const muscles = [exerciseDescription.mainMuscle].concat(exerciseDescription.otherMuscles);
     const instructions = exerciseDescription.instructions.map((instruction, index) => `${index + 1}. ${instruction}`).join('\n');
 
     const onPressLength = () => { setDialogVisible(true); }
@@ -29,14 +39,14 @@ export default function ViewExerciseScreen({ route }) {
         <ScrollView contentContainerStyle={{ padding: 20, alignItems: 'center' }}>
             <Headline style={{ textAlign: 'center', color: colors.primary }}>{exerciseType}</Headline>
             <Video
-                source={exerciseDescription.video}
+                source={PushUpVideo}
                 resizeMode='cover'
                 style={{ width: 300, height: 300, marginVertical: 10 }}
                 shouldPlay
             />
             <MultiDivider thickness={5} />
             <View style={{ width: '100%', marginTop: 5, flexDirection: 'row' }}>
-                {focuses}
+                <MuscleChipList muscles={muscles} />
             </View>
             <View style={{ width: '100%', marginTop: 20 }}>
                 <Subheading>Instructions</Subheading>
