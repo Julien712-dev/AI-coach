@@ -13,12 +13,13 @@ export default function TFModel() {
   const [model, setModel] = useState(null);
 
   useEffect(() => {
-    loadTestModel();
+    loadModel();
     return () => {
       model?.dispose();
     };
   }, []);
 
+  /* 
   const loadModel = async () => {
     console.log("inside model loading");
     const tfReady = await tf.ready();
@@ -28,8 +29,9 @@ export default function TFModel() {
     console.log("m is ", m);
     setModel(m);
   };
+  */
 
-  const loadTestModel = async () => {
+  const loadModel = async () => {
     console.log("inside test model loading");
     await tf.ready();
     const modelJson = await require("~/assets/model/test/model.json");

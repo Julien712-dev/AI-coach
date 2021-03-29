@@ -2,15 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import config from "~/src/config";
 import moment from "moment";
-import {
-  View,
-  ScrollView,
-  RefreshControl,
-} from "react-native";
+import { View, ScrollView, RefreshControl } from "react-native";
 import { Text, Title, Card, Paragraph } from "react-native-paper";
 import Carousel from "react-native-snap-carousel";
 import DietLoggingFAB from "./dietLoggingFAB";
-import { computeNutritionValues, getCoachAdvice } from "~/src/hooks/diet/Nutrition";
+import {
+  computeNutritionValues,
+  getCoachAdvice,
+} from "~/src/hooks/diet/Nutrition";
 import searchRecipe from "~/src/hooks/diet/searchRecipe";
 
 import LoadingScreen from "../LoadingScreen";
@@ -210,20 +209,7 @@ export default function DietScreenMain({ navigation }) {
             alignItems: "center",
             justifyContent: "center",
           }}
-        >
-          <Carousel
-            layout={"default"}
-            layoutCardOffset={9}
-            data={restaurantResults}
-            containerCustomStyle={{ overflow: "visible" }}
-            sliderWidth={300}
-            itemWidth={300}
-            renderItem={_renderRestaurantMenuItems}
-            onSnapToItem={(index) =>
-              setRestaurantMenuCarouselActiveIndex(index)
-            }
-          />
-        </View>
+        ></View>
         <View style={{ marginBottom: 80 }}></View>
       </ScrollView>
       <DietLoggingFAB navigation={navigation} />
