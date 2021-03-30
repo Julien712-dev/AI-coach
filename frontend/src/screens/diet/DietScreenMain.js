@@ -184,7 +184,7 @@ export default function DietScreenMain({ navigation }) {
             layoutCardOffset={5}
             activeSlideOffset={5}
             // ref={ref => this.carousel = ref}
-            data={recipeResults}
+            data={recipeResults || []}
             containerCustomStyle={{ overflow: "visible" }}
             sliderWidth={300}
             itemWidth={300}
