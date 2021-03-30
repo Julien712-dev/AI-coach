@@ -42,7 +42,7 @@ export default function LogDietDetailsScreen({ route, navigation }) {
   const [visible, setVisible] = useState(false);
   const [message, setMessage] = useState("");
 
-  const { recipe } = route.params;
+  const { recipe } = route.params || {};
 
   useEffect(() => {
     if (recipe != null) {
