@@ -7,11 +7,12 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from "react-native";
+import { Button } from "react-native-paper";
 
 import useFoodModel from "~/src/hooks/diet/useFoodModel";
 import useCamera from "~/src/hooks/useCamera";
 
-export default function RecognitionScreen() {
+export default function RecognitionScreen({ navigation }) {
   ratio = "1:1";
 
   const {
@@ -107,7 +108,16 @@ export default function RecognitionScreen() {
         <Text style={styles.text}>
           Predictions: {predictions ? predictions : "Predicting..."}
         </Text>
-        <Text></Text>
+      </View>
+      <View style={styles.buttonContainer}>
+        {predictions ? (
+          <Button
+            title="Proceed"
+            onPress={navigation.navigate("Log Diet", {
+              recipeName: predictions,
+            })}
+          />
+        ) : null}
       </View>
     </View>
   );

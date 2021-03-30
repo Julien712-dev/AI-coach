@@ -54,6 +54,7 @@ export default function DietScreenMain({ navigation }) {
 
   // For location use, to get location permission from user
   useEffect(() => {
+    console.log("inside useeffect", grant);
     setShowPopup(!grant);
   }, [grant]);
 
