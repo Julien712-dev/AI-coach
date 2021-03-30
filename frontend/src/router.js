@@ -24,6 +24,7 @@ import PlanWorkoutScreen from './screens/exercise/PlanWorkoutScreen';
 import ViewWorkoutScreen from './screens/exercise/ViewWorkoutScreen';
 import ViewExerciseScreen from './screens/exercise/ViewExerciseScreen';
 import DoWorkoutScreen from './screens/exercise/DoWorkoutScreen';
+import LogWorkoutScreen from './screens/exercise/LogWorkoutScreen';
 
 // Login Screen
 import LoginScreen from './screens/login/LoginScreen';
@@ -34,30 +35,30 @@ import { TouchableOpacity } from 'react-native';
 const Header = ({ scene, previous, navigation }) => {
 	const { options } = scene.descriptor;
 	const title =
-	  options.headerTitle !== undefined
-		? options.headerTitle
-		: options.title !== undefined
-		? options.title
-		: scene.route.name;
-  
+		options.headerTitle !== undefined
+			? options.headerTitle
+			: options.title !== undefined
+				? options.title
+				: scene.route.name;
+
 	return (
-	  <Appbar.Header theme={{ colors: { primary: '#1E90FF' } }}>
-		{previous ? (
-		  <Appbar.BackAction
-			onPress={navigation.goBack}
-			color={'white'}
-		  />
-		) : (
-		  <TouchableOpacity>
-			<Avatar.Icon size={40} icon="account-circle-outline" />
-		  </TouchableOpacity>
-		)}
-		<Appbar.Content
-		  title={previous ? title : <Ionicons name='ios-walk' size={40} color={'white'} />}
-		/>
-	  </Appbar.Header>
+		<Appbar.Header theme={{ colors: { primary: '#1E90FF' } }}>
+			{previous ? (
+				<Appbar.BackAction
+					onPress={navigation.goBack}
+					color={'white'}
+				/>
+			) : (
+				<TouchableOpacity>
+					<Avatar.Icon size={40} icon="account-circle-outline" />
+				</TouchableOpacity>
+			)}
+			<Appbar.Content
+				title={previous ? title : <Ionicons name='ios-walk' size={40} color={'white'} />}
+			/>
+		</Appbar.Header>
 	);
-  };
+};
 
 // Stacks
 const HomeStack = createStackNavigator();
@@ -65,28 +66,29 @@ const HomeStack = createStackNavigator();
 function HomeStackScreen() {
 	return (
 		<HomeStack.Navigator
-		initialRouteName="Home Main"
-		headerMode="screen"
-		screenOptions={{
-		header: ({ scene, previous, navigation }) => (
-			<Header scene={scene} previous={previous} navigation={navigation} />
-		),}}>
-			<HomeStack.Screen 
-				name='Home' 
+			initialRouteName="Home Main"
+			headerMode="screen"
+			screenOptions={{
+				header: ({ scene, previous, navigation }) => (
+					<Header scene={scene} previous={previous} navigation={navigation} />
+				),
+			}}>
+			<HomeStack.Screen
+				name='Home'
 				component={HomeScreen}
 				options={{ headerTitle: 'Home' }}
 			/>
-			<HomeStack.Screen 
-				name='Details' 
+			<HomeStack.Screen
+				name='Details'
 				component={DetailsScreen}
 				options={{ headerTitle: 'My Diet' }}
 			/>
-			<HomeStack.Screen 
-				name='Log Diet' 
-				component={LogDietScreen} 
+			<HomeStack.Screen
+				name='Log Diet'
+				component={LogDietScreen}
 				options={{ headerTitle: 'Log Diet' }}
 			/>
-			<HomeStack.Screen 
+			<HomeStack.Screen
 				name='Log Diet Details'
 				component={LogDietDetailsScreen}
 				options={{ headerTitle: 'Log Diet Details' }}
@@ -104,36 +106,37 @@ function DietStackScreen() {
 			initialRouteName="Diet Main"
 			headerMode="screen"
 			screenOptions={{
-			header: ({ scene, previous, navigation }) => (
-				<Header scene={scene} previous={previous} navigation={navigation} />
-			),}}>
-			<DietStack.Screen 
-				name='Diet' 
+				header: ({ scene, previous, navigation }) => (
+					<Header scene={scene} previous={previous} navigation={navigation} />
+				),
+			}}>
+			<DietStack.Screen
+				name='Diet'
 				component={DietScreenMain}
 				options={{ headerTitle: 'My Diet' }}
-			 />
-			<DietStack.Screen 
-				name='Edit Diet' 
-				component={EditDietScreen} 
+			/>
+			<DietStack.Screen
+				name='Edit Diet'
+				component={EditDietScreen}
 				options={{ headerTitle: 'Edit Diet' }}
 			/>
-			<DietStack.Screen 
-				name='Log Diet' 
-				component={LogDietScreen} 
+			<DietStack.Screen
+				name='Log Diet'
+				component={LogDietScreen}
 				options={{ headerTitle: 'Log Diet' }}
 			/>
-			<DietStack.Screen 
+			<DietStack.Screen
 				name='Log Diet Details'
 				component={LogDietDetailsScreen}
 				options={{ headerTitle: 'Log Diet Details' }}
 			/>
-      <DietStack.Screen 
-        name='Classify Food' 
-        component={FoodClassifyScreen}
-        options={{ headerTitle: 'Food Classify'}}
-      />
+			<DietStack.Screen
+				name='Classify Food'
+				component={FoodClassifyScreen}
+				options={{ headerTitle: 'Food Classify' }}
+			/>
 
-      
+
 		</DietStack.Navigator>
 	)
 }
@@ -146,21 +149,22 @@ function ExerciseStackScreen() {
 			initialRouteName="Exercise Main"
 			headerMode="screen"
 			screenOptions={{
-			header: ({ scene, previous, navigation }) => (
-				<Header scene={scene} previous={previous} navigation={navigation} />
-			),}}
+				header: ({ scene, previous, navigation }) => (
+					<Header scene={scene} previous={previous} navigation={navigation} />
+				),
+			}}
 		>
-			<ExerciseStack.Screen 
-				name='Exercise' 
+			<ExerciseStack.Screen
+				name='Exercise'
 				component={ExerciseMainScreen}
 				options={{ headerTitle: 'Workouts' }}
 			/>
-			<ExerciseStack.Screen 
-				name='Plan Workout' 
+			<ExerciseStack.Screen
+				name='Plan Workout'
 				component={PlanWorkoutScreen}
 				options={{ headerTitle: 'Plan Workout' }}
 			/>
-			<ExerciseStack.Screen 
+			<ExerciseStack.Screen
 				name='View Workout'
 				component={ViewWorkoutScreen}
 				options={{ headerTitle: 'View Workout' }}
@@ -174,6 +178,11 @@ function ExerciseStackScreen() {
 				name='Do Workout'
 				component={DoWorkoutScreen}
 				options={{ headerTitle: 'Do Workout' }}
+			/>
+			<ExerciseStack.Screen
+				name='Log Workout'
+				component={LogWorkoutScreen}
+				options={{ headerTitle: 'Log Workout' }}
 			/>
 		</ExerciseStack.Navigator>
 	);
@@ -212,20 +221,20 @@ const Stack = createStackNavigator();
 export default function Routers({ theme }) {
 
 	const loggedIn = useSelector(state => !!state.main.auth.user);
-	
+
 	return (
 		<NavigationContainer theme={theme}>
 			<Stack.Navigator mode='modal' screenOptions={{ headerShown: false }} initialRouteName={loggedIn ? 'Home' : 'Login'}>
-				{!!loggedIn ? 
-				<>
-					<Stack.Screen name='Home' component={BottomTabs} />
-					<Stack.Screen name='Entrance Survey' component={EntranceSurveyScreen} />
-				</> 
-					: 
-				<>
-					<Stack.Screen name='Login' component={LoginScreen} />
-					<Stack.Screen name='Sign Up' component={SignUpScreen} />
-				</>}
+				{!!loggedIn ?
+					<>
+						<Stack.Screen name='Home' component={BottomTabs} />
+						<Stack.Screen name='Entrance Survey' component={EntranceSurveyScreen} />
+					</>
+					:
+					<>
+						<Stack.Screen name='Login' component={LoginScreen} />
+						<Stack.Screen name='Sign Up' component={SignUpScreen} />
+					</>}
 				{/* Bottom Tab Bar is hidden for the following screens */}
 				<Stack.Screen
 					name='Edit Diet'

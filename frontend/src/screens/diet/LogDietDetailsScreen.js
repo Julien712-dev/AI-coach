@@ -12,7 +12,7 @@ import {
 } from "react-native-paper";
 import LoadingScreen from "../LoadingScreen";
 import Firebase from "firebase";
-import DropDown from "react-native-paper-dropdown";
+import DropDown from "~/src/components/DropDown";
 import moment from "moment";
 import { setLogs } from "~/src/store/authSlice";
 
