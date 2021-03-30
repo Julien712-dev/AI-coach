@@ -4,7 +4,7 @@ import Firebase from 'firebase';
 import config from '~/src/config';
 import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
 import { Button, Text, Title, TextInput, Chip, Snackbar } from 'react-native-paper';
-import DropDown from 'react-native-paper-dropdown';
+import DropDown from '~/src/components/DropDown';
 import LoadingScreen from "../LoadingScreen";
 import { updateTempStorage, clearTempStorage } from "~/src/store/profileSlice.js";
 import Swiper from 'react-native-swiper';
@@ -292,9 +292,6 @@ function StepThreeScreen({ swiperRef }) {
                     <DropDown
                         label={'Days per week'}
                         mode={'flat'}
-                        theme={{ colors: { 
-                            background: 'transparent'
-                        } }}
                         value={dayPerWeek}
                         setValue={setDayPerWeek}
                         list={config.constants.exerciseDayPerWeek}
