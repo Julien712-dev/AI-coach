@@ -158,19 +158,16 @@ export default function HomeScreen({ navigation }) {
 		const data = [];
 		for (let d=0; d<7; d++) {
 			let l = moment().add(-6+d, 'days').format('YYYYMMDD')
-			if (!!logs[l]) {
-				let totalCalories = 0;
-				for (let diet in logs[l]['exercise']) {
-					let result = logs[l]['exercise'][diet].reduce(function (acc, obj) { return acc + parseInt(obj.calorieAmount); }, 0); // 7
-					totalCalories += result
-				}
-				data.push({ day: moment(l).format('DD/MM'), calories: totalCalories })
+			if (!!logs[l] && !!logs[l]['workout']) {
+				data.push({ day: moment(l).format('DD/MM'), calories: 120 })
 			} else data.push({ day: moment(l).format('DD/MM'), calories: 0 })
 		}
 		return (		
 			<View style={{ flex: 1, flexDirection: "column", alignItems: 'center', justifyContent: 'center'}}>
-			<Title style={{ fontSize: 22, marginTop: 15 }}>Steps and Workouts</Title>
-				<Text style={{ fontSize: 44 }}>{todaySteps}</Text>
+			<Title style={{ fontSize: 22, marginTop: 15 }}>Weekly Workout</Title>
+			<VictoryChart width={310} height={200} theme={VictoryTheme.material} padding={{ left: 50, right: 50, top: 10, bottom: 40}}>
+				<VictoryBar data={data} x="day" y="calories" />
+			</VictoryChart>
 		</View>)
 	}
 
@@ -229,6 +226,7 @@ export default function HomeScreen({ navigation }) {
 			};
 			setWorkoutsCompletedThisWeek(workoutsCompleted);
 			setCalorieIntakeThisWeek(totalAmountOfCalories/daysLogged);
+			setCalorieBurntThisWeek(120 * workoutsCompleted);
 		}
 	}, [logs])
 
