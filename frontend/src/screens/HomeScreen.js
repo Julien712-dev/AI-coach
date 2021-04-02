@@ -17,7 +17,7 @@ import LEG_WORKOUT_IMAGE from '~/assets/image/leg-workout.jpeg';
 
 import { Pedometer } from 'expo-sensors';
 import { VictoryBar, VictoryChart, VictoryTheme, VictoryLine } from "victory-native";
-import { computeNutritionValues } from "../hooks/diet/Nutrition";
+import { computeNutritionValues, computeNutritionValuesAsync } from "../hooks/diet/Nutrition";
 
 function getWorkoutImage(workout) {
 	switch(workout.focus) {
@@ -53,6 +53,7 @@ export default function HomeScreen({ navigation }) {
 	const [calorieIntakeThisWeek, setCalorieIntakeThisWeek] = useState(0);
 	const [calorieBurntThisWeek, setCalorieBurntThisWeek] = useState(0);
 	const [workoutsCompletedThisWeek, setWorkoutsCompletedThisWeek] = useState(0);
+	const [nutritionValues, setNutritionValues] = useState();
 
 	const [todaySteps, setTodaySteps] = useState(0);
 	const today = moment();
@@ -128,7 +129,7 @@ export default function HomeScreen({ navigation }) {
 
 	function InsightsDiet(props) {
 		const data = [];
-		const nutritionValues = computeNutritionValues(profile)
+		// const nutritionValues = computeNutritionValues(profile)
 		for (let d=0; d<7; d++) {
 			let l = moment().add(-6+d, 'days').format('YYYYMMDD')
 			// console.log(l)
@@ -141,17 +142,26 @@ export default function HomeScreen({ navigation }) {
 				data.push({ day: moment(l).format('DD/MM'), calories: totalCalories })
 			} else data.push({ day: moment(l).format('DD/MM'), calories: 0 })
 		}
-		console.log(nutritionValues);
+		// console.log(nutritionValues);
+		if (!!nutritionValues) {
+			return (		
+				<View style={{ flex: 1, flexDirection: "column", alignItems: 'center', justifyContent: 'center'}}>
+				<Title style={{ fontSize: 22, marginTop: 15 }}>Weekly Diet</Title>
+				<VictoryChart width={310} height={200} theme={VictoryTheme.material} padding={{ left: 50, right: 50, top: 10, bottom: 40}}>
+					<VictoryLine
+						y={() => nutritionValues.dailyRecommendedCalories} 
+						style={{ data: { stroke: "#c43a31", strokeWidth: 3 } }}/>
+					<VictoryBar data={data} x="day" y="calories" />
+				</VictoryChart>
+			</View>)
+		}
+
 		return (		
 			<View style={{ flex: 1, flexDirection: "column", alignItems: 'center', justifyContent: 'center'}}>
 			<Title style={{ fontSize: 22, marginTop: 15 }}>Weekly Diet</Title>
-			<VictoryChart width={310} height={200} theme={VictoryTheme.material} padding={{ left: 50, right: 50, top: 10, bottom: 40}}>
-				<VictoryLine
-					y={() => nutritionValues.dailyRecommendedCalories} 
-					style={{ data: { stroke: "#c43a31", strokeWidth: 3 } }}/>
-				<VictoryBar data={data} x="day" y="calories" />
-			</VictoryChart>
+				<Text>Loading</Text>
 		</View>)
+
 	}
 
 	function InsightsExercise(props) {
@@ -235,6 +245,17 @@ export default function HomeScreen({ navigation }) {
 			navigation.navigate('Entrance Survey');
 		};
 	}, [isFetched]);
+
+	useEffect(() => {
+		async function getNutritionValues() {
+			if (!!profile) {
+				let nv = await computeNutritionValuesAsync({ profile, logs});
+				setNutritionValues(nv);
+				console.log('profile adjusted from steps and workouts: ', nv);
+			}
+		}
+		getNutritionValues()
+	}, [profile])
 
 	useEffect(() => {
         (() => {
