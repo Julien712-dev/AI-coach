@@ -211,7 +211,8 @@ export default function DietScreenMain({ navigation }) {
             justifyContent: "center",
           }}
         >
-          <Carousel
+        {!!restaurantResults && 
+        <Carousel
             layout={"default"}
             layoutCardOffset={9}
             data={restaurantResults}
@@ -222,7 +223,8 @@ export default function DietScreenMain({ navigation }) {
             onSnapToItem={(index) =>
               setRestaurantMenuCarouselActiveIndex(index)
             }
-          />
+          />}
+        {!restaurantResults && <View style={{ justifyContent: 'center', alignItems: 'center' }}><Text>Generating your personalized dine out recos!</Text></View>}
         </View>
         <View style={{ marginBottom: 80 }}></View>
       </ScrollView>
