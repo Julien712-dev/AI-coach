@@ -134,9 +134,6 @@ export default function LogDietDetailsScreen({ route, navigation }) {
           visible={showDropDown}
           showDropDown={() => setShowDropDown(true)}
           onDismiss={() => setShowDropDown(false)}
-          inputProps={{
-            right: <TextInput.Icon name={"menu-down"} />,
-          }}
         />
         <View style={{ marginTop: 10 }}>
           <Text>About the item</Text>
