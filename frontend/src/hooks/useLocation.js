@@ -20,6 +20,7 @@ export default () => {
   const checkPermission = async () => {
     let { status } = await getPermissionsAsync();
     status === "granted" ? setGrant(true) : setGrant(false);
+    console.log("inside checkPermission", status);
   };
 
   const requestLocationPermissionAsync = async () => {

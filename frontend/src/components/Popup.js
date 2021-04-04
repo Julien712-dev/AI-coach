@@ -11,7 +11,7 @@ const Popup = ({ title, message, callback }) => {
   const hideDialog = async () => {
     console.log("hide dialog");
     setVisible(false);
-    if (!callback) await callback();
+    if (callback) await callback();
   };
 
   return (

@@ -2,15 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import config from "~/src/config";
 import moment from "moment";
-import {
-  View,
-  ScrollView,
-  RefreshControl,
-} from "react-native";
+import { View, ScrollView, RefreshControl } from "react-native";
 import { Text, Title, Card, Paragraph } from "react-native-paper";
 import Carousel from "react-native-snap-carousel";
 import DietLoggingFAB from "./dietLoggingFAB";
-import { computeNutritionValues, getCoachAdvice } from "~/src/hooks/diet/Nutrition";
+import {
+  computeNutritionValues,
+  getCoachAdvice,
+} from "~/src/hooks/diet/Nutrition";
 import searchRecipe from "~/src/hooks/diet/searchRecipe";
 
 import LoadingScreen from "../LoadingScreen";
@@ -54,11 +53,14 @@ export default function DietScreenMain({ navigation }) {
   let profileRedux = useSelector((state) => state.main.auth.profile) || {};
 
   // For location use, to get location permission from user
+
   useEffect(() => {
+    console.log("inside dietscreen useeffect", grant);
     setShowPopup(!grant);
   }, [grant]);
 
   useEffect(() => {
+    console.log("inside dietscreen useeffect");
     let currentTime = new Date();
     let meal = config.messages.diet.find(
       (message) =>
@@ -69,7 +71,6 @@ export default function DietScreenMain({ navigation }) {
     setMessage(meal);
     setCoachAdvice(getCoachAdvice(profileRedux));
 
-    // get location async
     (async () => {
       if (!!profileRedux) {
         setLoading(true);
@@ -94,19 +95,10 @@ export default function DietScreenMain({ navigation }) {
         });
 
         setLoading(false);
+        console.log("finish loading");
       }
     })();
   }, [refreshTimes]);
-
-  // Fires when users click into the screen
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      // The screen is focused
-      // Call any action
-    });
-    // Return the function to unsubscribe from the event so it gets removed on unmount
-    return unsubscribe;
-  }, [navigation]);
 
   const wait = (timeout) => {
     return new Promise((resolve) => {
@@ -142,6 +134,7 @@ export default function DietScreenMain({ navigation }) {
 
   // Render function for restaurant menu item recommendations.
   function _renderRestaurantMenuItems({ item, index }) {
+    console.log("rendering restaurant");
     return (
       <ShowCard
         title={item.recommendedItem.itemName}
@@ -210,20 +203,25 @@ export default function DietScreenMain({ navigation }) {
             justifyContent: "center",
           }}
         >
-        {!!restaurantResults && 
-        <Carousel
-            layout={"default"}
-            layoutCardOffset={9}
-            data={restaurantResults}
-            containerCustomStyle={{ overflow: "visible" }}
-            sliderWidth={300}
-            itemWidth={300}
-            renderItem={_renderRestaurantMenuItems}
-            onSnapToItem={(index) =>
-              setRestaurantMenuCarouselActiveIndex(index)
-            }
-          />}
-        {!restaurantResults && <View style={{ justifyContent: 'center', alignItems: 'center' }}><Text>Generating your personalized dine out recos!</Text></View>}
+          {!!restaurantResults && (
+            <Carousel
+              layout={"default"}
+              layoutCardOffset={9}
+              data={restaurantResults}
+              containerCustomStyle={{ overflow: "visible" }}
+              sliderWidth={300}
+              itemWidth={300}
+              renderItem={_renderRestaurantMenuItems}
+              onSnapToItem={(index) =>
+                setRestaurantMenuCarouselActiveIndex(index)
+              }
+            />
+          )}
+          {!restaurantResults && (
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
+              <Text>Generating your personalized dine out recos!</Text>
+            </View>
+          )}
         </View>
         <View style={{ marginBottom: 80 }}></View>
       </ScrollView>

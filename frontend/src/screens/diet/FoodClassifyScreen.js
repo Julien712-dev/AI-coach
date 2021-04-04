@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Camera } from "expo-camera";
 import {
   StyleSheet,
@@ -7,11 +7,12 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from "react-native";
+import { Button } from "react-native-paper";
 
 import useFoodModel from "~/src/hooks/diet/useFoodModel";
 import useCamera from "~/src/hooks/useCamera";
 
-export default function RecognitionScreen() {
+export default function RecognitionScreen({ navigation }) {
   ratio = "1:1";
 
   const {
@@ -22,7 +23,7 @@ export default function RecognitionScreen() {
     cleanPhoto,
   } = useCamera();
   const {
-    ready,
+    modelReady,
     predictions,
     classifyImage,
     cleanPredictions,
@@ -44,6 +45,7 @@ export default function RecognitionScreen() {
     cleanPredictions();
     cleanPhoto();
   };
+
   const CameraPreview = ({ photo }) => {
     return (
       <ImageBackground
@@ -78,6 +80,7 @@ export default function RecognitionScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
+          enabled={modelReady}
           onPress={pressTakePicture}
           style={{
             alignSelf: "flex-end",
@@ -107,7 +110,21 @@ export default function RecognitionScreen() {
         <Text style={styles.text}>
           Predictions: {predictions ? predictions : "Predicting..."}
         </Text>
-        <Text></Text>
+      </View>
+      <View>
+        {predictions ? (
+          <Button
+            mode="contained"
+            style={{ borderRadius: 5, marginHorizontal: 10, marginVertical: 5 }}
+            onPress={() => {
+              navigation.navigate("Log Diet", {
+                recipeName: predictions,
+              });
+            }}
+          >
+            Proceed with this prediction
+          </Button>
+        ) : null}
       </View>
     </View>
   );

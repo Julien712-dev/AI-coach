@@ -268,14 +268,23 @@ export default () => {
     console.log("searching restaurants");
     const list = await fetchCuisineListAsync();
     const searchList = weightedRandom(defaultRecipeList, 5);
-    console.log("wr list", searchList);
+    console.log("wr list from getRestaurant", searchList);
     try {
       let foodItems = [];
 
       const snapshot = await Firebase.firestore()
         .collection("restaurants")
-        .where("menuDataWithNutritionInfo", ">", [])
+        .where("menuDataWithNutritionInfo", "!=", false)
         .get();
+
+      if (snapshot.empty) {
+        console.log("No matching documents.");
+        return;
+      }
+      snapshot.forEach((doc) => {
+        console.log(doc.id, "=>", doc.data());
+      });
+
       snapshot.forEach((doc) => {
         let restaurantData = doc.data();
         let recommendedItem = restaurantData.menuDataWithNutritionInfo[0];
@@ -292,6 +301,7 @@ export default () => {
           }
         }
       });
+      console.log(foodItems);
       foodItems = shuffle(foodItems);
       let foodItemsAccordingToWishList = {};
       for (let cuisineType in searchList) {
@@ -312,8 +322,10 @@ export default () => {
         }
       }
       let results = foodItems.slice(0, 5);
-      setRestaurantResults(finalResults);
-      return finalResults;
+      setRestaurantResults(results);
+      console.log("restaurant results from firebase: ", results);
+      console.log("restaurant full results from firebase: ", finalResults);
+      return results;
     } catch (e) {
       console.log(e);
     }
