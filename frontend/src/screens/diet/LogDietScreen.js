@@ -23,9 +23,9 @@ DetailsScreen["navigationOptions"] = (screenProps) => ({
 
 // screen for demo purpose
 export default function DetailsScreen({ navigation, route }) {
-  const { recipe } = route.params;
+  const { recipeName } = route.params;
   const { recipeResults, searchByName, fakeSearch } = searchRecipe();
-  const [query, setQuery] = React.useState(recipe);
+  const [query, setQuery] = React.useState(recipeName);
 
   const onChangeSearch = (query) => setQuery(query);
 

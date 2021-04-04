@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Camera } from "expo-camera";
 import {
   StyleSheet,
@@ -31,12 +31,6 @@ export default function RecognitionScreen({ navigation }) {
 
   const [type, setType] = useState(Camera.Constants.Type.back);
   const cameraRef = useRef(null);
-
-  useEffect(() => {
-    return () => {
-      cleanPhoto();
-    };
-  }, []);
 
   if (hasPermission === false || hasPermission === null) {
     return <Text>No access to camera</Text>;
@@ -117,14 +111,19 @@ export default function RecognitionScreen({ navigation }) {
           Predictions: {predictions ? predictions : "Predicting..."}
         </Text>
       </View>
-      <View style={styles.buttonContainer}>
+      <View>
         {predictions ? (
           <Button
-            title="Proceed"
-            onPress={navigation.navigate("Log Diet", {
-              recipeName: predictions,
-            })}
-          />
+            mode="contained"
+            style={{ borderRadius: 5, marginHorizontal: 10, marginVertical: 5 }}
+            onPress={() => {
+              navigation.navigate("Log Diet", {
+                recipeName: predictions,
+              });
+            }}
+          >
+            Proceed with this prediction
+          </Button>
         ) : null}
       </View>
     </View>
