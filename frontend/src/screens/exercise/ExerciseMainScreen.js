@@ -44,6 +44,7 @@ export default function ExerciseMainScreen({ navigation }) {
 	const workoutToday = useSelector(state => state.main.exercise.plan[today]);
 	const { colors } = useTheme();
 
+	const onPressLogWorkout = () => navigation.navigate('Log Workout');
 	const onPressDoWorkout = () => navigation.navigate('Do Workout', { day: today });
 	const onPressPlanWorkout = () => navigation.navigate('Plan Workout');
 
@@ -76,9 +77,9 @@ export default function ExerciseMainScreen({ navigation }) {
 				)
 			}
 		},
-		error => {
-			console.log(error)
-		})
+			error => {
+				console.log(error)
+			})
 
 	}, [])
 
@@ -89,21 +90,21 @@ export default function ExerciseMainScreen({ navigation }) {
 	return (
 		<ScrollView contentContainerStyle={{ alignItems: 'center', padding: 20 }}>
 			{pedometerAvailable ?
-			<View style={{ marginVertical: 10, justifyContent: 'center', alignItems: 'center' }}>
-				<Title style={{ fontWeight: '600', fontSize: 28 }}>Today's Activity</Title>
-				<ProgressCircle
-					percent={todaySteps/10000 * 100}
-					radius={100}
-					borderWidth={8}
-					color={colors.primary}
-					shadowColor={colors.border}
-					bgColor={colors.background}
-				>
-					<Headline>{todaySteps}</Headline>
-					<Text>out of 10,000</Text>
-				</ProgressCircle>
-				<Paragraph style={{ marginHorizontal: 15, marginTop: 10 }}>{stepHelperText}</Paragraph>
-			</View> :
+				<View style={{ marginVertical: 10, justifyContent: 'center', alignItems: 'center' }}>
+					<Title style={{ fontWeight: '600', fontSize: 28 }}>Today's Activity</Title>
+					<ProgressCircle
+						percent={todaySteps / 10000 * 100}
+						radius={100}
+						borderWidth={8}
+						color={colors.primary}
+						shadowColor={colors.border}
+						bgColor={colors.background}
+					>
+						<Headline>{todaySteps}</Headline>
+						<Text>out of 10,000</Text>
+					</ProgressCircle>
+					<Paragraph style={{ marginHorizontal: 15, marginTop: 10 }}>{stepHelperText}</Paragraph>
+				</View> :
 				<View style={{ marginVertical: 20, justifyContent: 'center', alignItems: 'center' }}>
 
 					<Ionicons name={'ios-speedometer'} size={150} color={'dodgerblue'} style={{ paddingLeft: 10 }} />
@@ -113,7 +114,7 @@ export default function ExerciseMainScreen({ navigation }) {
 
 			{cards}
 			<View style={{ width: '100%', marginTop: 30, flexDirection: 'row', justifyContent: 'space-around' }}>
-				<FAB icon='plus' />
+				<FAB icon='plus' onPress={onPressLogWorkout} survey/>
 				<FAB icon='play' onPress={onPressDoWorkout} />
 				<FAB icon='pencil' onPress={onPressPlanWorkout} />
 			</View>

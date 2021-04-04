@@ -22,7 +22,7 @@ const DropDown = forwardRef((props, ref) => {
     }, [list, value]);
     return (<Menu visible={visible} onDismiss={onDismiss} theme={theme} anchor={<TouchableRipple ref={ref} onPress={showDropDown} onLayout={onLayout}>
             <View pointerEvents={"none"}>
-              <TextInput value={displayValue} mode={mode} label={label} placeholder={placeholder} pointerEvents={"none"} theme={theme} {...inputProps}/>
+              <TextInput value={displayValue} mode={mode} label={label} placeholder={placeholder} pointerEvents={"none"} theme={theme} right={<TextInput.Icon name={'menu-down'} />} {...inputProps}/>
             </View>
           </TouchableRipple>} style={{
         maxWidth: inputLayout?.width,

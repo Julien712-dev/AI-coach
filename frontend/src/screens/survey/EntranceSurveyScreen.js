@@ -92,9 +92,6 @@ function StepOneScreen({ swiperRef }) {
                         visible={showHeightDropDown}
                         showDropDown={() => setShowHeightDropDown(true)}
                         onDismiss={() => setShowHeightDropDown(false)}
-                        inputProps={{
-                            right: <TextInput.Icon name={'menu-down'} />,
-                        }}
                     />
                 </View>
             </View>
@@ -113,9 +110,6 @@ function StepOneScreen({ swiperRef }) {
                         visible={showWeightDropDown}
                         showDropDown={() => setShowWeightDropDown(true)}
                         onDismiss={() => setShowWeightDropDown(false)}
-                        inputProps={{
-                            right: <TextInput.Icon name={'menu-down'} />,
-                        }}
                     />
                 </View>
             </View>
@@ -134,9 +128,6 @@ function StepOneScreen({ swiperRef }) {
                         visible={showSexDropDown}
                         showDropDown={() => setShowSexDropDown(true)}
                         onDismiss={() => setShowSexDropDown(false)}
-                        inputProps={{
-                            right: <TextInput.Icon name={'menu-down'} />,
-                        }}
                     />
                 </View>
             </View>
@@ -298,9 +289,6 @@ function StepThreeScreen({ swiperRef }) {
                         visible={showDayDropdown}
                         showDropDown={() => setShowDayDropdown(true)}
                         onDismiss={() => setShowDayDropdown(false)}
-                        inputProps={{
-                            right: <TextInput.Icon name={'menu-down'} />,
-                        }}
                     />
                     <DropDown
                         label={'Minutes per day'}
@@ -314,9 +302,6 @@ function StepThreeScreen({ swiperRef }) {
                         visible={showMinuteDropdown}
                         showDropDown={() => setShowMinuteDropdown(true)}
                         onDismiss={() => setShowMinuteDropdown(false)}
-                        inputProps={{
-                            right: <TextInput.Icon name={'menu-down'} />,
-                        }}
                     />
                 </View>
             </View>
