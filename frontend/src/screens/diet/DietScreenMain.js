@@ -183,8 +183,7 @@ export default function DietScreenMain({ navigation }) {
             layout={"default"}
             layoutCardOffset={5}
             activeSlideOffset={5}
-            // ref={ref => this.carousel = ref}
-            data={recipeResults}
+            data={recipeResults || []}
             containerCustomStyle={{ overflow: "visible" }}
             sliderWidth={300}
             itemWidth={300}
@@ -210,7 +209,27 @@ export default function DietScreenMain({ navigation }) {
             alignItems: "center",
             justifyContent: "center",
           }}
-        ></View>
+        >
+          {!!restaurantResults && (
+            <Carousel
+              layout={"default"}
+              layoutCardOffset={9}
+              data={restaurantResults}
+              containerCustomStyle={{ overflow: "visible" }}
+              sliderWidth={300}
+              itemWidth={300}
+              renderItem={_renderRestaurantMenuItems}
+              onSnapToItem={(index) =>
+                setRestaurantMenuCarouselActiveIndex(index)
+              }
+            />
+          )}
+          {!restaurantResults && (
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
+              <Text>Generating your personalized dine out recos!</Text>
+            </View>
+          )}
+        </View>
         <View style={{ marginBottom: 80 }}></View>
       </ScrollView>
       <DietLoggingFAB navigation={navigation} />

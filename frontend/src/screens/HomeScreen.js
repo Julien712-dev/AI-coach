@@ -1,6 +1,6 @@
 import * as Firebase from 'firebase';
 import { View, StyleSheet, ScrollView, StatusBar, SafeAreaView, ImageBackground } from 'react-native';
-import { Button, Title, Card, Text, Divider } from 'react-native-paper';
+import { useTheme, Button, Title, Card, Text, Divider, Portal, Dialog, Paragraph } from 'react-native-paper';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
@@ -17,7 +17,7 @@ import LEG_WORKOUT_IMAGE from '~/assets/image/leg-workout.jpeg';
 
 import { Pedometer } from 'expo-sensors';
 import { VictoryBar, VictoryChart, VictoryTheme, VictoryLine } from "victory-native";
-import { computeNutritionValues } from "../hooks/diet/Nutrition";
+import { computeNutritionValues, computeNutritionValuesAsync } from "../hooks/diet/Nutrition";
 
 function getWorkoutImage(workout) {
 	switch(workout.focus) {
@@ -45,15 +45,42 @@ export default function HomeScreen({ navigation }) {
 	let currentPlan = useSelector(state => state.main.exercise.plan);
 	let logs = useSelector(state => state.main.auth.logs) || {};
 	var plan = {};
+	const [loading, setLoading] = useState(false);
 	const [isFetched, setIsFetched] = useState(false);
 	const [profile, setProfile] = useState(null);
 	const [workoutOfTheDay, setWorkoutOfTheDay] = useState(null);
 	const [insightCarouselActiveIndex, setInsightCarouselActiveIndex] = useState(0);
-	const [caloriesConsumedThisWeek, setCaloriesBurntThisWeek] = useState(0);
+	const [calorieIntakeThisWeek, setCalorieIntakeThisWeek] = useState(0);
+	const [calorieBurntThisWeek, setCalorieBurntThisWeek] = useState(0);
+	const [workoutsCompletedThisWeek, setWorkoutsCompletedThisWeek] = useState(0);
+	const [nutritionValues, setNutritionValues] = useState();
 
 	const [todaySteps, setTodaySteps] = useState(0);
 	const today = moment();
 	const dispatch = useDispatch();
+
+	const [dialogVisible, setDialogVisible] = useState(false)
+    const { colors } = useTheme();
+
+	function onLogWorkout(workout) {
+		let workoutDbRef = Firebase.database().ref(`/users/${user.uid}/logs/${today.format('YYYYMMDD')}/workout`);
+		workoutDbRef.set([workout])
+
+		// fetch from realtime db again
+		setTimeout(() => {
+			let userDatabaseDietRef = Firebase.database().ref(
+				`/users/${user.uid}/logs`
+			);
+			userDatabaseDietRef.once("value", (snapshot) => {
+				let value = snapshot.val();
+				if (!!value) {
+				// console.log(value);
+				dispatch(setLogs({ logs: value }));
+				}
+				setLoading(false);
+			});
+			}, 1000);
+	}
 
 	const logout = () => {
 		Firebase.auth().signOut()
@@ -74,7 +101,7 @@ export default function HomeScreen({ navigation }) {
 			<View style={{ flex: 1, flexDirection: "row" }}>
 				<View style={{ width: 80, marginLeft: 5, justifyContent: 'center' }}>
 					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
-						<Text style={{ fontSize: 32 }}>{caloriesConsumedThisWeek}</Text>
+						<Text style={{ fontSize: 32 }}>{Math.round(calorieIntakeThisWeek)}</Text>
 					</View>
 					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
 						<Text style={{ fontSize: 10, textAlign: 'center' }}>average calories intake</Text>
@@ -82,7 +109,7 @@ export default function HomeScreen({ navigation }) {
 				</View>
 				<View style={{ width: 110, marginHorizontal: 5, justifyContent: 'center', marginBottom: 10 }}>
 					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
-						<Text style={{ fontSize: 72, fontWeight: '600' }}>3</Text>
+						<Text style={{ fontSize: 72, fontWeight: '600' }}>{(workoutsCompletedThisWeek)}</Text>
 					</View>
 					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
 						<Text style={{ fontSize: 12, textAlign: 'center'}}>workouts completed</Text>
@@ -90,7 +117,7 @@ export default function HomeScreen({ navigation }) {
 				</View>
 				<View style={{ width: 80, marginRight: 5, justifyContent: 'center' }}>
 					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
-						<Text style={{ fontSize: 32 }}>{caloriesConsumedThisWeek}</Text>
+						<Text style={{ fontSize: 32 }}>{Math.round(calorieBurntThisWeek)}</Text>
 					</View>
 					<View style={{ justifyContent: 'center', alignItems: 'center'}}>
 						<Text style={{ fontSize: 10, textAlign: 'center' }}>average calories consumption</Text>
@@ -102,10 +129,10 @@ export default function HomeScreen({ navigation }) {
 
 	function InsightsDiet(props) {
 		const data = [];
-		const nutritionValues = computeNutritionValues(profile)
+		// const nutritionValues = computeNutritionValues(profile)
 		for (let d=0; d<7; d++) {
 			let l = moment().add(-6+d, 'days').format('YYYYMMDD')
-			console.log(l)
+			// console.log(l)
 			if (!!logs[l]) {
 				let totalCalories = 0;
 				for (let diet in logs[l]['diet']) {
@@ -115,22 +142,42 @@ export default function HomeScreen({ navigation }) {
 				data.push({ day: moment(l).format('DD/MM'), calories: totalCalories })
 			} else data.push({ day: moment(l).format('DD/MM'), calories: 0 })
 		}
-		console.log(data);
+		// console.log(nutritionValues);
+		if (!!nutritionValues) {
+			return (		
+				<View style={{ flex: 1, flexDirection: "column", alignItems: 'center', justifyContent: 'center'}}>
+				<Title style={{ fontSize: 22, marginTop: 15 }}>Weekly Diet</Title>
+				<VictoryChart width={310} height={200} theme={VictoryTheme.material} padding={{ left: 50, right: 50, top: 10, bottom: 40}}>
+					<VictoryLine
+						y={() => nutritionValues.dailyRecommendedCalories} 
+						style={{ data: { stroke: "#c43a31", strokeWidth: 3 } }}/>
+					<VictoryBar data={data} x="day" y="calories" />
+				</VictoryChart>
+			</View>)
+		}
+
 		return (		
 			<View style={{ flex: 1, flexDirection: "column", alignItems: 'center', justifyContent: 'center'}}>
 			<Title style={{ fontSize: 22, marginTop: 15 }}>Weekly Diet</Title>
-			<VictoryChart width={310} height={200} theme={VictoryTheme.material} padding={{ left: 50, right: 50, top: 10, bottom: 40}}>
-				<VictoryLine y={() => nutritionValues.dailyRecommendedCalories} />
-				<VictoryBar data={data} x="day" y="calories" />
-			</VictoryChart>
+				<Text>Loading</Text>
 		</View>)
+
 	}
 
 	function InsightsExercise(props) {
+		const data = [];
+		for (let d=0; d<7; d++) {
+			let l = moment().add(-6+d, 'days').format('YYYYMMDD')
+			if (!!logs[l] && !!logs[l]['workout']) {
+				data.push({ day: moment(l).format('DD/MM'), calories: 120 })
+			} else data.push({ day: moment(l).format('DD/MM'), calories: 0 })
+		}
 		return (		
 			<View style={{ flex: 1, flexDirection: "column", alignItems: 'center', justifyContent: 'center'}}>
-			<Title style={{ fontSize: 22, marginTop: 15 }}>Steps and Workouts</Title>
-				<Text style={{ fontSize: 44 }}>{todaySteps}</Text>
+			<Title style={{ fontSize: 22, marginTop: 15 }}>Weekly Workout</Title>
+			<VictoryChart width={310} height={200} theme={VictoryTheme.material} padding={{ left: 50, right: 50, top: 10, bottom: 40}}>
+				<VictoryBar data={data} x="day" y="calories" />
+			</VictoryChart>
 		</View>)
 	}
 
@@ -175,7 +222,7 @@ export default function HomeScreen({ navigation }) {
 	// Listen to log update and update the logs for diet and exercise
 	useEffect(() => {
 		if (!!logs) {
-			let totalAmountOfCalories = 0, daysLogged = 0;
+			let totalAmountOfCalories = 0, daysLogged = 0, workoutsCompleted = 0;
 			for (var l in logs) {
 				if (l >= moment().add(-6, 'days').format('YYYYMMDD') && l <= today.format('YYYYMMDD')) {
 					daysLogged++;
@@ -184,9 +231,12 @@ export default function HomeScreen({ navigation }) {
 						let result = logs[l]['diet'][d].reduce(function (acc, obj) { return acc + parseInt(obj.calorieAmount); }, 0); // 7
 						totalAmountOfCalories += result;
 					}
+					if (!!logs[l]['workout']) workoutsCompleted++;
 				}
 			};
-			setCaloriesBurntThisWeek(totalAmountOfCalories/daysLogged);
+			setWorkoutsCompletedThisWeek(workoutsCompleted);
+			setCalorieIntakeThisWeek(totalAmountOfCalories/daysLogged);
+			setCalorieBurntThisWeek(120 * workoutsCompleted);
 		}
 	}, [logs])
 
@@ -195,6 +245,17 @@ export default function HomeScreen({ navigation }) {
 			navigation.navigate('Entrance Survey');
 		};
 	}, [isFetched]);
+
+	useEffect(() => {
+		async function getNutritionValues() {
+			if (!!profile) {
+				let nv = await computeNutritionValuesAsync({ profile, logs});
+				setNutritionValues(nv);
+				console.log('profile adjusted from steps and workouts: ', nv);
+			}
+		}
+		getNutritionValues()
+	}, [profile])
 
 	useEffect(() => {
         (() => {
@@ -224,24 +285,24 @@ export default function HomeScreen({ navigation }) {
 
 				Pedometer.isAvailableAsync().then(result => {
 					console.log('pedometer enabled: ', result)
+					const end = new Date();
+					const start = new Date();
+					if (result) {
+						start.setDate(end.getDate() - 1);
+						Pedometer.getStepCountAsync(start, end).then(
+							result => {
+								console.log('past step count: ', result.steps)
+								setTodaySteps(result.steps);
+							},
+							error => {
+								console.log(error);
+							}
+						)
+					}
 				},
 				error => {
 					console.log(error)
 				})
-
-				const end = new Date();
-				const start = new Date();
-
-				start.setDate(end.getDate() - 1);
-				Pedometer.getStepCountAsync(start, end).then(
-					result => {
-						console.log('past step count: ', result.steps)
-						setTodaySteps(result.steps);
-					},
-					error => {
-						console.log(error);
-					}
-				)
 			});
         })();
 	}, []);
@@ -251,6 +312,7 @@ export default function HomeScreen({ navigation }) {
 	} else {
 		return (
 			<SafeAreaView>
+			{loading && <LoadingScreen />}
 			<ScrollView contentContainerStyle={{ padding: 10 }}>
 				<StatusBar barStyle="dark-content" style="auto" />
 				<View style={{ flex: 1 }}>
@@ -315,6 +377,7 @@ export default function HomeScreen({ navigation }) {
 								borderColor: '#1E90FF', 
 								minHeight: 100,  }}>
 								{!!logs[today.format('YYYYMMDD')] ?
+								!!logs[today.format('YYYYMMDD')]['diet'] ?
 								<View style={{ width: '100%' }}>
 									<Title>Your logged meals today: </Title>
 									{!!logs[today.format('YYYYMMDD')]['diet']['breakfast'] &&
@@ -374,8 +437,9 @@ export default function HomeScreen({ navigation }) {
 											</View>)}
 									</View>}
 								</View>
- 								:
-								<Text>You have not logged your diet yet. Logged food will be shown here.</Text>}
+ 								: <Text>You have not logged your diet yet. Logged food will be shown here.</Text>
+								: <Text>You have not logged your diet yet. Logged food will be shown here.</Text>
+							}
 							</View>
 							<View style={{ marginTop: 5, flexDirection: 'row', justifyContent: 'center' }}>
 								<Button onPress={() => navigation.navigate('Diet')}>Explore Recommendations</Button>
@@ -391,13 +455,19 @@ export default function HomeScreen({ navigation }) {
 								<Title style={{ marginLeft: 15 }}>Workout</Title>
 							</View>
 							<View style={{ flex: 1, alignItems: 'flex-end' }}>
-								<Button icon="plus" style={{ alignSelf: 'flex-end' }}>Log workout</Button>
+								{
+								!!logs[`${today.format('YYYYMMDD')}`] ? 
+									!!logs[`${today.format('YYYYMMDD')}`]['workout'] ? 
+										<Button icon="check" color="green">COMPLETED</Button> : 
+										<Button icon="plus" style={{ alignSelf: 'flex-end' }} onPress={() => setDialogVisible(true)}>Log workout</Button> :
+										<Button icon="plus" style={{ alignSelf: 'flex-end' }} onPress={() => setDialogVisible(true)}>Log workout</Button>
+								}
 							</View>
 						</View>
 						<Divider />
 						{!!workoutOfTheDay && 
 							<Card.Content style={{ marginTop: 5 }}>
-							{workoutOfTheDay.type == 'rest' ? 
+							{workoutOfTheDay.type == 'rest' || workoutOfTheDay.type == 'recovery' ? 
 								<View style={{ height: 170, width: '100%', borderRadius: 20 }}>
 									<ImageBackground source={REST_DAY_IMAGE} style={styles.bakcgroundImage}>
 										<View style={styles.textOverImageWrapper}>
@@ -436,6 +506,18 @@ export default function HomeScreen({ navigation }) {
 						Log out
 					</Button>
 				</View>
+				<Portal>
+                <Dialog visible={dialogVisible} onDismiss={() => setDialogVisible(false)}>
+                    <Dialog.Title>Mark workout as complete?</Dialog.Title>
+                    <Dialog.Content>
+                        <Paragraph>You can log this workout to the database.</Paragraph>
+                    </Dialog.Content>
+                    <Dialog.Actions>
+                        <Button onPress={() => onLogWorkout(workoutOfTheDay)}>Save</Button>
+                        <Button color={colors.disabled} onPress={() => setDialogVisible(false)}>Cancel</Button>
+                    </Dialog.Actions>
+                </Dialog>
+            </Portal>
 			</ScrollView>
 			</SafeAreaView>
 		);

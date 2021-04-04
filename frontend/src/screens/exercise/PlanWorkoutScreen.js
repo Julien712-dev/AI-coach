@@ -5,7 +5,7 @@ import { StyleSheet, View, ScrollView, TouchableOpacity, TouchableWithoutFeedbac
 import { useTheme, FAB, Headline, Text, IconButton, Surface, Title, Portal, Dialog, Paragraph, Button } from 'react-native-paper';
 import StarRating from 'react-native-star-rating';
 
-import { resetDraftPlan, saveDraftPlan, swapWorkout, removeWorkout } from '~/src/store/exerciseSlice';
+import { generatePlan, resetDraftPlan, saveDraftPlan, swapWorkout, removeWorkout } from '~/src/store/exerciseSlice';
 import { constants } from '~/src/config';
 
 const styles = StyleSheet.create({
@@ -107,8 +107,10 @@ export default function PlanWorkoutScreen({ navigation }) {
     const uid = useSelector(state => state.main.auth.user.uid);
     const draftPlan = useSelector(state => state.main.exercise.draftPlan);
     const planModified = useSelector(state => state.main.exercise.planModified);
+    const profile = useSelector(state => state.main.auth.profile);
     const dispatch = useDispatch();
-    const [dialogVisible, setDialogVisible] = useState(false);
+    const [saveDialogVisible, setSaveDialogVisible] = useState(false);
+    const [generateDialogVisible, setGenerateDialogVisible] = useState(false);
     const [navigationAction, setNavigationAction] = useState(false);    // The navigation action interrupted by the 'Save?' dialog
     const { colors } = useTheme();
 
@@ -117,7 +119,7 @@ export default function PlanWorkoutScreen({ navigation }) {
             if (planModified) {
                 event.preventDefault();
                 setNavigationAction(event.data.action);
-                setDialogVisible(true);
+                setSaveDialogVisible(true);
             }
         });
         return unsubscribe;
@@ -145,23 +147,37 @@ export default function PlanWorkoutScreen({ navigation }) {
     const onActivityDelete = day => {
         dispatch(removeWorkout({ day }));
     };
-    const onDialogDismiss = () => {
-        setDialogVisible(false);
+    const onSaveDialogDismiss = () => {
+        setSaveDialogVisible(false);
     };
     const onSaveChanges = () => {
-        setDialogVisible(false);
+        setSaveDialogVisible(false);
         Firebase.database().ref(`/users/${uid}/exercisePlan`).set(draftPlan);   // Save to firebase
         dispatch(saveDraftPlan());
         navigation.dispatch(navigationAction);
     };
     const onDiscardChanges = () => {
-        setDialogVisible(false);
+        setSaveDialogVisible(false);
         dispatch(resetDraftPlan());
         navigation.dispatch(navigationAction);
     };
     const onCancelChanges = () => {
-        setDialogVisible(false);
+        setSaveDialogVisible(false);
     }
+    const onGenerateDialogDismiss = () => {
+        setGenerateDialogVisible(false);
+    };
+    const onPressGenerate = () => {
+        setGenerateDialogVisible(true);
+    };
+    const onGenerate = () => {
+        dispatch(generatePlan(profile));
+        setGenerateDialogVisible(false);
+    };
+    const onGenerateCancel = () => {
+        setGenerateDialogVisible(false);
+    };
+
     const rows = constants.days.map(day => {
         const header = day[0].toUpperCase() + day.slice(1);
         const activity = draftPlan[day];
@@ -175,23 +191,43 @@ export default function PlanWorkoutScreen({ navigation }) {
         );
     });
     return (
-        <ScrollView style={{ padding: 20 }}>
-            <Table>
-                {rows}
-            </Table>
-            <Portal>
-                <Dialog visible={dialogVisible} onDismiss={onDialogDismiss}>
-                    <Dialog.Title>Save?</Dialog.Title>
-                    <Dialog.Content>
-                        <Paragraph>You have made changes to your workout plan.</Paragraph>
-                    </Dialog.Content>
-                    <Dialog.Actions>
-                        <Button onPress={onSaveChanges}>Save</Button>
-                        <Button color={colors.disabled} onPress={onDiscardChanges}>Don't save</Button>
-                        <Button color={colors.disabled} onPress={onCancelChanges}>Cancel</Button>
-                    </Dialog.Actions>
-                </Dialog>
-            </Portal>
-        </ScrollView>
+        <View>
+            <ScrollView style={{ padding: 20 }}>
+                <Table>
+                    {rows}
+                </Table>
+                <Portal>
+                    {/* Save Dialog */}
+                    <Dialog visible={saveDialogVisible} onDismiss={onSaveDialogDismiss}>
+                        <Dialog.Title>Save?</Dialog.Title>
+                        <Dialog.Content>
+                            <Paragraph>You have made changes to your workout plan.</Paragraph>
+                        </Dialog.Content>
+                        <Dialog.Actions>
+                            <Button onPress={onSaveChanges}>Save</Button>
+                            <Button color={colors.disabled} onPress={onDiscardChanges}>Don't save</Button>
+                            <Button color={colors.disabled} onPress={onCancelChanges}>Cancel</Button>
+                        </Dialog.Actions>
+                    </Dialog>
+                    {/* Generate plan Dialog */}
+                    <Dialog visible={generateDialogVisible} onDismiss={onGenerateDialogDismiss}>
+                        <Dialog.Title>Generate new plan?</Dialog.Title>
+                        <Dialog.Content>
+                            <Paragraph>This will overwrite your current changes, but you can review the new plan before saving it.</Paragraph>
+                        </Dialog.Content>
+                        <Dialog.Actions>
+                            <Button onPress={onGenerate}>Generate</Button>
+                            <Button color={colors.disabled} onPress={onGenerateCancel}>Cancel</Button>
+                        </Dialog.Actions>
+                    </Dialog>
+                </Portal>
+            </ScrollView>
+            <FAB
+                icon='reload'
+                style={{ position: 'absolute', right: 16, bottom: 16 }}
+                onPress={onPressGenerate}
+            />
+        </View>
+
     );
 }
