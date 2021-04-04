@@ -104,10 +104,14 @@ export default function HomeScreen({ navigation }) {
   const { colors } = useTheme();
 
   function onLogWorkout(workout) {
-    let workoutDbRef = Firebase.database().ref(
+    const workoutDbRef = Firebase.database().ref(
       `/users/${user.uid}/logs/${today.format("YYYYMMDD")}/workout`
     );
-    workoutDbRef.set([workout]);
+    const workouts = logs[today.format("YYYYMMDD")]?.workout;
+
+    if (workouts != null && Array.isArray(workouts))
+      workoutDbRef.set(workouts.concat([workout]));
+    else workoutDbRef.set([workout]);
 
     // fetch from realtime db again
     setTimeout(() => {
@@ -117,7 +121,6 @@ export default function HomeScreen({ navigation }) {
       userDatabaseDietRef.once("value", (snapshot) => {
         let value = snapshot.val();
         if (!!value) {
-          // console.log(value);
           dispatch(setLogs({ logs: value }));
         }
         setLoading(false);
@@ -378,7 +381,6 @@ export default function HomeScreen({ navigation }) {
   }, [profile]);
 
   useEffect(() => {
-    let subscription = null;
     (() => {
       setIsFetched(false);
       const userDatabaseRef = Firebase.database().ref(`/users/${user.uid}`);
@@ -400,7 +402,7 @@ export default function HomeScreen({ navigation }) {
         setIsFetched(true);
 
         // pedometer
-        subscription = Pedometer.watchStepCount((result) => {
+        let subscription = Pedometer.watchStepCount((result) => {
           console.log(result.steps);
         });
 
@@ -428,9 +430,6 @@ export default function HomeScreen({ navigation }) {
         );
       });
     })();
-    return () => {
-      if (subscription != null) subscription.remove();
-    };
   }, []);
 
   if (!isFetched) {
