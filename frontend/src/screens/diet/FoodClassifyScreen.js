@@ -23,7 +23,7 @@ export default function RecognitionScreen({ navigation }) {
     cleanPhoto,
   } = useCamera();
   const {
-    ready,
+    modelReady,
     predictions,
     classifyImage,
     cleanPredictions,
@@ -31,6 +31,12 @@ export default function RecognitionScreen({ navigation }) {
 
   const [type, setType] = useState(Camera.Constants.Type.back);
   const cameraRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      cleanPhoto();
+    };
+  }, []);
 
   if (hasPermission === false || hasPermission === null) {
     return <Text>No access to camera</Text>;
@@ -45,6 +51,7 @@ export default function RecognitionScreen({ navigation }) {
     cleanPredictions();
     cleanPhoto();
   };
+
   const CameraPreview = ({ photo }) => {
     return (
       <ImageBackground
@@ -79,6 +86,7 @@ export default function RecognitionScreen({ navigation }) {
         </TouchableOpacity>
 
         <TouchableOpacity
+          enabled={modelReady}
           onPress={pressTakePicture}
           style={{
             alignSelf: "flex-end",
