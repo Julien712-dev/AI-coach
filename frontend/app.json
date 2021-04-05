@@ -19,7 +19,12 @@
       "assets/images/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.tmc.coachai",
+      "buildNumber": "1.0.0"
+    },
+    "android": {
+      "package": "com.tmc.coachai",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/image/favicon.png"
