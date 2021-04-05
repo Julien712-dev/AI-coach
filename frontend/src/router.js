@@ -24,7 +24,7 @@ import PlanWorkoutScreen from "./screens/exercise/PlanWorkoutScreen";
 import ViewWorkoutScreen from "./screens/exercise/ViewWorkoutScreen";
 import ViewExerciseScreen from "./screens/exercise/ViewExerciseScreen";
 import DoWorkoutScreen from "./screens/exercise/DoWorkoutScreen";
-//import LogWorkoutScreen from './screens/exercise/LogWorkoutScreen';
+// import LogWorkoutScreen from './screens/exercise/LogWorkoutScreen';
 
 // Login Screen
 import LoginScreen from "./screens/login/LoginScreen";
@@ -181,11 +181,11 @@ function ExerciseStackScreen() {
         component={DoWorkoutScreen}
         options={{ headerTitle: "Do Workout" }}
       />
-      <ExerciseStack.Screen
+      {/* <ExerciseStack.Screen
         name="Log Workout"
         component={LogWorkoutScreen}
         options={{ headerTitle: "Log Workout" }}
-      />
+      /> */}
     </ExerciseStack.Navigator>
   );
 }
