@@ -66,7 +66,7 @@ export default function ExerciseMainScreen({ navigation }) {
 						setTodaySteps(result.steps);
 
 						switch (true) {
-							case (result.steps < 5000): { setStepHelperText('You are quite inactive. A healthy person walks'); break; }
+							case (result.steps < 5000): { setStepHelperText('You are quite inactive. A healthy person walks 8,000 - 10,000 steps per day. Work harder!'); break; }
 							case (result.steps < 10000): { setStepHelperText('You are about to reach 10,000 steps today! This is the aveage steps of a healthy person!'); break; }
 							case (result.steps > 10000): { setStepHelperText('You have been very active today! Be prepared to burn some calories!'); break; }
 						}
