@@ -108,13 +108,14 @@ export default () => {
   }) => {
     try {
       console.log({
-        type,
-        minCarbs,
-        maxCarbs,
-        maxProtein,
-        minCalories,
-        maxCalories,
-        maxFat,
+        // type,
+        // minCarbs,
+        // maxCarbs,
+        // maxProtein,
+        // minCalories,
+        // maxCalories,
+        // maxFat,
+        query
       });
 
       const response = await spoonacular.get("/complexSearch", {
@@ -130,6 +131,7 @@ export default () => {
         },
       });
       const results = processResults(response.data.results);
+      console.log(results);
       setRecipeResults(results);
     } catch (e) {
       console.log(e);
@@ -159,9 +161,10 @@ export default () => {
   ) => {
     const list = await fetchCuisineListAsync();
     const searchList = weightedRandom(list, number);
+    console.log('searchlist: ', searchList);
     let tempResults = [];
     try {
-      for (cuisine in searchList) {
+      for (let cuisine in searchList) {
         console.log(searchList[cuisine]);
         const response = await spoonacular.get("/complexSearch", {
           params: {
@@ -274,7 +277,7 @@ export default () => {
 
       const snapshot = await Firebase.firestore()
         .collection("restaurants")
-        .where("menuDataWithNutritionInfo", "!=", false)
+        .where("type", "array-contains-any", ['breakfast', 'lunch', 'snack', 'dinner'])
         .get();
 
       if (snapshot.empty) {
@@ -287,6 +290,7 @@ export default () => {
 
       snapshot.forEach((doc) => {
         let restaurantData = doc.data();
+        if (!restaurantData.menuDataWithNutritionInfo) return;
         let recommendedItem = restaurantData.menuDataWithNutritionInfo[0];
         let properItemFound = false;
         for (var item of restaurantData.menuDataWithNutritionInfo) {
