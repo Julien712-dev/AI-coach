@@ -37,6 +37,7 @@ export default () => {
   };
   const [recipeResults, setRecipeResults] = useState(null);
   const [restaurantResults, setRestaurantResults] = useState(null);
+  const [isFetched, setIsFetched] = useState(false);
 
   const { cuisineList, fetchCuisineListAsync } = useProfileFirebase();
 
@@ -106,6 +107,7 @@ export default () => {
     minFat = 0,
     maxFat,
   }) => {
+    setIsFetched(false);
     try {
       console.log({
         // type,
@@ -133,6 +135,7 @@ export default () => {
       const results = processResults(response.data.results);
       console.log(results);
       setRecipeResults(results);
+      setIsFetched(true);
     } catch (e) {
       console.log(e);
     }
@@ -277,7 +280,7 @@ export default () => {
 
       const snapshot = await Firebase.firestore()
         .collection("restaurants")
-        .where("type", "array-contains-any", ['breakfast', 'lunch', 'snack', 'dinner'])
+        .where("type", "array-contains-any", ['breakfast', 'lunch', 'dinner'])
         .get();
 
       if (snapshot.empty) {
@@ -343,5 +346,6 @@ export default () => {
     getRestaurantRecommendations,
     recipeResults,
     restaurantResults,
+    isFetched
   };
 };
