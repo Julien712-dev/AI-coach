@@ -48,6 +48,7 @@ function DoExerciseScreen({ index, exercise, onComplete, classification, setImag
 
     const [cameraRef, adjustCameraRatio, cameraRatio] = useCameraRatio('4:3', { tensor: true });
     const cameraAspectRatio = calculateAspectRatio(cameraRatio);
+    console.debug(cameraAspectRatio);
 
     useEffect(() => console.log(classification), [classification]);
 
@@ -145,7 +146,7 @@ export default function DoWorkoutScreen({ navigation, route }) {
 
     const permissions = usePermissions([CAMERA]);
 
-    const [isClassifierReady, classification, setImageIterator] = useExerciseClassifier(3, progress?.index);
+    const [isClassifierReady, classification, setImageIterator] = useExerciseClassifier(1, progress?.index);
 
     useEffect(() => { dispatch(startWorkout({ day })); }, [day]);
 
