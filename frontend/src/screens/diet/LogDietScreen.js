@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, SafeAreaView } from "react-native";
 import { Text, Searchbar, Button, Divider } from "react-native-paper";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -24,10 +24,15 @@ DetailsScreen["navigationOptions"] = (screenProps) => ({
 // screen for demo purpose
 export default function DetailsScreen({ navigation, route }) {
   const { recipeName } = route.params || '';
-  const { recipeResults, searchByName, fakeSearch } = searchRecipe();
+  const { recipeResults, searchByName, isFetched } = searchRecipe();
   const [query, setQuery] = React.useState(recipeName);
+  const [iconPressed, setIconPressed] = React.useState(false);
 
   const onChangeSearch = (query) => setQuery(query);
+
+  useEffect(() => {
+    setIconPressed(false);
+  }, [recipeResults])
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -37,7 +42,10 @@ export default function DetailsScreen({ navigation, route }) {
           placeholder="Search for a food item"
           onChangeText={onChangeSearch}
           value={query}
-          onIconPress={() => searchByName({ query })}
+          onIconPress={() => {
+            setIconPressed(true); 
+            searchByName({ query }); 
+          }}
         />
         <Divider />
         <Text style={{ fontSize: 16, alignSelf: "center", marginVertical: 5 }}>
@@ -53,8 +61,11 @@ export default function DetailsScreen({ navigation, route }) {
         </Button>
       </View>
       <SafeAreaView style={{ flex: 1, paddingHorizontal: 20 }}>
+        {isFetched && recipeResults.length == 0 && <View style={{ alignItems: 'center' }}><Text>Sorry, we cannot find the dish from the database.</Text></View>}
+        {!isFetched && !!iconPressed && <View style={{ alignItems: 'center' }}><Text>Searching.....</Text></View>}
         <VerticalList data={recipeResults} screenName="Log Diet Details" />
       </SafeAreaView>
+
     </SafeAreaView>
   );
 }
