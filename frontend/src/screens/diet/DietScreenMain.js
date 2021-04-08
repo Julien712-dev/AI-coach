@@ -219,7 +219,7 @@ export default function DietScreenMain({ navigation }) {
           )}
           {!restaurantResults && (
             <View style={{ justifyContent: "center", alignItems: "center" }}>
-              <Text>Generating your personalized dine out recos!</Text>
+              <Text>Preparing restaurant recommendations!</Text>
             </View>
           )}
         </View>
