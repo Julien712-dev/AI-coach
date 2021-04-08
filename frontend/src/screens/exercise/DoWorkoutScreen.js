@@ -53,7 +53,7 @@ function DoExerciseScreen({ index, exercise, onComplete, classification, setImag
 
     // Check if countdown is finished
     useEffect(() => {
-        if ((description.lengthUnit == 'seconds' && secondsElapsed >= exercise.length))
+        if (!!description && description.lengthUnit == 'seconds' && secondsElapsed >= exercise.length)
             onComplete();
     }, [exercise, description, secondsElapsed, onComplete]);
 
@@ -62,7 +62,7 @@ function DoExerciseScreen({ index, exercise, onComplete, classification, setImag
         setImageIterator(imageIterator);
     };
 
-    if (description.lengthUnit == 'reps')
+    if (!!description && description.lengthUnit == 'reps')
         var progressContent = (
             <TouchableOpacity onLongPress={onComplete}>
                 <CustomProgressCircle percent={0}>
@@ -71,7 +71,7 @@ function DoExerciseScreen({ index, exercise, onComplete, classification, setImag
                 </CustomProgressCircle>
             </TouchableOpacity>
         );
-    else if (description.lengthUnit == 'seconds') {
+    else if (!!description && description.lengthUnit == 'seconds') {
         const secondsLeft = Math.max(0, exercise.length - secondsElapsed);
         const percent = Math.min(100, 100 * (timeElapsed / (exercise.length * 1000)));
         var progressContent = (

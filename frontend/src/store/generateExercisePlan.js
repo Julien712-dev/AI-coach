@@ -107,7 +107,7 @@ function assignSequence(plan, physicalFitness) {
             let lastExerciseDescription;
             while (accumulatedTime < day.time * 60) {
                 let exerciseType, exerciseDescription;
-                if (lastExerciseDescription == null || getFocus(lastExerciseDescription) == day.focus)
+                if (lastExerciseDescription == null || getFocus(lastExerciseDescription) != day.focus)
                     [exerciseType, exerciseDescription] = findExercise(day.focus);
                 else {
                     const focus = Object.entries(numFocus).reduce((prev, curr) => prev[1] < curr[1] ? prev : curr)[0];  // Find the focus with minimum occurrences
