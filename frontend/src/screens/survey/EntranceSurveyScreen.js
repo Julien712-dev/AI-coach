@@ -360,7 +360,7 @@ function StepFourScreen({ navigation, swiperRef }) {
         <View style={{ flex: 1 }}>
             <View style={{ height: 420 }}>
                 <View style={{ marginHorizontal: 10 }}>
-                    <Title>Step 3: Diet Preferences</Title>
+                    <Title>Step 4: Diet Preferences</Title>
                 </View>
                 <View style={{ marginHorizontal: 10 }}>
                     <Text>Body goal</Text> 
