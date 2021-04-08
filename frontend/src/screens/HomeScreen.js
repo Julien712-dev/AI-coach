@@ -197,7 +197,7 @@ export default function HomeScreen({ navigation }) {
             </View>
           </View>
         </View>
-        <View style={{ marginBottom: 15 }}><Text>Recommended intake: {nutritionValues.dailyRecommendedCalories} kcal</Text></View>
+        {!!nutritionValues && <View style={{ marginBottom: 15 }}><Text>Recommended intake: {nutritionValues.dailyRecommendedCalories} kcal</Text></View>}
       </View>
     );
   }
