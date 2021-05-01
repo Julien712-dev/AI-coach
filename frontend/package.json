@@ -64,7 +64,8 @@
     "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
-    "victory-native": "^35.3.1"
+    "victory-native": "^35.3.1",
+    "expo-speech": "~8.4.0"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0"

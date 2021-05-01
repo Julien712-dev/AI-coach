@@ -4,6 +4,7 @@ import { TouchableOpacity, View } from 'react-native';
 import { useTheme, Headline, Text, Snackbar } from 'react-native-paper';
 import { CAMERA } from 'expo-permissions';
 import { Camera } from 'expo-camera';
+import * as Speech from 'expo-speech';
 import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
 import ProgressCircle from 'react-native-progress-circle';
 import usePermissions from '~/src/hooks/usePermissions';
@@ -17,6 +18,15 @@ import { startWorkout, completeRest, completeExercise } from '~/src/store/exerci
 function calculateAspectRatio(ratio) {
     const [height, width] = ratio.split(':');
     return width / height;
+}
+
+function getAdvice(label) {
+    switch(label) {
+        case 'push-up-arms-not-bent-enough': return 'You need to bend lower!';
+        case 'push-up-waist-too-low': return 'Keep your body straight!';
+        case 'sit-up-too-low': return 'Move your body higher!';
+        default: return 'You are doing great!';
+    }
 }
 
 const TensorCamera = cameraWithTensors(Camera);
@@ -48,9 +58,12 @@ function DoExerciseScreen({ index, exercise, onComplete, classification, setImag
 
     const [cameraRef, adjustCameraRatio, cameraRatio] = useCameraRatio('4:3', { tensor: true });
     const cameraAspectRatio = calculateAspectRatio(cameraRatio);
-    console.debug(cameraAspectRatio);
 
-    useEffect(() => console.log(classification), [classification]);
+    useEffect(() => {
+        console.debug(classification);
+        if (!!classification)
+            Speech.speak(getAdvice(classification.classLabel));
+    }, [classification]);
 
     // Check if countdown is finished
     useEffect(() => {
@@ -146,7 +159,7 @@ export default function DoWorkoutScreen({ navigation, route }) {
 
     const permissions = usePermissions([CAMERA]);
 
-    const [isClassifierReady, classification, setImageIterator] = useExerciseClassifier(1, progress?.index);
+    const [isClassifierReady, classification, setImageIterator] = useExerciseClassifier(5, progress?.index);
 
     useEffect(() => { dispatch(startWorkout({ day })); }, [day]);
 
