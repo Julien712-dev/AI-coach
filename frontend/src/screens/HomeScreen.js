@@ -359,7 +359,7 @@ export default function HomeScreen({ navigation }) {
         }
       }
       setWorkoutsCompletedThisWeek(workoutsCompleted);
-      setCalorieIntakeThisWeek(totalAmountOfCalories / daysLogged);
+      if (!!totalAmountOfCalories) setCalorieIntakeThisWeek(totalAmountOfCalories / daysLogged);
       setCalorieBurntThisWeek(120 * workoutsCompleted);
     }
   }, [logs]);
