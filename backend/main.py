@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 available_fps = [3, 4, 5]
 models = {fps: tf.keras.models.load_model(f'model/fps_{fps}') for fps in available_fps}
-class_labels = ['push-up-arms-not-bent-enough', 'push-up-normal', 'push-up-waist-too-low']
+class_labels = ['push-up-arms-not-bent-enough', 'push-up-normal', 'push-up-waist-too-low', 'sit-up-normal', 'sit-up-too-low']
 
 @app.route('/', methods=['GET'])
 def root():
