@@ -84,12 +84,13 @@ export default function DietScreenMain({ navigation }) {
               ? undefined
               : nutritionValues.dailyRecommendedCalories * 0.55 * meal.weight,
           maxCalories: nutritionValues.dailyRecommendedCalories * meal.weight,
+          vegetarian: ('vegetarian' in profileRedux.dietRestrictions) ? true : false
         });
 
         await getRestaurantRecommendations({
           minCalories:
             meal.meal == "breakfast" || meal.meal == "snack"
-              ? undefined
+              ? 0
               : nutritionValues.dailyRecommendedCalories * 0.55 * meal.weight,
           maxCalories: nutritionValues.dailyRecommendedCalories * meal.weight,
         });
