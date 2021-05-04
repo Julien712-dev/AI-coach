@@ -160,7 +160,7 @@ export default () => {
   // number is number of results
   const smartSearch = async (
     number,
-    { type = "lunch", minCalories, maxCalories }
+    { type = "lunch", minCalories, maxCalories, vegetarian = false }
   ) => {
     const list = await fetchCuisineListAsync();
     const searchList = weightedRandom(list, number);
@@ -177,6 +177,7 @@ export default () => {
             minCalories,
             maxCalories,
             number: searchList[cuisine],
+            ...(!!vegetarian && {diet: vegetarian})
           },
         });
         // add the cuisine type to the result manually
