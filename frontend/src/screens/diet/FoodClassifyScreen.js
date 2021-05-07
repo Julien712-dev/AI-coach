@@ -115,7 +115,7 @@ export default function RecognitionScreen({ navigation }) {
         {predictions ? (
           <Button
             mode="contained"
-            style={{ borderRadius: 5, marginHorizontal: 10, marginVertical: 5 }}
+            style={{ borderRadius: 5, marginHorizontal: 10 }}
             onPress={() => {
               navigation.navigate("Log Diet", {
                 recipeName: predictions,
