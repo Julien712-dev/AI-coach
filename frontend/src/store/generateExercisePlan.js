@@ -52,7 +52,7 @@ function generateEmptyPlan(dayPerWeek, minutePerSession) {
         case 1: days = { workoutDays: ['sun'], recoveryDays: [], restDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'] }; break;
         case 2: days = { workoutDays: ['sun', 'wed'], recoveryDays: [], restDays: ['mon', 'tue', 'thu', 'fri', 'sat'] }; break;
         case 3: days = { workoutDays: ['mon', 'wed', 'sat'], recoveryDays: [], restDays: ['sun', 'tue', 'thu', 'fri'] }; break;
-        case 4: days = { workoutDays: ['mon', 'tue', 'sat'], recoveryDays: ['thu'], restDays: ['wed', 'fri', 'sat', 'sun'] }; break;
+        case 4: days = { workoutDays: ['mon', 'tue', 'sat'], recoveryDays: ['fri'], restDays: ['wed', 'thu', 'sun'] }; break;
         case 5: days = { workoutDays: ['mon', 'tue', 'thu', 'fri'], recoveryDays: ['sat'], restDays: ['wed', 'sun'] }; break;
     }
     const plan = {};

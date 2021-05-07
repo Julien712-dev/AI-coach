@@ -20,6 +20,7 @@ const exerciseSlice = createSlice({
             const { dayPerWeek, minutePerSession, physicalFitness } = action.payload;
             state.plan = generateExercisePlan({ dayPerWeek, minutePerSession, physicalFitness });
             state.draftPlan = state.plan;
+            state.planModified = true;
         },
         resetDraftPlan: state => {
             state.draftPlan = state.plan;
