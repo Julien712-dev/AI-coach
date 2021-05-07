@@ -5,12 +5,12 @@ import firebase from 'firebase'
 // There are some console.log() in this file which can be removed in the future.
 
 export const fetchCuisineListAsync = async () => {
-  return await fetchData({ path: '/profile/cuisineList'})
+  return await fetchData({ path: '/cuisineList'})
   
 }
 
 export const updateCuisineList = ({ cuisineType, change }) => {
-  updateNumericalData({ path: '/profile/cuisineList', key: cuisineType, change })
+  updateNumericalData({ path: '/cuisineList', key: cuisineType, change })
 }
 
 export const fetchFavListAsync = async () => {

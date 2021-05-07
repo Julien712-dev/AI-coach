@@ -21,7 +21,7 @@ export default () => {
   }, []);
 
   const fetchCuisineListAsync = async () => {
-    let data = await fetchData({ path: "/profile/cuisineList" });
+    let data = await fetchData({ path: "/cuisineList" });
     if (data === null) data = defaultCuisineList;
     setCuisineList(data);
     return data;
@@ -35,7 +35,7 @@ export default () => {
     if (newValue > 18) newValue = 18;
     else if (newValue < 2) newValue = 2;
     updateData({
-      path: "/profile/cuisineList",
+      path: "/cuisineList",
       data: { [cuisineType]: newValue },
     });
     fetchCuisineListAsync();
