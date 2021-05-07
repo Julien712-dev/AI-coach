@@ -76,8 +76,19 @@ export default function LogWorkoutScreen({ navigation }) {
             workoutDbRef.set(workouts.concat([workout]));
         else
             workoutDbRef.set([workout]);
+        
 
-        navigation.navigate('Exercise');
+        // fetch from realtime db again
+        setTimeout(() => {
+            logsDbRef.once('value', snapshot => {
+                let value = snapshot.val();
+                if (!!value) {
+                    dispatch(setLogs({ logs: value }));
+                }
+            });
+            navigation.navigate('Exercise');
+        }, 100);
+
     };
 
     const onPressCancel = () => {
