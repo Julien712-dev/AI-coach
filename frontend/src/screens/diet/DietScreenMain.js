@@ -75,16 +75,16 @@ export default function DietScreenMain({ navigation }) {
       if (!!profileRedux) {
         setLoading(true);
         let nutritionValues = computeNutritionValues(profileRedux);
-
+        let isVegetarian = !!profileRedux.dietRestrictions && profileRedux.dietRestrictions.includes('vegetarian')
         // can add more params afterwards
         await smartSearch(3, {
-          type: meal.meal,
+          type: meal.typeQueryForSpoonacular,
           minCalories:
             meal.meal == "breakfast" || meal.meal == "snack"
-              ? undefined
+              ? 0
               : nutritionValues.dailyRecommendedCalories * 0.55 * meal.weight,
           maxCalories: nutritionValues.dailyRecommendedCalories * meal.weight,
-          vegetarian: (!!profileRedux.dietRestrictions && 'vegetarian' in profileRedux.dietRestrictions) ? true : false
+          vegetarian: isVegetarian
         });
 
         await getRestaurantRecommendations({

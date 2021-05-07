@@ -131,6 +131,7 @@ module.exports = {
                 endAt: 6,
                 title: ``,
                 message: `Time for a good-night sleep and prepare for the amazing journey tomorrow!`,
+                typeQueryForSpoonacular: `bread,breakfast,appetizer`,
                 weight: 0.25
             },
             {
@@ -140,6 +141,7 @@ module.exports = {
                 endAt: 11,
                 title: `Good morning!`,
                 message: `We got you. It's time for a nice breakfast!`,
+                typeQueryForSpoonacular: `bread,breakfast`,
                 weight: 0.25
             },
             {
@@ -149,6 +151,7 @@ module.exports = {
                 endAt: 15,
                 title: `Yay! Lunch time!`,
                 message: `Just treat yourself better!`,
+                typeQueryForSpoonacular: `lunch,main course`,
                 weight: 0.3,
             },
             {
@@ -158,7 +161,8 @@ module.exports = {
                 endAt: 18,
                 title: `Tea time!`,
                 message: `Grab a snack if you feel like having one.`,
-                weight: 0.1
+                typeQueryForSpoonacular: `bread,snack,appetizer,side dish,fingerfood,salad,beverage,soup`,
+                weight: 0.2
             },
             {
                 time: `night`,
@@ -167,6 +171,7 @@ module.exports = {
                 endAt: 24,
                 title: `Dinner's ready!`,
                 message: `Feel like a feast? Or planning to go clean?`,
+                typeQueryForSpoonacular: `dinner,main course`,
                 weight: 0.35
             }
         ]
