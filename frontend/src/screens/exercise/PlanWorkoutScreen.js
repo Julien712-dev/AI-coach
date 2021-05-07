@@ -178,7 +178,7 @@ export default function PlanWorkoutScreen({ navigation }) {
         setGenerateDialogVisible(false);
     };
 
-    const rows = constants.days.map(day => {
+    const rows = !!draftPlan ? constants.days.map(day => {
         const header = day[0].toUpperCase() + day.slice(1);
         const activity = draftPlan[day];
         const component = activity == undefined ?
@@ -189,7 +189,7 @@ export default function PlanWorkoutScreen({ navigation }) {
                 {component}
             </Row>
         );
-    });
+    }) : [];
     return (
         <View>
             <ScrollView style={{ padding: 20 }}>

@@ -20,9 +20,9 @@ function getFocus(exercise) {
 }
 
 function findExercise(focus) {
-    const suitableExercises = Object.entries(exerciseLibrary).filter(([key, value]) =>
+    const suitableExercises = focus != 'wholebody' ? Object.entries(exerciseLibrary).filter(([key, value]) =>
         getFocus(value) == focus
-    );
+    ) : Object.entries(exerciseLibrary);
     return suitableExercises[Math.floor(Math.random() * suitableExercises.length)];
 }
 
@@ -51,7 +51,7 @@ function generateEmptyPlan(dayPerWeek, minutePerSession) {
     switch (dayPerWeek) {
         case 1: days = { workoutDays: ['sun'], recoveryDays: [], restDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'] }; break;
         case 2: days = { workoutDays: ['sun', 'wed'], recoveryDays: [], restDays: ['mon', 'tue', 'thu', 'fri', 'sat'] }; break;
-        case 3: days = { workoutDays: ['mon', 'wed', 'sat'], recoveryDays: [], restDays: ['mon', 'tue', 'thu', 'fri'] }; break;
+        case 3: days = { workoutDays: ['mon', 'wed', 'sat'], recoveryDays: [], restDays: ['sun', 'tue', 'thu', 'fri'] }; break;
         case 4: days = { workoutDays: ['mon', 'tue', 'sat'], recoveryDays: ['thu'], restDays: ['wed', 'fri', 'sat', 'sun'] }; break;
         case 5: days = { workoutDays: ['mon', 'tue', 'thu', 'fri'], recoveryDays: ['sat'], restDays: ['wed', 'sun'] }; break;
     }
@@ -68,13 +68,13 @@ function generateEmptyPlan(dayPerWeek, minutePerSession) {
 
 function assignIntensity(plan) {
     let high = true;
-    for (const day of constants.days)
-        if (plan[day].type == 'workout') {
+    for (const day of Object.values(plan))
+        if (day.type == 'workout') {
             if (high) {
-                plan[day].intensity = 'high';
+                day.intensity = 'high';
                 high = false;
             } else {
-                plan[day].intensity = 'low';
+                day.intensity = 'low';
                 high = true;
             }
         }

@@ -41,7 +41,7 @@ function WorkoutReminderCard({ workout, onPressStart }) {
 
 export default function ExerciseMainScreen({ navigation }) {
 	const today = getDayOfWeek();
-	const workoutToday = useSelector(state => state.main.exercise.plan[today]);
+	const workoutToday = useSelector(state => state.main.exercise.plan?.[today]);
 	const { colors } = useTheme();
 
 	const onPressLogWorkout = () => navigation.navigate('Log Workout');
@@ -84,7 +84,7 @@ export default function ExerciseMainScreen({ navigation }) {
 	}, [])
 
 	let cards = [<AnalysisCard key='analysis' />];
-	if (workoutToday.type == 'workout')
+	if (workoutToday?.type == 'workout')
 		cards.push(<WorkoutReminderCard key='workout-reminder' workout={workoutToday} onPressStart={onPressDoWorkout} />);
 
 	return (
