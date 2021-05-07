@@ -84,7 +84,7 @@ export default function DietScreenMain({ navigation }) {
               ? undefined
               : nutritionValues.dailyRecommendedCalories * 0.55 * meal.weight,
           maxCalories: nutritionValues.dailyRecommendedCalories * meal.weight,
-          vegetarian: ('vegetarian' in profileRedux.dietRestrictions) ? true : false
+          vegetarian: (!!profileRedux.dietRestrictions && 'vegetarian' in profileRedux.dietRestrictions) ? true : false
         });
 
         await getRestaurantRecommendations({
