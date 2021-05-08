@@ -148,7 +148,7 @@ module.exports = {
                 time: `afternoon`,
                 meal: `lunch`,
                 startAt: 11,
-                endAt: 15,
+                endAt: 14,
                 title: `Yay! Lunch time!`,
                 message: `Just treat yourself better!`,
                 typeQueryForSpoonacular: `lunch,main course`,
@@ -157,7 +157,7 @@ module.exports = {
             {
                 time: `evening`,
                 meal: `snack`,
-                startAt: 15,
+                startAt: 14,
                 endAt: 18,
                 title: `Tea time!`,
                 message: `Grab a snack if you feel like having one.`,
