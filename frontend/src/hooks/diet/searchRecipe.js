@@ -2,6 +2,7 @@ import { useState } from "react";
 import spoonacular from "~/src/api/spoonacular";
 import Firebase from "firebase";
 import "firebase/firestore";
+import apikeys from "../../apikeys";
 
 import useProfileFirebase from "../useProfileFirebase";
 
@@ -26,7 +27,7 @@ function shuffle(array) {
 }
 
 export default () => {
-  const apiKey = "24d701faa961453a88deb86494e8e39d";
+  const apiKey = apikeys.spoonacularApiKey;
   const defaultRecipeList = {
     American: 10,
     Chinese: 10,

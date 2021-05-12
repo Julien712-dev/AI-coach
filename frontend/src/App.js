@@ -18,9 +18,12 @@ import { store, persistor } from './store/store';
 // Router
 import Router from './router';
 
+// API Keys
+import apiKeys from './apikeys'
+
 // Initialize Firebase
 const firebaseConfig = {
-	apiKey: 'AIzaSyBFcIUtiuhVH0-xzx5aiTadgsn4eNUcf8w',
+	apiKey: apiKeys.firebaseApiKey,
 	authDomain: 'coach-ai.firebaseapp.com',
 	databaseURL: 'https://coach-ai.firebaseio.com',
 	projectId: 'coach-ai',
